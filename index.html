@@ -372,6 +372,7 @@ body.editing .nav .navs a{justify-content:center;padding:8px 0;min-height:34px}}
 .tbl.modt .tr,.tbl.modt .th-row{grid-template-columns:minmax(0,1.6fr) repeat(calc(var(--n) - 1),minmax(0,1fr)) 120px}
 .tbl.modt .tr{cursor:pointer}.tbl.modt .tr.flag{background:#FFF8E6}.tbl.modt small{color:var(--ink2)}
 .tbl.modt .tr>div{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.tbl.modt{overflow-x:auto}.tbl.modt .tr,.tbl.modt .th-row{min-width:calc(var(--n) * 108px + 180px)}.tbl.modt .tr>div:not(.c1){white-space:nowrap}
 .recgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}.recgrid .full{grid-column:1/-1}
 .mvrow{display:block;color:var(--ink2);margin-top:3px}
 .status[class*="ms-"]{background:#EEF1F6;color:var(--ink2)}
@@ -389,6 +390,18 @@ body.editing .nav .navs a{justify-content:center;padding:8px 0;min-height:34px}}
 .kcard{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--surf);border-radius:10px;padding:8px;margin-bottom:6px;cursor:pointer}.kcard b{display:block;font-size:13px}.kcard small{display:block;font-size:11.5px;color:var(--ink2)}
 .kvp{width:100%;border-collapse:collapse}.kvp th{width:55mm;text-align:left;font-weight:normal;color:#556;padding:1.5mm 0;border-bottom:.2mm solid #e3e7ed;vertical-align:top}.kvp td{padding:1.5mm 0;border-bottom:.2mm solid #e3e7ed}
 @media (max-width:900px){.nav .navs{flex-direction:row;overflow:visible;margin:0;padding:0;display:contents}.nav .ng{display:none}.tbl.modt .tr,.tbl.modt .th-row{grid-template-columns:minmax(0,1fr) 100px}.tbl.modt .tr>div:not(.c1):not(:last-child),.tbl.modt .th-row span:not(:first-child):not(:last-child){display:none}.recgrid{grid-template-columns:1fr}.kanban{grid-template-columns:repeat(6,160px)}.agrow .d{width:74px}}
+.sh-foot{flex-wrap:wrap;row-gap:8px}
+.sh-foot .btn{flex:0 0 auto}
+.list-head{flex-wrap:wrap;row-gap:8px}
+.brandrow{display:flex;align-items:center;gap:4px;margin-bottom:6px}.brandrow .brand{flex:1;min-width:0;margin:0!important}.navarr{display:flex;gap:2px}.navarr .btn{color:#C3CCDC;font-size:18px;min-width:30px;min-height:30px;padding:0}.navarr .btn:hover{background:#26324a}
+.navlogo{max-height:40px;max-width:190px;width:auto;display:block;background:#fff;border-radius:8px;padding:4px 8px}.brand.haslogo{padding:4px 0}
+.paytabs{display:flex;flex-wrap:wrap;gap:6px 22px;margin-bottom:14px}
+.px{opacity:.5;font-size:14px;min-width:28px}.px:hover{opacity:1;color:var(--bad)}
+.stx{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.ordr{position:relative}.ordr .rx{position:absolute;top:6px;right:6px}.ordr .status{margin-right:26px}
+.tbl.mtt .tr{position:relative}.tbl.cu .tr{position:relative}.tbl.cu .cux{position:absolute;right:6px;top:6px}.tbl.mtt .mtx{position:absolute;right:6px;top:50%;transform:translateY(-50%)}
+.txm{display:flex;gap:4px;align-items:center}.txm select{flex:1}
+@media (max-width:900px){body.editing .nav{display:none}.brandrow .navarr{display:none}}
 .ied-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px}.ied-stage{position:relative;background:repeating-conic-gradient(#eee 0 25%,#fff 0 50%) 0 0/20px 20px;border-radius:10px;display:grid;place-items:center;min-height:300px;overflow:hidden}.ied-stage canvas{max-width:100%;max-height:62vh;display:block;cursor:crosshair}
 .ied-sel{position:absolute;border:2px dashed #1E4FD8;background:rgba(30,79,216,.12);pointer-events:none}.ied-side{display:flex;flex-direction:column;gap:8px}
 .tile{position:relative}.ied{position:absolute;right:4px;bottom:4px;width:26px;height:26px;border-radius:50%;background:rgba(15,23,40,.75);color:#fff;display:grid;place-items:center;font-size:13px;cursor:pointer;z-index:6;pointer-events:auto}.tbl.pr2 .im{position:relative}
@@ -949,7 +962,8 @@ function num(v){
   else if(hasD&&/^\-?\d{1,3}(\.\d{3})+$/.test(s)) s=s.replace(/\./g,'');
   const n=parseFloat(s);return isFinite(n)?n:0;
 }
-function dateSl(d){if(!d)return '';const x=new Date(d);return isNaN(x)?'':x.toLocaleDateString(LOC,{day:'numeric',month:'numeric',year:'numeric'})}
+function dateSl(d){if(!d)return '';if(typeof d==='string'&&/^\d{4}-\d{2}-\d{2}/.test(d))return `${d.slice(8,10)}/${d.slice(5,7)}/${d.slice(0,4)}`;const x=new Date(d);return isNaN(x)?'':`${String(x.getDate()).padStart(2,'0')}/${String(x.getMonth()+1).padStart(2,'0')}/${x.getFullYear()}`}
+const dtm=t=>{const x=new Date(+t||t);return isNaN(x)?'':`${dateSl(x)} ${String(x.getHours()).padStart(2,'0')}:${String(x.getMinutes()).padStart(2,'0')}`};
 function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function slug(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\w]+/g,'-').replace(/^-|-$/g,'').slice(0,40)}
 function ascii(s){return String(s||'').replace(/[čć]/g,'c').replace(/[ČĆ]/g,'C').replace(/š/g,'s').replace(/Š/g,'S').replace(/ž/g,'z').replace(/Ž/g,'Z').replace(/đ/g,'d').replace(/Đ/g,'D').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\x20-\x7E]/g,'')}
@@ -1080,7 +1094,7 @@ async function trOne(text,tl,sl,prov){
 }
 /** translate array of texts → [{text,src}] */
 async function translateTexts(texts,tl,sl='auto'){
-  const prov=S.settings.trProvider||'google',P=texts.map(protect);
+  const prov='google',P=texts.map(protect);
   if(prov==='deepl'){
     try{const idx=P.map((p,i)=>p.t.trim()?i:-1).filter(i=>i>=0);const res=texts.map(t=>({text:t,src:sl}));
       if(idx.length){const r=await trDeepL(idx.map(i=>P[i].t),tl,sl);idx.forEach((i,k)=>res[i]={text:unprotect(r[k].text,P[i]),src:r[k].src})}
@@ -2323,7 +2337,7 @@ async function runAct(a){
       const W=DL(cur),subj=`${W.offerNo} ${cur.number}${cur.title?' – '+cur.title:''}`,body=`${W.mailHi},\n\n${W.mailBody(cur.number)}\n\n${W.mailBye}\n${c.name||''}${c.phone?'\n'+c.phone:''}${c.email?'\n'+c.email:''}`;
       const share=()=>navigator.share({files:[file],title:subj,text:body});
       if(navigator.canShare&&navigator.canShare({files:[file]})){try{await share()}catch(e){if(e.name!=='AbortError')toast('PDF je pripravljen.','',15000,{label:'Pošlji',fn:()=>share().catch(()=>{})})}}
-      else{download(blob,base+'.pdf');setTimeout(()=>{location.href=`mailto:${encodeURIComponent(cur.customer.email||'')}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body+'\n\n'+DL(cur).mailAtt)}`},600)}
+      else{download(blob,base+'.pdf');setTimeout(()=>{openMail(cur.customer.email||'',subj,body+'\n\n'+DL(cur).mailAtt)},600)}
       if(!cur.sentAt)cur.sentAt=Date.now();if(cur.status==='osnutek'){cur.status='poslano';buildEditor();changed()}else changed()
       setTimeout(()=>toast('Ponudba poslana.','',9000,{label:'Opomni me čez 3 dni',fn:()=>addTodo({text:`Pokliči ${cur.customer?.name||'kupca'} glede ponudbe št. ${cur.number}`,due:isoAdd(today(),3),quoteId:cur.id,cust:cur.customer?.name||''}).then(()=>toast('Opravilo dodano.'))}),1200);
     });
@@ -2402,7 +2416,7 @@ function showSettings(){
     <p class="help">Spletne trgovine za končne kupce običajno prikazujejo cene z DDV. Pri pobiranju iz B2B cenikov to izklopi.</p>
   </div>
   <div class="panel"><h2>Shranjevanje in varnostne kopije</h2>
-    <p>Vsi podatki (ponudbe, naročila, stranke, ceniki …) se sproti shranjujejo <b>v tej napravi</b>. Zadnja varnostna kopija: <b>${st.lastBackup?new Date(+st.lastBackup).toLocaleString('sl-SI'):'še nikoli'}</b>.</p>
+    <p>Vsi podatki (ponudbe, naročila, stranke, ceniki …) se sproti shranjujejo <b>v tej napravi</b>. Zadnja varnostna kopija: <b>${st.lastBackup?dtm(+st.lastBackup):'še nikoli'}</b>.</p>
     <div class="sub">1. Samodejna kopija na disk (računalnik, Chrome/Edge)</div>
     ${window.showDirectoryPicker?`<div class="kv">Mapa: <b>${S.dir?esc(S.dir.name):'ni izbrana'}</b>${S.dir?` · ${bkState==='paused'?'<span class="warnc">zaustavljeno</span>':'aktivno'}`:''}</div>
       <div class="inline"><button class="btn" id="pickDir">${ic('folder')}${S.dir?'Zamenjaj mapo':'Izberi mapo'}</button>${S.dir&&bkState==='paused'?`<button class="btn sig" id="bkResume">Nadaljuj</button>`:''}${S.dir?`<button class="btn ghost" id="forgetDir">Izklopi</button>`:''}</div>
@@ -2412,12 +2426,12 @@ function showSettings(){
     ${sf('Google Client ID','driveId',{ph:'xxxx.apps.googleusercontent.com'})}
     <div class="row" style="margin-top:8px">${sf('Google koledar (ID ali primary)','gcalId',{ph:'primary'})}<label class="chk" style="align-self:end"><input type="checkbox" data-s="gcalMont" ${st.gcalMont?'checked':''}>Montaže vpiši v Google koledar</label></div>
     <div class="inline" style="margin-top:8px"><button class="btn" id="drvUp"${st.driveId?'':' disabled'}>${ic('cloud')}Pošlji podatke v Drive</button><button class="btn" id="drvDown"${st.driveId?'':' disabled'}>${ic('download')}Prenesi iz Drive</button></div>
-    <p class="help">Na napravi, kjer si delal, klikni <b>Pošlji</b>; na drugi napravi <b>Prenesi</b> (zamenja podatke na tej napravi). ${st.lastDrive?'Zadnje pošiljanje: '+new Date(+st.lastDrive).toLocaleString('sl-SI')+'.':''} Client ID pridobiš po navodilih (poglavje Shranjevanje).</p>
+    <p class="help">Na napravi, kjer si delal, klikni <b>Pošlji</b>; na drugi napravi <b>Prenesi</b> (zamenja podatke na tej napravi). ${st.lastDrive?'Zadnje pošiljanje: '+dtm(+st.lastDrive)+'.':''} Client ID pridobiš po navodilih (poglavje Shranjevanje).</p>
     <div class="sub">3. Ročna varnostna kopija (vse naprave)</div>
     <div class="inline"><button class="btn" id="bkOut">${ic('download')}Shrani kopijo</button><button class="btn" id="bkIn">${ic('upload')}Uvozi (dodaj)</button><button class="btn ghost danger" id="bkRestore">${ic('upload')}Obnovi (zamenjaj vse)</button></div>
     <p class="help">Na telefonu se kopija shrani v Prenose/Datoteke – od tam jo lahko deliš v Drive, e-pošto ali računalnik.</p>
   </div>
-  <div class="panel"><h2>Začetna stran in plačila</h2><div class="row"><label class="fld"><span>Začetna stran</span><select data-s="startView">${[['dash','Nadzorna plošča'],['calendar','Koledar in roki'],['list','Ponudbe'],['orders','Naročila']].map(([k,l])=>`<option value="${k}"${(st.startView||'dash')===k?' selected':''}>${l}</option>`).join('')}</select></label>${sf('Plačilni rok za kupce (dni)','payDays',{num:1,ph:'8'})}</div><div class="row">${sf('Kilometrina za osebno vozilo (€/km)','kmRate',{num:1,ph:'preveri veljavni znesek'})}${sf('E-pošta računovodje (več loči z vejico)','accEmails',{type:'email'})}</div></div>
+  <div class="panel"><h2>Začetna stran in plačila</h2><label class="chk" style="margin-bottom:8px"><input type="checkbox" data-s="navLogo" ${st.navLogo?'checked':''}>Prikaži logotip podjetja na vrhu programa (logotip naložiš v rubriki Podjetje)</label><div class="row"><label class="fld"><span>Začetna stran</span><select data-s="startView">${[['dash','Nadzorna plošča'],['calendar','Koledar in roki'],['list','Ponudbe'],['orders','Naročila']].map(([k,l])=>`<option value="${k}"${(st.startView||'dash')===k?' selected':''}>${l}</option>`).join('')}</select></label>${sf('Plačilni rok za kupce (dni)','payDays',{num:1,ph:'8'})}</div><div class="row">${sf('Kilometrina za osebno vozilo (€/km)','kmRate',{num:1,ph:'preveri veljavni znesek'})}${sf('E-pošta računovodje (več loči z vejico)','accEmails',{type:'email'})}</div></div>
   <div class="panel"><h2>Namestitev aplikacije</h2><p>${isStandalone()?'Program teče kot nameščena aplikacija.':'Program lahko namestiš kot aplikacijo na računalnik, Android ali iPhone – z ikono, brez naslovne vrstice in z delovanjem brez interneta.'}</p><button class="btn" id="instHelp">${ic('install')}Kako namestim</button></div>
   <div class="panel"><h2>Pobiranje s spletnih strani</h2><p>Aplikacija prebere stran prek posrednika. Brez nastavitve uporablja javne posrednike, ki so včasih počasni. Z lastnim (brezplačnim) Cloudflare Workerjem je hitreje in zanesljiveje.</p>
     ${sf('Naslov lastnega posrednika','proxy',{ph:'https://stik-proxy.tvoj-racun.workers.dev'})}
@@ -2430,9 +2444,7 @@ function showSettings(){
   <div class="panel"><h2>Jezik in prevajanje</h2><p>Aplikacija sama zazna jezik uvožene vsebine. Ponudbo lahko pripraviš v slovenščini, angleščini ali nemščini – oznake, datumi in zneski se prilagodijo, besedila pa prevedeš z enim klikom.</p>
     <div class="row"><label class="fld"><span>Privzeti jezik novih ponudb</span><select data-s="lang">${TGT.map(([k,l,n])=>`<option value="${k}"${(st.lang||'sl')===k?' selected':''}>${n}</option>`).join('')}</select></label>
     <label class="fld"><span>Ko je uvožena vsebina v drugem jeziku</span><select data-s="trAuto">${[['ask','Ponudi prevod (en klik)'],['auto','Prevedi samodejno'],['off','Ne opozarjaj']].map(([k,l])=>`<option value="${k}"${(st.trAuto||'ask')===k?' selected':''}>${l}</option>`).join('')}</select></label></div>
-    <label class="fld"><span>Prevajalnik</span><select data-s="trProvider">${[['google','Google Prevajalnik – brezplačno, brez nastavitev'],['deepl','DeepL – najboljša kakovost (API ključ + posrednik)'],['mymemory','MyMemory – brezplačna rezerva (krajša besedila)']].map(([k,l])=>`<option value="${k}"${(st.trProvider||'google')===k?' selected':''}>${l}</option>`).join('')}</select></label>
-    <div style="height:8px"></div>${sf('DeepL API ključ (neobvezno)','deeplKey',{ph:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx'})}
-    <p class="help">DeepL deluje samo prek lastnega posrednika (Cloudflare Worker iz paketa). Ključ lahko namesto sem shraniš v Worker kot skrivnost <code>DEEPL_KEY</code>. Če DeepL ne odgovori, aplikacija samodejno uporabi Google.</p>
+    <label class="fld"><span>Prevajalnik</span><select data-s="trProvider">${[['google','Google Prevajalnik – brezplačno, brez nastavitev']].map(([k,l])=>`<option value="${k}"${(st.trProvider||'google')===k?' selected':''}>${l}</option>`).join('')}</select></label>
     <div class="inline" style="margin-top:8px"><button class="btn" id="testTr">${ic('globe')}Preizkusi prevod</button><span class="help" id="trRes"></span></div>
     <p class="help">Za prevod se besedilo (naziv, opis, pogoji) pošlje izbrani prevajalski storitvi. Podatki o kupcu se ne pošiljajo.</p>
   </div>
@@ -2466,7 +2478,7 @@ function showSettings(){
   </div>
   </div></div>`;
 }
-$('#vSet').addEventListener('change',e=>{if(e.target.id==='trackTpl'){const o={};e.target.value.split('\n').forEach(l=>{const i=l.indexOf('=');if(i>0){const k=l.slice(0,i).trim(),v=l.slice(i+1).trim();if(k&&v)o[k]=v}});S.settings.trackTpl=o;saveSettings();toast('Povezave za sledenje shranjene.')}if(e.target.dataset.s==='aiMode')showSettings()});
+$('#vSet').addEventListener('change',e=>{if(e.target.dataset.s==='navLogo')setTimeout(renderNav,50);if(e.target.id==='trackTpl'){const o={};e.target.value.split('\n').forEach(l=>{const i=l.indexOf('=');if(i>0){const k=l.slice(0,i).trim(),v=l.slice(i+1).trim();if(k&&v)o[k]=v}});S.settings.trackTpl=o;saveSettings();toast('Povezave za sledenje shranjene.')}if(e.target.dataset.s==='aiMode')showSettings()});
 $('#vSet').addEventListener('input',e=>{const el=e.target.closest('[data-s]');if(!el)return;let v=el.type==='checkbox'?el.checked:el.value;if(el.hasAttribute('data-num'))v=num(v);setPath(S.settings,el.dataset.s,v);saveSettings();
   if(el.dataset.s==='company.logoScale'){$('#lsz').textContent=v+' %';const lp=$('.logo-prev');if(lp)lp.style.backgroundSize=`auto ${Math.round(40*v/100)}px`}
   if(el.dataset.s==='company.logoLight'){const lp=$('.logo-prev');if(lp)lp.classList.toggle('dark',!!v)}});
@@ -2485,7 +2497,7 @@ $('#vSet').addEventListener('click',async e=>{
   const dc=t.closest('[data-delc]');if(dc&&confirm('Izbrišem stranko?')){S.customers.splice(+dc.dataset.delc,1);await saveCustomers();showSettings()}
   if(t.closest('#bkOut')){const data={app:'stik-ponudbe-backup',v:1,date:new Date().toISOString(),settings:S.settings,customers:S.customers,quotes:S.quotes,prices:S.prices,todos:S.todos,orders:S.orders,ships:S.ships,campaigns:S.campaigns};await saveOut(`STIK-Prodaja-kopija-${today()}.json`,'application/json',async()=>backupBlob());S.settings.lastBackup=Date.now();saveSettings()}
   if(t.closest('#bkIn'))pickFile('.json,application/json',f=>importProjectFile(f));
-  if(t.closest('#bkRestore'))pickFile('.json,application/json',async f=>{try{const j=JSON.parse(await f.text());if(j.app!=='stik-ponudbe-backup')throw new Error('to ni varnostna kopija');if(!confirm(`Kopija z dne ${j.date?new Date(j.date).toLocaleString('sl-SI'):'?'}: ${j.quotes?.length||0} ponudb, ${j.orders?.length||0} naročil, ${j.customers?.length||0} strank.\n\nZamenjam VSE podatke v tej napravi?`))return;await restoreAll(j);toast('Podatki obnovljeni.');showList()}catch(err){toast('Obnova ni uspela: '+err.message,'err')}});
+  if(t.closest('#bkRestore'))pickFile('.json,application/json',async f=>{try{const j=JSON.parse(await f.text());if(j.app!=='stik-ponudbe-backup')throw new Error('to ni varnostna kopija');if(!confirm(`Kopija z dne ${j.date?dtm(j.date):'?'}: ${j.quotes?.length||0} ponudb, ${j.orders?.length||0} naročil, ${j.customers?.length||0} strank.\n\nZamenjam VSE podatke v tej napravi?`))return;await restoreAll(j);toast('Podatki obnovljeni.');showList()}catch(err){toast('Obnova ni uspela: '+err.message,'err')}});
   if(t.closest('#drvUp')){driveSyncUp();return}
   if(t.closest('#drvDown')){driveSyncDown();return}
   if(t.closest('#instHelp')){installHelp();return}
@@ -2506,7 +2518,8 @@ function todoDueCount(){const t=today();return S.todos.filter(x=>!x.done&&x.due&
 function renderNav(){
   const n=todoDueCount();let g=null;
   const col=S.settings.navCol||{};
-  $('#nav').innerHTML=`<div class="brand" data-go="dash">${MARK}<span>STIK Prodaja</span></div>
+  const lg=S.settings.navLogo&&S.settings.company.logo;
+  $('#nav').innerHTML=`<div class="brandrow"><div class="brand${lg?' haslogo':''}" data-go="dash">${lg?`<img class="navlogo" src="${esc(S.settings.company.logo)}" alt="${esc(S.settings.company.name||'')}">`:`${MARK}<span>STIK Prodaja</span>`}</div><div class="navarr"><button class="btn sm ghost icon" id="navBack" title="Nazaj (tudi stranski gumb miške)" aria-label="Nazaj">‹</button><button class="btn sm ghost icon" id="navFwd" title="Naprej" aria-label="Naprej">›</button></div></div>
   ${divs().length?`<select class="divsel" id="divSel" aria-label="Program"><option value="">Vsi programi</option>${divs().map(d=>`<option value="${d.id}"${S.settings.divF===d.id?' selected':''}>${esc(d.name)}</option>`).join('')}</select>`:''}<div class="navs">
   ${NAV.map(([k,l,i,grp,sh])=>{const h=grp!==g?(g=grp,grp?`<div class="ng${col[grp]?' col':''}" data-ngc="${grp}">${grp}<span>${col[grp]?'+':'−'}</span></div>`:''):'';if(grp&&col[grp]&&navOn!==k)return h;const cnt=k==='todo'?n:k==='montaze'?S.orders.filter(o=>!o.deleted&&!o.cancelled&&!o.done&&(o.type||'montaza')==='montaza'&&o.planned&&o.planned<=isoAdd(today(),7)).length:k==='list'?S.quotes.filter(q=>q.status==='poslano'&&!orderOf(q)).length:k==='dfa'?(S.recs.dfa||[]).filter(r=>payDue(r)==='zapadlo').length:0;
     return `${h}<a data-go="${k}" data-nav="${k}" class="${navOn===k?'on':''}${MOB_MAIN.includes(k)?' mm':' mx'}" title="${l}">${ic(i)}<span><i class="d">${l}</i><i class="m">${sh||l}</i></span>${cnt?`<em class="${k==='todo'||k==='dfa'?'badge':'cnt2'}">${cnt}</em>`:''}</a>`}).join('')}</div>
@@ -2588,7 +2601,7 @@ function renderCustomers(){
     <div class="list-head"><h1>Stranke <small>${S.customers.length}</small></h1>
       <label class="search">${ic('search')}<input id="cuQ" placeholder="Išči po imenu, kraju, e-pošti" value="${esc(custQ)}"></label>
       ${printBtn('cuPrint')}<button class="btn" id="cuImp">${ic('upload')}Uvozi CSV</button><button class="btn" id="cuExp"${S.customers.length?'':' disabled'}>${ic('download')}Izvozi</button><button class="btn sig" id="cuNew">${ic('plus')}Nova stranka</button></div>
-    ${S.customers.length?`<div class="tbl cu">${L.map(c=>{const qs=custQuotes(c);const sum=qs.reduce((a,q)=>a+totals(q).gross,0);return `<div class="tr" data-cu="${c.id}" tabindex="0">
+    ${S.customers.length?`<div class="tbl cu">${L.map(c=>{const qs=custQuotes(c);const sum=qs.reduce((a,q)=>a+totals(q).gross,0);return `<div class="tr" data-cu="${c.id}" tabindex="0"><button class="btn sm ghost icon px cux" data-cudel="${c.id}" title="Izbriši" aria-label="Izbriši">✕</button>
       <div class="av">${esc((c.name||'?').trim().slice(0,1).toUpperCase())}</div>
       <div class="c1"><b>${esc(c.name)}</b><span>${esc([c.contact,[c.post,c.city].filter(Boolean).join(' ')].filter(Boolean).join(' · ')||'—')}</span></div>
       <div class="c2">${c.phone?`<a href="tel:${esc(c.phone.replace(/\s/g,''))}" data-stop>${ic('phone')}${esc(c.phone)}</a>`:''}${c.email?`<a href="mailto:${esc(c.email)}" data-stop>${ic('mail')}${esc(c.email)}</a>`:''}</div>
@@ -2625,7 +2638,7 @@ function editCustomer(c){
     }});
 }
 async function newQuoteFor(c){const q=newQuote();if(c){q.customer=custToQuote(c);q.customerId=c.id}S.quotes.push(q);cur=q;await saveQuoteNow();openQuote(q.id,true)}
-$('#vCust').addEventListener('click',async e=>{
+$('#vCust').addEventListener('click',async e=>{const cdl=e.target.closest('[data-cudel]');if(cdl){e.stopPropagation();const c=S.customers.find(x=>x.id===cdl.dataset.cudel);if(confirm(`Izbrišem stranko ${c?.name||''}? Ponudbe in naročila ostanejo.`))quickDel(S.customers,cdl.dataset.cudel,saveCustomers,renderCustomers,x=>x.name);return}
   const t=e.target;if(t.closest('[data-stop]'))return;
   if(t.closest('#cuNew2'))return editCustomer();
   if(t.closest('#cuPrint'))return printPage('Stranke',ptable(['Naziv','Kontakt','Naslov','Telefon','E-pošta','ID za DDV'],S.customers.map(c=>[`<b>${esc(c.name)}</b>`,esc(c.contact||''),esc([c.address,[c.post,c.city].filter(Boolean).join(' ')].filter(Boolean).join(', ')),esc(c.phone||''),esc(c.email||''),esc(c.taxId||'')])),{landscape:1});
@@ -3103,7 +3116,7 @@ function ordRow(o){
       <div class="prog">${LINE_ST.map(([k,l])=>cnt(k)?`<span class="ls ${k}">${l}: ${cnt(k)}</span>`:'').join('')}</div></div>
     <div class="o3">${o.done?`<span class="due ok">${ic('check')}Izvedeno ${dateSl(o.doneDate)}</span>`:pl}</div>
     <div class="o4"><b>${fmt(T.gross)}</b>${o.payment?.method?`<span>${esc((PAY.find(x=>x[0]===o.payment.method)||[])[1]||'')}</span>`:''}<span class="${o.avans?.on?'okc':'warnc'}">${o.avans?.on?'avans ✓':'avans ✗'}</span>${(()=>{const s2=invState(o);return o.done||o.avans?.on||s2!=='no'?`<span class="${s2==='ok'?'okc':'warnc'}">${s2==='ok'?'račun ✓':s2==='av'?'avansni račun':'račun ✗'}</span>`:''})()}${T.rest>0.005?`<span>ostane ${fmt(T.rest)}</span>`:`<span class="okc">plačano</span>`}</div>
-    <span class="status ${sk}">${sl}</span></div>`;
+    <span class="status ${sk}">${sl}</span><button class="btn sm ghost icon px rx" data-odel="${o.id}" title="Izbriši" aria-label="Izbriši">✕</button></div>`;
 }
 function renderOrders(){
   const t=today(),wk=isoAdd(t,7),all=S.orders.filter(o=>!o.deleted&&divOk(o));
@@ -3139,7 +3152,8 @@ function renderOrders(){
     ${body}</div>`;
 }
 $('#vOrd').addEventListener('click',async e=>{
-  const t=e.target;const f=t.closest('[data-of]');if(f){ordF=f.dataset.of;renderOrders();return}
+  const t=e.target;const od=t.closest('[data-odel]');if(od){e.stopPropagation();if(confirm('Izbrišem naročilo?'))quickDel(S.orders,od.dataset.odel,saveOrders,renderOrders,x=>x.number);return}
+  const f=t.closest('[data-of]');if(f){ordF=f.dataset.of;renderOrders();return}
   const ft=t.closest('[data-ot]');if(ft){ordT=ft.dataset.ot;renderOrders();return}
   if(t.closest('#ordPrintList')){const L=S.orders.filter(o=>!o.deleted&&!o.cancelled&&!o.done).sort((a,b)=>(a.planned||'9').localeCompare(b.planned||'9'));printPage('Naročila v teku',ptable(['Naročilo','Kupec','Vrsta','Postavke','Izvedba','Znesek','Avans','Ostane'],L.map(o=>{const T=orderTotals(o);return[esc(o.number),esc(o.customer?.name||''),esc(otName(o)),esc(o.lines.filter(l=>!l.x).map(l=>`${l.title} (${(LINE_ST.find(s2=>s2[0]===(l.st||'za'))||[])[1]})`).join('; ')),o.planned?dateSl(o.planned)+(o.plannedTime?' '+esc(o.plannedTime):''):'',fmt(T.gross),o.avans?.on?fmt(T.av):'—',fmt(T.rest)]})),{landscape:1});return}
   if(t.closest('#ordToPO')){pickSupplier(id=>pickOrderLines(async sel=>{if(!sel.length)return;const p=await createPO(id,sel.map(([o,l])=>({id:uid(),title:l.title,qty:l.qty,sku:'',orderId:o.id,lineId:l.id,arrived:false})));await syncPOtoOrders(p);openPO(p.id)}));return}
@@ -3317,7 +3331,7 @@ function shipRow(sh){
     <div class="o2"><b class="carrier">${esc(sh.carrier)}</b>${sh.service?' · '+esc(sh.service):''}<div>${sh.tracking?(u?`<a href="${esc(u)}" target="_blank" rel="noopener" data-stop>${ic('link')}${esc(sh.tracking)}</a>`:esc(sh.tracking)):'<span class="due none">brez sledilne številke</span>'}</div></div>
     <div class="o3"><span class="due">${ic('cal')}${dateSl(sh.date)}</span>${sh.deliveredDate?`<br><span class="due ok">${ic('check')}${dateSl(sh.deliveredDate)}</span>`:''}</div>
     <div class="o4">${+sh.cost?`<b>${fmt(+sh.cost)}</b><span>strošek</span>`:''}${+sh.cod?`<span class="warnc">odkupnina ${fmt(+sh.cod)}</span>`:''}</div>
-    <span class="status sh-${st[0]}">${st[1]}</span></div>`;
+    <span class="status sh-${st[0]}">${st[1]}</span><button class="btn sm ghost icon px rx" data-shdel="${sh.id}" title="Izbriši" aria-label="Izbriši">✕</button></div>`;
 }
 function renderShips(){
   const all=S.ships.filter(x=>!x.deleted),m=x=>!shipQ||[x.number,x.orderNumber,x.tracking,x.carrier,x.to?.name,x.to?.city,x.transport?.company,x.transport?.orderNo,x.note].join(' ').toLowerCase().includes(shipQ.toLowerCase());
@@ -3335,6 +3349,7 @@ function renderShips(){
     ${L.length?L.map(shipRow).join(''):`<div class="empty"><h2>${all.length?'Ni pošiljk v tem pogledu':'Še ni pošiljk'}</h2><p>Pošiljko ustvariš tukaj ali v naročilu (vrsta »Pošiljanje« ali gumb <b>Nova pošiljka</b>). Prejemnik in izdelki se prenesejo iz naročila.</p></div>`}</div>`;
 }
 $('#vShip').addEventListener('click',async e=>{const t=e.target;if(t.closest('[data-stop]'))return;
+  const sd=t.closest('[data-shdel]');if(sd){e.stopPropagation();quickDel(S.ships,sd.dataset.shdel,saveShips,renderShips,x=>x.number);return}
   if(t.closest('#shipNew'))return newShipment(null);
   if(t.closest('#shipPrint'))return printPage('Pošiljke',ptable(['Št.','Prejemnik','Prevoznik','Sledilna št.','Odprema','Dostava','Stanje','Strošek'],S.ships.filter(x=>!x.deleted).sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(x=>[esc(x.number),esc(x.to?.name||''),esc(x.carrier),esc(x.tracking||''),dateSl(x.date),x.deliveredDate?dateSl(x.deliveredDate):'',(SHIP_ST.find(z=>z[0]===x.status)||[])[1]||'',+x.cost?fmt(+x.cost):''])),{landscape:1});
   const f=t.closest('[data-sf]');if(f){shipF=f.dataset.sf;renderShips();return}
@@ -3386,7 +3401,7 @@ $('#vShipD').addEventListener('click',async e=>{const t=e.target,sh=curShip;if(!
     else if(o&&sh.status==='poslano'){sh.lines.forEach(id=>{const l=o.lines.find(x=>x.id===id);if(l&&(l.st==='za'||l.st==='nar'))l.st='pri'});await saveOrders()}
     await saveShips();renderShipKeep();return}
   if(t.closest('#shipCopy')){try{await navigator.clipboard.writeText(sh.tracking);toast('Sledilna številka kopirana.')}catch{prompt('Kopiraj:',sh.tracking)}return}
-  if(t.closest('#shipMail')){const c=S.settings.company,u=trackUrl(sh);location.href=`mailto:${encodeURIComponent(sh.to?.email||'')}?subject=${encodeURIComponent(`Vaša pošiljka je na poti${sh.orderNumber?' (naročilo '+sh.orderNumber+')':''}`)}&body=${encodeURIComponent(`Pozdravljeni,\n\nvaša pošiljka je bila ${dateSl(sh.date)} predana prevozniku ${sh.carrier}.\nSledilna številka: ${sh.tracking}${u?'\nSledenje: '+u:''}\n\nLep pozdrav,\n${c.name||''}${c.phone?'\n'+c.phone:''}`)}`;return}
+  if(t.closest('#shipMail')){const c=S.settings.company,u=trackUrl(sh);openMail(sh.to?.email||'',`Vaša pošiljka je na poti${sh.orderNumber?' (naročilo '+sh.orderNumber+')':''}`,`Pozdravljeni,\n\nvaša pošiljka je bila ${dateSl(sh.date)} predana prevozniku ${sh.carrier}.\nSledilna številka: ${sh.tracking}${u?'\nSledenje: '+u:''}\n\nLep pozdrav,\n${c.name||''}${c.phone?'\n'+c.phone:''}`);return}
   if(t.closest('#shipDel')){if(confirm('Izbrišem to pošiljko?')){S.ships=S.ships.filter(x=>x.id!==sh.id);await saveShips();showShips()}return}
 });
 function printLabel(sh){
@@ -3472,6 +3487,9 @@ function renderMarketing(){
     </div>`;
   }else if(mkTab==='follow'){const L=followList();
     body=`<div class="list-head sub"><p class="help" style="margin:0;flex:1">Poslane ponudbe brez odgovora, starejše od <input id="fuDays" class="inp mini" value="${+S.settings.followDays||3}" inputmode="numeric"> dni. Pokliči ali pošlji opomnik, nato označi izid.</p><button class="btn" id="fuCsv"${L.length?'':' disabled'}>${ic('download')}Izvozi za follow-up (CSV)</button></div>
+      <div class="inline" style="margin-bottom:10px"><button class="btn sm sig" id="fmNew" style="flex:none">${ic('plus')}Dodaj stranko ročno</button></div>
+      ${R$('followman').filter(r=>r.status!=='zaključeno').map(r=>`<div class="ordr fu"><div class="o1"><b>${esc(r.customer)}</b><span>${esc(r.topic||'ročni follow-up')}${r.next?` · naslednji stik ${dateSl(r.next)}`:''}</span></div><div class="o2">${esc((r.note||'').slice(0,120))}</div><div class="o4"><span class="status ms-${esc(r.status||'odprto')}">${esc(r.status||'odprto')}</span></div>
+        <div class="fu-a">${r.phone?`<a class="btn sm" href="tel:${esc(r.phone.replace(/\s/g,''))}">${ic('phone')}Pokliči</a>`:''}<button class="btn sm" data-fmmail="${r.id}">${ic('mail')}E-pošta</button><button class="btn sm" data-fmed="${r.id}">Uredi</button><button class="btn sm ok" data-fmdone="${r.id}">Zaključeno</button><button class="btn sm ghost icon px" data-fmdel="${r.id}" aria-label="Izbriši">✕</button></div></div>`).join('')}
       ${L.length?L.map(({q,age,sentD})=>{const c=q.customer||{};return `<div class="ordr fu"><div class="o1"><b>${esc(c.name||'Brez kupca')}</b><span>Ponudba ${esc(q.number)} · poslano ${dateSl(sentD)} · <b class="${age>7?'warnc':''}">pred ${age} dnevi</b></span></div>
         <div class="o2">${esc((q.title||q.items.map(i=>i.title).join(', ')).slice(0,120))}</div><div class="o4"><b>${fmt(totals(q).gross)}</b></div>
         <div class="fu-a">${c.phone?`<a class="btn sm" href="tel:${esc(c.phone.replace(/\s/g,''))}">${ic('phone')}Pokliči</a>`:''}${c.email?`<button class="btn sm" data-fumail="${q.id}">${ic('mail')}Opomnik</button>`:''}<button class="btn sm" data-futodo="${q.id}">${ic('todo')}Opravilo</button><button class="btn sm ok" data-fuacc="${q.id}">Sprejeto</button><button class="btn sm ghost danger" data-furej="${q.id}">Zavrnjeno</button><button class="btn sm ghost" data-open2="${q.id}">Odpri</button></div></div>`}).join(''):`<div class="empty"><h2>Ni ponudb za follow-up</h2><p>Tu se prikažejo poslane ponudbe, na katere kupec še ni odgovoril.</p></div>`}`;
@@ -3485,9 +3503,14 @@ function renderMarketing(){
   }
   mkShell(body);afterMk();
 }
-function fuMail(q){const c=q.customer||{},co=S.settings.company;location.href=`mailto:${encodeURIComponent(c.email||'')}?subject=${encodeURIComponent(`Ponudba št. ${q.number} – ${co.name||''}`)}&body=${encodeURIComponent(`Pozdravljeni,\n\npred nekaj dnevi smo vam poslali ponudbo št. ${q.number}${q.title?' ('+q.title+')':''}. Zanima nas, ali ste jo uspeli pregledati in ali imate kakšno vprašanje.\n\nZ veseljem vam pomagamo pri odločitvi ali ponudbo prilagodimo.\n\nLep pozdrav,\n${co.contact||co.name||''}\n${co.name||''}${co.phone?'\n'+co.phone:''}`)}`}
+function fuMail(q){const c=q.customer||{},co=S.settings.company;openMail(c.email||'',`Ponudba št. ${q.number} – ${co.name||''}`,`Pozdravljeni,\n\npred nekaj dnevi smo vam poslali ponudbo št. ${q.number}${q.title?' ('+q.title+')':''}. Zanima nas, ali ste jo uspeli pregledati in ali imate kakšno vprašanje.\n\nZ veseljem vam pomagamo pri odločitvi ali ponudbo prilagodimo.\n\nLep pozdrav,\n${co.contact||co.name||''}\n${co.name||''}${co.phone?'\n'+co.phone:''}`)}
 $('#vMk').addEventListener('click',async e=>{const t=e.target;
   const tb=t.closest('[data-mk]');if(tb){mkTab=tb.dataset.mk;renderMarketing();return}
+  if(t.closest('#fmNew')){editRec('followman',null);return}
+  const fme=t.closest('[data-fmed]');if(fme){editRec('followman',R$('followman').find(x=>x.id===fme.dataset.fmed));return}
+  const fmm=t.closest('[data-fmmail]');if(fmm){const r=R$('followman').find(x=>x.id===fmm.dataset.fmmail),co=S.settings.company;openMail(r.email||S.customers.find(c=>c.name===r.customer)?.email||'',r.topic||('Pozdrav – '+(co.name||'')),`Pozdravljeni,\n\n\n\nLep pozdrav,\n${co.contact||''}\n${co.name||''}`);return}
+  const fmd=t.closest('[data-fmdone]');if(fmd){R$('followman').find(x=>x.id===fmd.dataset.fmdone).status='zaključeno';await saveRecsNow();renderMarketing();return}
+  const fdl=t.closest('[data-fmdel]');if(fdl){quickDel(R$('followman'),fdl.dataset.fmdel,saveRecsNow,renderMarketing,x=>x.customer);return}
   const om=t.closest('[data-opm],[data-opd],[data-opt]');if(om){const [kind,id]=(om.dataset.opm||om.dataset.opd||om.dataset.opt).split('|');
     let obj=null,mark=async()=>{};
     if(kind==='thanks'){obj=S.orders.find(o=>o.id===id);mark=async()=>{obj.mk={...(obj.mk||{}),thanks:today()};await saveOrders()}}
@@ -3672,7 +3695,7 @@ async function driveSyncDown(){
   const tok=await driveToken();if(!tok)return;busy(true,'Iščem podatke v Google Drive …');
   try{const f=await driveFind(tok,'STIK-Prodaja-podatki.json');if(!f){busy(false);toast('V Drive še ni shranjenih podatkov. Najprej jih pošlji z naprave, kjer delaš.','err',8000);return}
     const r=await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`,{headers:{Authorization:'Bearer '+tok}});const j=await r.json();busy(false);
-    if(!confirm(`Podatki v Drive so z dne ${new Date(f.modifiedTime).toLocaleString('sl-SI')}:\n${j.quotes?.length||0} ponudb, ${j.orders?.length||0} naročil, ${j.customers?.length||0} strank.\n\nZamenjam vse podatke v tej napravi s temi?`))return;
+    if(!confirm(`Podatki v Drive so z dne ${dtm(f.modifiedTime)}:\n${j.quotes?.length||0} ponudb, ${j.orders?.length||0} naročil, ${j.customers?.length||0} strank.\n\nZamenjam vse podatke v tej napravi s temi?`))return;
     await restoreAll(j);toast('Podatki prenešeni iz Google Drive.');showList();}
   catch(e){busy(false);toast('Drive: '+e.message,'err',8000)}
 }
@@ -3736,7 +3759,7 @@ function oppMail(kind,o){
   if(kind==='lost'){sub=`Ponudba št. ${o.number} – ali vam lahko še pomagamo?`;body=`Pozdravljeni ${first},\n\npred časom smo vam poslali ponudbo št. ${o.number}${o.title?' ('+o.title+')':''}. Če se še odločate, vam jo z veseljem prilagodimo ali pripravimo boljše pogoje.\n\nSporočite nam, kaj vam ustreza.`+sig}
   if(kind==='warr'){sub=`Garancija za ${o[1].title} se izteka`;to=o[0].customer?.email||'';body=`Pozdravljeni ${(o[0].customer?.name||'').split(' ')[0]},\n\ngarancija za ${o[1].title} velja do ${dateSl(o[2])}. Pred iztekom vam priporočamo pregled – tako morebitne napake odpravimo še v garanciji.\n\nZa termin odgovorite na to sporočilo ali nas pokličite.`+sig}
   if(kind==='inact'){sub=`Novosti za vaše vozilo – ${co.name||''}`;to=o.email||'';body=`Pozdravljeni ${(o.name||'').split(' ')[0]},\n\nže nekaj časa se nismo slišali. Pripravili smo novosti in ugodnosti za stalne stranke – z veseljem vam pripravimo ponudbo po meri.`+sig}
-  location.href=`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
+  openMail(to,sub,body);
 }
 
 
@@ -3775,7 +3798,9 @@ CDN.pdfjs='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
 CDN.pdfw='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 async function readTableFile(f){
   const n=f.name.toLowerCase();
-  if(/\.(xlsx|xlsm|xls|ods)$/.test(n)){await loadScript(CDN.xlsx);const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];return XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''}).map(r=>r.map(x=>String(x??'').trim())).filter(r=>r.some(Boolean))}
+  if(/\.(xlsx|xlsm|xls|ods)$/.test(n)){await loadScript(CDN.xlsx);const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true});const ws=wb.Sheets[wb.SheetNames[0]];
+    const cv=x=>x instanceof Date?new Date(x.getTime()+12*3600e3).toISOString().slice(0,10):typeof x==='number'?String(Math.round(x*1e6)/1e6):String(x??'').trim();
+    return XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''}).map(r=>r.map(cv)).filter(r=>r.some(Boolean))}
   if(/\.pdf$/.test(n)||f.type==='application/pdf')return pdfRows(await f.arrayBuffer());
   if(/\.docx$/.test(n))return (await docxParse(await f.arrayBuffer())).rows;
   if(/\.doc$/.test(n))throw new Error('stari format .doc – v Wordu ga shrani kot .docx ali PDF in uvozi znova');
@@ -3882,7 +3907,7 @@ function poRow(p){const st=poStatus(p),t=today(),late=p.expected&&p.expected<t&&
   return `<div class="ordr po" data-po="${p.id}" tabindex="0"><div class="o1"><b>${esc(p.supplierName||'Brez dobavitelja')}</b><span>${esc(p.number)}${p.supplierRef?' · potrditev '+esc(p.supplierRef):''}${p.date?' · naročeno '+dateSl(p.date):''}</span></div>
     <div class="o2">${esc((p.lines||[]).slice(0,3).map(l=>`${l.title} × ${fmtN(l.qty,3)}`).join(', '))}${(p.lines||[]).length>3?` <em>+${p.lines.length-3}</em>`:''}${(p.files||[]).length?` <span class="ls nar">${ic('file')} ${p.files.length} dok.</span>`:''}</div>
     <div class="o3">${st==='prispelo'?`<span class="due ok">${ic('check')}Prispelo ${dateSl(p.arrivedDate)}</span>`:p.expected?`<span class="due ${late?'late':''}">${ic('cal')}Pričakovano ${dateSl(p.expected)}</span>`:'<span class="due none">brez datuma dobave</span>'}</div>
-    <div class="o4">${(p.lines||[]).length} postavk</div><span class="status po-${st}">${PO_ST[st]}</span></div>`}
+    <div class="o4">${(p.lines||[]).length} postavk</div><span class="status po-${st}">${PO_ST[st]}</span><button class="btn sm ghost icon px rx" data-podel="${p.id}" title="Izbriši" aria-label="Izbriši">✕</button></div>`}
 function renderBuy(){
   const all=S.pos.filter(p=>!p.deleted),m=p=>!buyQ||[p.number,p.supplierName,p.supplierRef,p.note,...(p.lines||[]).map(l=>l.title)].join(' ').toLowerCase().includes(buyQ.toLowerCase());
   let body='';
@@ -3897,6 +3922,7 @@ function renderBuy(){
     <div class="chips">${[['narocila',`Naročila dobaviteljem (${all.length})`],['dobavitelji',`Dobavitelji (${S.suppliers.length})`]].map(([k,l])=>`<button class="chip${buyTab===k?' on':''}" data-bt="${k}">${l}</button>`).join('')}</div>${body}</div>`;
 }
 $('#vBuy').addEventListener('click',async e=>{const t=e.target;if(t.closest('[data-stop]'))return;
+  const pd=t.closest('[data-podel]');if(pd){e.stopPropagation();quickDel(S.pos,pd.dataset.podel,savePO,renderBuy,x=>x.number);return}
   const bt=t.closest('[data-bt]');if(bt){buyTab=bt.dataset.bt;renderBuy();return}
   if(t.closest('#supNew'))return editSupplier();
   const su=t.closest('[data-sup]');if(su)return editSupplier(S.suppliers.find(x=>x.id===su.dataset.sup));
@@ -3962,7 +3988,7 @@ document.addEventListener('click',async e=>{
   if(e.target.closest('#poMail')&&curPO){const p=curPO,s=S.suppliers.find(x=>x.id===p.supplierId)||{},c=S.settings.company,en=s.lang==='en',de=s.lang==='de';
     const hi=de?'Sehr geehrte Damen und Herren,\n\nwir bestellen:':en?'Dear Sir or Madam,\n\nplease accept our order:':'Pozdravljeni,\n\nnaročamo:';const bye=de?'Bitte bestätigen Sie die Bestellung und den Liefertermin.\n\nMit freundlichen Grüßen':en?'Please confirm the order and the delivery date.\n\nKind regards':'Prosimo za potrditev naročila in roka dobave.\n\nLep pozdrav';
     const body=`${hi}\n\n${p.lines.map(l=>`- ${l.sku?l.sku+' ':''}${l.title} × ${fmtN(l.qty,3)}`).join('\n')}\n\n${de?'Unsere Bestellnummer':en?'Our order no.':'Naša št. naročila'}: ${p.number}\n\n${bye},\n${c.contact||''}\n${c.name||''}\n${[c.address,[c.post,c.city].filter(Boolean).join(' ')].filter(Boolean).join(', ')}\n${c.taxId?(de?'USt-IdNr.':en?'VAT ID':'ID za DDV')+': '+c.taxId:''}\n${c.phone||''}`;
-    location.href=`mailto:${encodeURIComponent(s.email||'')}?subject=${encodeURIComponent((de?'Bestellung ':en?'Order ':'Naročilo ')+p.number+' – '+(c.name||''))}&body=${encodeURIComponent(body)}`;
+    openMail(s.email||'',(de?'Bestellung ':en?'Order ':'Naročilo ')+p.number+' – '+(c.name||''),body);
     if(!p.date){p.date=today();p.sentAt=Date.now();await savePO();await syncPOtoOrders(p);renderPO()}}
 });
 function printPO(p){const c=S.settings.company,s=S.suppliers.find(x=>x.id===p.supplierId)||{};
@@ -3995,7 +4021,7 @@ function renderWar(){
         <div><button class="btn sm" data-newclaim="${x.o.id}|${x.l.id}">${ic('alert')}Reklamacija</button></div></div>`).join('')}</div>`:'<div class="empty"><h2>Ni garancij v tem pogledu</h2><p>Garancije nastanejo iz naročil (postavke z garancijo v mesecih). Serijske številke vpišeš pri postavkah naročila.</p></div>'}`;
   }else{
     const C=S.claims.filter(c=>!q||[c.number,c.product,c.serial,c.customer?.name,c.supplier,c.defect].join(' ').toLowerCase().includes(q)).sort((a,b)=>b.created-a.created);
-    body=`${C.length?C.map(c=>`<div class="ordr claim" data-claim="${c.id}" tabindex="0"><div class="o1"><b>${esc(c.customer?.name||'Brez kupca')}</b><span>${esc(c.number)} · ${dateSl(c.date)}</span></div><div class="o2"><b>${esc(c.product||'')}</b>${c.serial?' · '+esc(c.serial):''}<br>${esc((c.defect||'').slice(0,90))}</div><div class="o3">${esc(c.supplier||'')}${c.sentDate?`<br><small>poslano ${dateSl(c.sentDate)}</small>`:''}</div><div class="o4"></div><span class="status cl-${c.status}">${CL_ST[c.status]||c.status}</span></div>`).join(''):'<div class="empty"><h2>Ni reklamacij</h2><p>Novo reklamacijo odpreš tukaj ali pri garanciji izdelka (gumb Reklamacija).</p></div>'}`;
+    body=`${C.length?C.map(c=>`<div class="ordr claim" data-claim="${c.id}" tabindex="0"><div class="o1"><b>${esc(c.customer?.name||'Brez kupca')}</b><span>${esc(c.number)} · ${dateSl(c.date)}</span></div><div class="o2"><b>${esc(c.product||'')}</b>${c.serial?' · '+esc(c.serial):''}<br>${esc((c.defect||'').slice(0,90))}</div><div class="o3">${esc(c.supplier||'')}${c.sentDate?`<br><small>poslano ${dateSl(c.sentDate)}</small>`:''}</div><div class="o4"></div><span class="status cl-${c.status}">${CL_ST[c.status]||c.status}</span><button class="btn sm ghost icon px rx" data-cldel="${c.id}" title="Izbriši" aria-label="Izbriši">✕</button></div>`).join(''):'<div class="empty"><h2>Ni reklamacij</h2><p>Novo reklamacijo odpreš tukaj ali pri garanciji izdelka (gumb Reklamacija).</p></div>'}`;
   }
   $('#vWar').innerHTML=`<div class="wrap"><div class="list-head"><h1>Garancije in reklamacije</h1><label class="search">${ic('search')}<input id="warQ" placeholder="Išči serijsko št., izdelek, kupca" value="${esc(warQ)}"></label>${warTab==='garancije'?`<button class="btn" id="warCsv">${ic('download')}<span class="hide-s">CSV</span></button>`:''}${printBtn('warPrint')}<button class="btn sig" id="claimNew">${ic('plus')}Nova reklamacija</button></div>
     <div class="chips">${[['garancije',`Garancije (${W.length})`],['reklamacije',`Reklamacije (${S.claims.length})`]].map(([k,l])=>`<button class="chip${warTab===k?' on':''}" data-wt="${k}">${l}</button>`).join('')}</div>${body}</div>`;
@@ -4068,9 +4094,10 @@ document.addEventListener('click',async e=>{
   if(e.target.closest('#clSend')&&curClaim){const c=curClaim,L=CLT[c.lang]||CLT.sl,co=S.settings.company;
     const body=`${c.lang==='de'?'Sehr geehrte Damen und Herren,\n\nwir melden folgende Reklamation:':c.lang==='en'?'Dear Sir or Madam,\n\nwe hereby submit the following warranty claim:':'Pozdravljeni,\n\npošiljamo reklamacijo:'}\n\n${L.prod}: ${c.product}\n${L.ser}: ${c.serial||'-'}\n${L.ref}: ${c.supplierRef||'-'}\n${L.id}: ${c.installDate?dateSl(c.installDate):'-'}\n${L.def}: ${c.defect||''}\n${L.req}: ${L.reqs[c.request]||''}\n\n${c.lang==='de'?'Das Reklamationsprotokoll und Fotos senden wir im Anhang.':c.lang==='en'?'Please find the claim report and photos attached.':'Reklamacijski zapisnik in fotografije so v prilogi.'}\n\n${co.contact||''}\n${co.name||''}\n${co.phone||''}`;
     printPage(`Reklamacija ${c.number}`,await claimHTML(c));
-    setTimeout(()=>{if(confirm('Zapisnik shrani kot PDF v oknu za tisk (Shrani kot PDF). Odprem zdaj e-pošto za dobavitelja? PDF in fotografije pripni k sporočilu.')){location.href=`mailto:${encodeURIComponent(c.supplierEmail||'')}?subject=${encodeURIComponent((c.lang==='de'?'Reklamation ':c.lang==='en'?'Warranty claim ':'Reklamacija ')+c.number+' – '+c.product)}&body=${encodeURIComponent(body)}`;if(c.status==='odprta'){c.status='poslano';c.sentDate=today();saveClaims();renderClaim()}}},1200);}
+    setTimeout(()=>{if(confirm('Zapisnik shrani kot PDF v oknu za tisk (Shrani kot PDF). Odprem zdaj e-pošto za dobavitelja? PDF in fotografije pripni k sporočilu.')){openMail(c.supplierEmail||'',(c.lang==='de'?'Reklamation ':c.lang==='en'?'Warranty claim ':'Reklamacija ')+c.number+' – '+c.product,body);if(c.status==='odprta'){c.status='poslano';c.sentDate=today();saveClaims();renderClaim()}}},1200);}
 });
 $('#vWar').addEventListener('click',async e=>{const t=e.target;
+  const cd=t.closest('[data-cldel]');if(cd){e.stopPropagation();quickDel(S.claims,cd.dataset.cldel,saveClaims,renderWar,x=>x.number);return}
   const wt=t.closest('[data-wt]');if(wt){warTab=wt.dataset.wt;renderWar();return}
   const wf=t.closest('[data-wf]');if(wf){warF=wf.dataset.wf;renderWar();return}
   const nc=t.closest('[data-newclaim]');if(nc){const [oid,lid]=nc.dataset.newclaim.split('|');const o=S.orders.find(x=>x.id===oid);newClaim(o,o&&o.lines.find(l=>l.id===lid));return}
@@ -4436,7 +4463,7 @@ const MODS={
   postopki:{t:'Montaže (postopki)',one:'Postopek montaže',ic:'wrench',desc:'Navodila za montažo po izdelkih in vozilih: koraki, orodje, čas in opozorila.',
     f:[['title','Naslov','text',1],['product','Izdelek','product'],['vehicle','Vozilo','text'],['time','Čas montaže (ur)','num'],['tools','Orodje','area'],['material','Material','area'],['steps','Koraki','area'],['warn','Opozorila','area'],['video','Video (povezava)','url'],['files','Slike, PDF navodila','files']],cols:['title','product','vehicle','time']},
   dfa:{t:'DFA plačila (prejeti računi)',one:'Prejeti račun',ic:'down',desc:'Evidenca prejetih računov in plačil. Uvozi Excel iz računovodskega programa, plačila se samodejno označijo ob uvozu bančnega izpiska.',
-    f:[['supplier','Dobavitelj','supplier',1],['no','Št. računa','text'],['date','Datum računa','date'],['due','Zapadlost','date'],['amount','Znesek (€)','money'],['status','Stanje plačila','sel',['odprto','v postopku','plačano']],['paidDate','Plačano dne','date'],['ref','Sklic','text'],['iban','TRR dobavitelja','text'],['cat','Vrsta stroška','sel',['blago','prevoz','carina','storitve','najemnina','oglaševanje','drugo']],['note','Opombe','area'],['files','Račun (PDF)','files']],cols:['supplier','no','due','amount'],cal:[['due','Zapadlost računa']],
+    f:[['number','Številka','text'],['no','Originalna številka','text'],['supplier','Dobavitelj','supplier',1],['country','Država stranke','text'],['date','Datum','date'],['done','Opravljeno','date'],['due','Zapadlost','date'],['amount','Znesek','money'],['currency','DE','text'],['status','Stanje plačila','sel',['odprto','v postopku','plačano']],['paidDate','Plačano dne','date'],['ref','Sklic','text'],['iban','TRR dobavitelja','text'],['cat','Vrsta stroška','sel',['blago','prevoz','carina','storitve','najemnina','oglaševanje','drugo']],['note','Opombe','area'],['files','Račun (PDF)','files']],cols:['number','no','supplier','country','date','done','due','amount','currency'],cal:[['due','Zapadlost računa']],
     stf:payStatus,stl:{odprto:'Odprto',zapadlo:'Zapadlo',postopek:'V postopku',placano:'Plačano'},flag:r=>payStatus(r)==='zapadlo'},
   narocnine:{t:'Naročnine',one:'Naročnina',ic:'repeat',desc:'Programska oprema, storitve in članarine z naslednjim plačilom.',
     f:[['name','Storitev','text',1],['provider','Ponudnik','text'],['amount','Znesek (€)','money'],['period','Obdobje','sel',['mesečno','letno','četrtletno','enkratno']],['next','Naslednje plačilo / podaljšanje','date'],['pay','Način plačila','text'],['cat','Kategorija','sel',['programska oprema','splet in domena','telefonija','zavarovanje','članarina','drugo']],['active','Aktivna','check'],['note','Opombe (uporabnik, prijava …)','area']],cols:['name','provider','amount','period','next'],cal:[['next','Plačilo naročnine']],
@@ -4470,7 +4497,7 @@ const MODS={
 };
 delete MODS.mont;
 const MOD_Q={},MOD_F={};
-const fldVal=(r,[k,,type,,opts])=>{const v=r[k];if(v==null||v==='')return '';if(type==='div')return divTag(v);if(type==='date')return dateSl(v);if(type==='month')return monthName(v);if(type==='money')return fmt(+v);if(type==='check')return v?'✓':'';if(type==='files')return (v||[]).length?`${v.length} dat.`:'';if(type==='url')return `<a href="${esc(v)}" target="_blank" rel="noopener" data-stop>odpri</a>`;return esc(String(v))};
+const fldVal=(r,[k,,type,,opts])=>{const v=r[k];if(v==null||v==='')return '';if(type==='div')return divTag(v);if(type==='money'&&r.currency&&r.currency!=='EUR')return fmtN(+v,2);if(type==='date')return dateSl(v);if(type==='month')return monthName(v);if(type==='money')return fmt(+v);if(type==='check')return v?'✓':'';if(type==='files')return (v||[]).length?`${v.length} dat.`:'';if(type==='url')return `<a href="${esc(v)}" target="_blank" rel="noopener" data-stop>odpri</a>`;return esc(String(v))};
 function modStatus(m,r){if(m.stf){const k=m.stf(r);return[k,m.stl[k]]}if(m.st){const v=r[m.st]||(m.f.find(x=>x[0]===m.st)[3]||[])[0];return[v,v]}return null}
 function showMod(k){cur=null;curOrder=null;setNav(k);topSimple(MODS[k].t);show('#vMod');renderMod(k)}
 function renderMod(k){
@@ -4482,13 +4509,14 @@ function renderMod(k){
   const tab=MOD_T[k]||(DRIVE_FIRST.includes(k)?'drive':'recs'),D=driveSpace(k),tabs=`<div class="chips mtabs"><button class="chip${tab==='drive'?' on':''}" data-mtab="drive">${ic('folder')}Mape in datoteke (${D.items.length})</button><button class="chip${tab==='recs'?' on':''}" data-mtab="recs">${ic('menu')}Evidenca (${L.length})</button></div>`;
   $('#vMod').dataset.mod=k;
   if(tab==='drive'){$('#vMod').innerHTML=`<div class="wrap wide">${tabs}${driveHTML(k,m.t,m.desc)}</div>`;afterDrive($('#vMod'));return}
-  $('#vMod').innerHTML=`<div class="wrap wide">${BANK_TABS.some(b=>b[0]===k)?bankTabsHTML(k):''}${tabs}<div class="list-head"><h1>${esc(m.t)} <small>${L.length}</small></h1><label class="search">${ic('search')}<input id="modQ" placeholder="Išči" value="${esc(MOD_Q[k]||'')}"></label>
+  $('#vMod').innerHTML=`<div class="wrap wide">${PAY_TABS.flatMap(g=>g[1]).some(b=>b[0]===k)?payTabsHTML(k):''}${tabs}<div class="list-head"><h1>${esc(m.t)} <small>${L.length}</small></h1><label class="search">${ic('search')}<input id="modQ" placeholder="Išči" value="${esc(MOD_Q[k]||'')}"></label>
     ${k==='racunovodstvo'?`<button class="btn" id="accPack">${ic('download')}<span class="hide-s">Mesečni paket (CSV)</span></button>`:''}${k==='zaloga'?`<button class="btn" id="stFromPrice">${ic('tag')}<span class="hide-s">Iz cenika</span></button>`:''}
     <button class="btn" id="modImp">${ic('upload')}<span class="hide-s">Uvoz Excel</span></button><button class="btn" id="modXls">${ic('download')}<span class="hide-s">Excel</span></button><button class="btn" id="modCsv">${ic('download')}<span class="hide-s">CSV</span></button>${printBtn('modPrint')}<button class="btn sig" id="modNew">${ic('plus')}${esc(m.one)}</button></div>
     <p class="help" style="margin:-6px 0 12px">${esc(m.desc)}</p>
     ${k==='prihodi'?expectedArrivalsHTML():''}
     ${stOpts.length?`<div class="chips tchips"><button class="chip sm${!fl?' on':''}" data-mf="">Vse (${L.length})</button>${stOpts.map(([a,b])=>`<button class="chip sm${fl===a?' on':''}" data-mf="${esc(a)}">${esc(b)} (${L.filter(r=>(modStatus(m,r)||[])[0]===a).length})</button>`).join('')}</div>`:''}
-    ${F.length?`<div class="tbl modt" style="--n:${cols.length}"><div class="th-row">${cols.map(c=>`<span>${esc(c[1])}</span>`).join('')}<span></span></div>${F.map(r=>{const s=modStatus(m,r),c=m.calc&&m.calc(r);return `<div class="tr${m.flag&&m.flag(r)?' flag':''}${k==='dfa'||k==='ifaman'?' pay-'+payStatus(r):''}" data-rec="${r.id}">${cols.map((c2,i)=>`<div class="${i?'':'c1'}">${i?fldVal(r,c2):`<b>${fldVal(r,c2)||'—'}</b>${c?`<br><small>${c}</small>`:''}`}</div>`).join('')}<div>${s?`<span class="status ms-${esc(String(s[0]).replace(/\s+/g,'-'))}">${esc(s[1])}</span>`:''}</div></div>`}).join('')}</div>`:`<div class="empty"><h2>${L.length?'Ni zadetkov':'Še ni vnosov'}</h2><p>${esc(m.desc)}</p><button class="btn sig" id="modNew2">${ic('plus')}${esc(m.one)}</button></div>`}
+    ${F.length?`<div class="tbl modt" style="--n:${cols.length}"><div class="th-row">${cols.map(c=>`<span>${esc(c[1])}</span>`).join('')}<span></span></div>${F.map(r=>{const s=modStatus(m,r),c=m.calc&&m.calc(r);return `<div class="tr${m.flag&&m.flag(r)?' flag':''}${k==='dfa'||k==='ifaman'?' pay-'+payStatus(r):''}" data-rec="${r.id}">${cols.map((c2,i)=>`<div class="${i?'':'c1'}">${i?fldVal(r,c2):`<b>${fldVal(r,c2)||'—'}</b>${c?`<br><small>${c}</small>`:''}`}</div>`).join('')}<div class="stx">${s?`<span class="status ms-${esc(String(s[0]).replace(/\s+/g,'-'))}">${esc(s[1])}</span>`:''}<button class="btn sm ghost icon px" data-mdel="${r.id}" title="Izbriši" aria-label="Izbriši">✕</button></div></div>`}).join('')}</div>`:`<div class="empty"><h2>${L.length?'Ni zadetkov':'Še ni vnosov'}</h2><p>${esc(m.desc)}</p><button class="btn sig" id="modNew2">${ic('plus')}${esc(m.one)}</button></div>`}
+    ${sumBar(k)}
     ${(k==='dfa'||k==='ifaman')&&L.length?`<p class="xsum">Neplačano: <b>${fmt(L.filter(r=>payStatus(r)!=='placano').reduce((a,r)=>a+(+r.amount||0),0))}</b> · od tega zapadlo: <b class="warnc">${fmt(L.filter(r=>payStatus(r)==='zapadlo').reduce((a,r)=>a+(+r.amount||0),0))}</b> · plačano: <b class="okc">${fmt(L.filter(r=>payStatus(r)==='placano').reduce((a,r)=>a+(+r.amount||0),0))}</b></p>`:''}
     ${k==='narocnine'&&L.length?`<p class="xsum">Aktivne naročnine letno: <b>${fmt(L.filter(r=>r.active!==false).reduce((a,r)=>{const x=+r.amount||0;return a+(r.period==='mesečno'?x*12:r.period==='četrtletno'?x*4:r.period==='letno'?x:0)},0))}</b></p>`:''}
   </div>`;
@@ -4519,7 +4547,9 @@ function editRec(k,r){
     :k==='prihodi'&&r.id?`<div class="inline full"><button class="btn sm sig" id="rcStock" style="flex:none" ${r.stocked?'disabled':''}>${ic('layers')}${r.stocked?'Že prišteto v zalogo':'Prištej v zalogo'}</button><span class="help">Postavke v obliki »šifra naziv × količina«, vsaka v svoji vrstici.</span></div>`
     :k==='potovanja'?`<div class="inline full"><button class="btn sm" id="trKm" style="flex:none">${ic('globe')}Izračunaj kilometre</button><button class="btn sm" id="trMap" style="flex:none">Odpri v Google Maps</button><span class="help" id="trRes"></span></div>`
     :k==='sestanki'&&r.id?`<div class="inline full"><button class="btn sm" id="mtTodo" style="flex:none">${ic('todo')}Sklepe dodaj med opravila</button></div>`:'';
-  openModal({title:isNew?m.one:(r[m.f[0][0]]?String(r[m.f[0][0]]):m.one),wide:1,body:`${dl}<div class="recgrid">${m.f.map(f=>recInput(f,r[f[0]])).join('')}${extra}</div><p class="xsum" id="recCalc">${m.calc?m.calc(r):''}</p>`,
+  const FD=S.drive[k]?driveSpace(k).folders:(DRIVE_DEF[k]?driveSpace(k).folders:[]);const curF=r.id?(driveSpace(k).items.find(x=>x.type==='rec'&&x.recId===r.id)||{}).folder||'':'';
+  const fsel=!m.hidden&&FD.length?`<label class="fld"><span>Mapa (v Mape in datoteke)</span><select data-rfolder><option value="">— brez mape —</option>${FD.map(f=>`<option value="${f.id}"${curF===f.id?' selected':''}>${esc(f.name)}</option>`).join('')}</select></label>`:'';
+  openModal({title:isNew?m.one:(r[m.f[0][0]]?String(r[m.f[0][0]]):m.one),wide:1,body:`${dl}<div class="recgrid">${fsel}${m.f.map(f=>recInput(f,r[f[0]])).join('')}${extra}</div><p class="xsum" id="recCalc">${m.calc?m.calc(r):''}</p>`,
     foot:`${r.id?`<button class="btn ghost danger" data-md="del" aria-label="Izbriši">${ic('trash')}</button><button class="btn ghost" data-md="print">${ic('print')}</button>`:''}<span class="grow"></span><button class="btn" data-md="close">Prekliči</button><button class="btn pri" data-md="save">${ic('check')}Shrani</button>`,
     onOpen:async()=>{const fe=$('#recFiles');if(fe)fe.innerHTML=await filesHTML(r.files,'data-rfdel')+linksHTML(r);const dz=$('#recDrop');if(dz){['dragover','dragenter'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('over')}));dz.addEventListener('dragleave',()=>dz.classList.remove('over'));dz.addEventListener('drop',async e=>{e.preventDefault();dz.classList.remove('over');Object.assign(r,recVals(m));for(const f of e.dataTransfer.files){const x=await storeFile(f,{kind:m.one,ref:r.id});if(x){r.files=[...(r.files||[]),x.id];await routeToDocs(k,r,x,f)}}$('#recFiles').innerHTML=await filesHTML(r.files,'data-rfdel')+linksHTML(r)})}},
     onInput:()=>{if(m.calc){const t=clone(r);Object.assign(t,recVals(m));$('#recCalc').innerHTML=m.calc(t)}},
@@ -4528,7 +4558,7 @@ function editRec(k,r){
       if(t.closest('[data-rlink]')){const u=prompt('Povezava (Google Drive, YouTube, Dropbox …):');if(u&&/^https?:/.test(u)){Object.assign(r,recVals(m));r.links=[...(r.links||[]),{url:u.trim(),name:prompt('Naziv:',u.replace(/^https?:\/\/(www\.)?/,'').slice(0,50))||u}];$('#recFiles').innerHTML=await filesHTML(r.files,'data-rfdel')+linksHTML(r)}return}
       const lv=t.closest('[data-rlv]');if(lv){const L=r.links[+lv.dataset.rlv];const gd=(L.url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]+)/)||[])[1],yt=ytId(L.url);if(gd||yt){const w=document.createElement('div');w.className='lprev';w.innerHTML=`<iframe src="${gd?`https://drive.google.com/file/d/${gd}/preview`:`https://www.youtube.com/embed/${yt}`}" allowfullscreen></iframe>`;lv.closest('.lrow').after(w)}else window.open(L.url,'_blank');return}
       const ld=t.closest('[data-rld]');if(ld){r.links.splice(+ld.dataset.rld,1);$('#recFiles').innerHTML=await filesHTML(r.files,'data-rfdel')+linksHTML(r);return}
-      const ls=t.closest('[data-rls]');if(ls){const L=r.links[+ls.dataset.rls],co=S.settings.company;location.href=`mailto:?subject=${encodeURIComponent(L.name)}&body=${encodeURIComponent(`Pozdravljeni,\n\npošiljamo: ${L.name}\n${L.url}\n\nLep pozdrav,\n${co.name||''}`)}`;return}
+      const ls=t.closest('[data-rls]');if(ls){const L=r.links[+ls.dataset.rls],co=S.settings.company;openMail('',L.name,`Pozdravljeni,\n\npošiljamo: ${L.name}\n${L.url}\n\nLep pozdrav,\n${co.name||''}`);return}
       const fd=t.closest('[data-rfdel]');if(fd){r.files=r.files.filter(x=>x!==fd.dataset.rfdel);await DB.del('files',fd.dataset.rfdel);$('#recFiles').innerHTML=await filesHTML(r.files,'data-rfdel');return}
       const mv=t.closest('[data-mv]');if(mv){const q=num($('#mvQty').value)*(+mv.dataset.mv);if(!q)return;Object.assign(r,recVals(m));r.qty=(+r.qty||0)+q;(r.moves=r.moves||[]).push({date:today(),qty:q,note:$('#mvNote').value});await saveRecsNow();closeModal();editRec(k,r);renderMod(k);return}
       if(t.closest('#trKm,#trMap')){Object.assign(r,recVals(m));let st=String(r.route||'').split('\n').map(x=>x.trim()).filter(Boolean);if(st.length<2){toast('V relacijo vpiši vsaj dva kraja (vsak v svoji vrstici).','err');return}if(r.back&&st[st.length-1]!==st[0])st=[...st,st[0]];
@@ -4538,7 +4568,7 @@ function editRec(k,r){
         if(t.closest('#accSend')){let to=S.settings.accEmails||prompt('E-pošta računovodje (več naslovov loči z vejico):','')||'';if(!to)return;S.settings.accEmails=to;saveSettings();const files=fs.map(f=>new File([dataURLtoBlob(f.data)],f.name,{type:f.type}));
           const body=`Pozdravljeni,\n\nza obdobje ${r.month||''} pošiljam dokumente (${r.docType||''}):\n${fs.map(f=>'- '+f.name).join('\n')}\n${r.note?'\n'+r.note+'\n':''}\nLep pozdrav,\n${S.settings.company.contact||''}\n${S.settings.company.name||''}`;
           if(navigator.canShare&&navigator.canShare({files})){try{await navigator.share({files,title:'Dokumenti '+(r.month||''),text:body});r.status='poslano računovodji';r.sent=today();await saveRecsNow();return}catch{}}
-          await zipFiles(fs,`dokumenti-${r.month||today()}.zip`);location.href=`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent('Dokumenti za računovodstvo '+(r.month||''))}&body=${encodeURIComponent(body)}`;toast('ZIP z dokumenti je prenesen – pripni ga k odprti e-pošti.','',10000);r.status='poslano računovodji';r.sent=today();await saveRecsNow();return}
+          await zipFiles(fs,`dokumenti-${r.month||today()}.zip`);openMail(to,'Dokumenti za računovodstvo '+(r.month||''),body);toast('ZIP z dokumenti je prenesen – pripni ga k odprti e-pošti.','',10000);r.status='poslano računovodji';r.sent=today();await saveRecsNow();return}
         await zipFiles(fs,`dokumenti-${r.month||today()}.zip`);return}
       if(t.closest('#rcStock')){Object.assign(r,recVals(m));if(r.state&&r.state!=='v redu'&&!confirm('Stanje prevzema ni »v redu«. Vseeno prištejem v zalogo?'))return;let n=0;String(r.items||'').split('\n').map(x=>x.trim()).filter(Boolean).forEach(line=>{const mq=line.match(/^(.*?)\s*[×x*]\s*([\d.,]+)\s*\w*$/i);const name=(mq?mq[1]:line).trim(),q=mq?num(mq[2]):1;const sku=(name.match(/^([A-Z0-9][\w.-]{2,})\s+/)||[])[1]||'';const nm=sku?name.slice(sku.length).trim():name;
         let it=R$('zaloga').find(z=>(sku&&z.sku===sku)||z.name===nm);if(!it){it={id:uid(),created:Date.now(),sku,name:nm,qty:0,min:'',unit:'kos',loc:'',files:[]};R$('zaloga').push(it)}it.qty=(+it.qty||0)+q;(it.moves=it.moves||[]).push({date:r.date||today(),qty:q,note:'Prevzem '+(r.doc||r.supplier||'')});n++});r.stocked=true;await saveRecsNow();toast(`V zalogo prišteto ${n} postavk.`);closeModal();renderAfterRec(k);return}
@@ -4549,13 +4579,19 @@ function editRec(k,r){
       if(a==='print'){closeModal();printRec(k,r);return}
       r.links=r.links||[];const req=m.f.find(f=>f[3]===1&&!r[f[0]]);if(req){toast('Izpolni: '+req[1],'err');return}
       if((k==='dfa'||k==='ifaman')){if(r.status==='plačano'&&!r.paidDate)r.paidDate=today();if(r.paidDate&&r.status!=='plačano')r.status='plačano'}
-      if(!r.id){r.id=uid();R$(k).push(r)}r.updated=Date.now();await saveRecsNow();closeModal();renderAfterRec(k);toast('Shranjeno.')}});
+      const fsel2=$('#modal [data-rfolder]'),fid=fsel2?fsel2.value:null;
+      if(!r.id){r.id=uid();R$(k).push(r)}r.updated=Date.now();await saveRecsNow();
+      for(const f of m.f.filter(f=>f[2]==='customer'))if(r[f[0]])await ensureCustomer(r[f[0]],{phone:r.phone,email:r.email,address:r.address});
+      if(k==='b2b'&&r.company)await ensureCustomer(r.company,{phone:r.phone,email:r.email});
+      if(fid!==null){const D=driveSpace(k);let it=D.items.find(x=>x.type==='rec'&&x.recId===r.id);const nm=String(r[m.f[0][0]]||m.one);if(fid){if(!it){it={id:uid(),type:'rec',recId:r.id,created:Date.now()};D.items.push(it)}Object.assign(it,{folder:fid,name:nm});(r.files||[]).forEach(fl=>{if(!D.items.some(x=>x.fileId===fl&&x.folder===fid))DB.get('files',fl).then(fr=>{if(fr){D.items.push({id:uid(),folder:fid,type:'file',name:fr.name,fileId:fl,mime:fr.type,size:fr.size,created:Date.now()});saveDrive()}})})}else if(it)D.items.splice(D.items.indexOf(it),1);await saveDrive()}
+      closeModal();renderAfterRec(k);toast('Shranjeno.')}});
 }
 async function zipFiles(fs,name){try{await loadScript(CDN.jszip);const z=new JSZip();fs.forEach(f=>z.file(f.name,dataURLtoBlob(f.data)));download(await z.generateAsync({type:'blob'}),name)}catch{fs.forEach(f=>download(dataURLtoBlob(f.data),f.name))}}
 async function routeToDocs(k,r,x,f){const folder=k==='racunovodstvo'?(r.docType||'Ostali dokumenti'):k==='dfa'?'DFA prejeti računi':k==='leasing'?'Leasing dokumenti':k==='izpiski'?'Banka dokumenti':null;if(!folder)return;
   const D=driveSpace('dokumenti');let fo=D.folders.find(y=>y.name===folder&&!y.parent);if(!fo){fo={id:uid(),name:folder,parent:''};D.folders.push(fo)}
   D.items.push({id:uid(),folder:fo.id,type:'file',name:f.name,fileId:x.id,mime:f.type||x.type,size:f.size,created:Date.now(),from:k});await saveDrive()}
-function renderAfterRec(k){if(k==='montman'&&$('#vMontaze').classList.contains('on'))return renderMontaze();if(['dejavnosti','register'].includes(k)&&$('#vComp').classList.contains('on'))return renderCompany();if($('#vMod').classList.contains('on')&&$('#vMod').dataset.mod===k)renderMod(k);else if($('#vCal').classList.contains('on'))renderCal();else if($('#vDash').classList.contains('on'))renderDash()}
+function quickDel(arr,id,save,rerender,label){const i=arr.findIndex(x=>x.id===id);if(i<0)return;const [x]=arr.splice(i,1);Promise.resolve(save()).then(()=>{rerender();toast(`Izbrisano${label?': '+(label(x)||''):''}.`,'',8000,{label:'Razveljavi',fn:async()=>{arr.splice(i,0,x);await save();rerender()}})})}
+function renderAfterRec(k){if(k==='followman'&&$('#vMk').classList.contains('on'))return renderMarketing();if(k==='montman'&&$('#vMontaze').classList.contains('on'))return renderMontaze();if(['dejavnosti','register'].includes(k)&&$('#vComp').classList.contains('on'))return renderCompany();if($('#vMod').classList.contains('on')&&$('#vMod').dataset.mod===k)renderMod(k);else if($('#vCal').classList.contains('on'))renderCal();else if($('#vDash').classList.contains('on'))renderDash()}
 function linksHTML(r){return (r.links||[]).length?`<div class="files" style="margin-top:6px">${r.links.map((L,i)=>`<div class="fitem lrow"><span class="ftype">${/youtu/.test(L.url)?'VID':/drive\.google/.test(L.url)?'DRV':'URL'}</span><div class="fn"><b>${esc(L.name)}</b><span>${esc(L.url.slice(0,60))}</span></div><button class="btn sm" data-rlv="${i}">Poglej</button><button class="btn sm" data-rls="${i}" title="Pošlji po e-pošti">${ic('mail')}</button><button class="btn sm ghost icon danger" data-rld="${i}" aria-label="Odstrani">${ic('trash')}</button></div>`).join('')}</div>`:''}
 function recVals(m){const o={};$$('#modal [data-r]').forEach(e=>{const f=m.f.find(x=>x[0]===e.dataset.r);o[e.dataset.r]=e.type==='checkbox'?e.checked:(f&&(f[2]==='num'||f[2]==='money'))?(e.value===''?'':num(e.value)):e.value.trim()});return o}
 async function printRec(k,r){const m=MODS[k];const files=(await Promise.all((r.files||[]).map(id=>DB.get('files',id)))).filter(Boolean);
@@ -4563,6 +4599,7 @@ async function printRec(k,r){const m=MODS[k];const files=(await Promise.all((r.f
 const MOD_T={},DRIVE_FIRST=['dokumenti','tehpor','cert','epp'];
 $('#vMod').addEventListener('click',async e=>{const t=e.target,k=$('#vMod').dataset.mod,m=MODS[k];if(t.closest('[data-stop]'))return;
   const mt=t.closest('[data-mtab]');if(mt){MOD_T[k]=mt.dataset.mtab;renderMod(k);return}
+  const md=t.closest('[data-mdel]');if(md){e.stopPropagation();quickDel(R$(k),md.dataset.mdel,saveRecsNow,()=>renderMod(k),x=>x[m.f[0][0]]);return}
   if(t.closest('#modImp')){pickFile('.xlsx,.xls,.xlsm,.ods,.csv,.pdf',f=>importModFile(k,f));return}
   if(t.closest('#modXls')){const F=m.f.filter(x=>x[2]!=='files');exportXlsx(`STIK-${k}-${today()}`,[F.map(x=>x[1]),...R$(k).map(r=>F.map(x=>x[2]==='div'?divName(r[x[0]]):x[2]==='check'?(r[x[0]]?'da':'ne'):r[x[0]]??''))]);return}
   if(t.closest('#modNew,#modNew2'))return editRec(k,null);
@@ -4669,7 +4706,7 @@ $('#vCal').addEventListener('click',async e=>{const t=e.target;
 });
 const gcal={last:0,busy:false,err:'',
   ok(){return !!(driveToken.tok&&driveToken.exp>Date.now())},
-  state(){if(!S.settings.driveId)return{cls:'off',txt:'Google koledar ni povezan. Dogodki so shranjeni samo v tej napravi.'};if(this.busy)return{cls:'busy',txt:'Sinhroniziram z Google koledarjem …'};if(this.err)return{cls:'err',txt:'Sinhronizacija ni uspela: '+this.err};const l=+S.settings.gcalLast||0;return{cls:l?'on':'off',txt:l?`Sinhronizirano z Google koledarjem ${new Date(l).toLocaleString('sl-SI')}${this.ok()?'':' · za novo sinhronizacijo klikni gumb'}`:'Google je nastavljen – klikni Sinhroniziraj za povezavo s koledarjem.'}}};
+  state(){if(!S.settings.driveId)return{cls:'off',txt:'Google koledar ni povezan. Dogodki so shranjeni samo v tej napravi.'};if(this.busy)return{cls:'busy',txt:'Sinhroniziram z Google koledarjem …'};if(this.err)return{cls:'err',txt:'Sinhronizacija ni uspela: '+this.err};const l=+S.settings.gcalLast||0;return{cls:l?'on':'off',txt:l?`Sinhronizirano z Google koledarjem ${dtm(l)}${this.ok()?'':' · za novo sinhronizacijo klikni gumb'}`:'Google je nastavljen – klikni Sinhroniziraj za povezavo s koledarjem.'}}};
 function gcalBody(e){const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Ljubljana';const b={summary:e.title,location:e.location||'',description:(e.desc||'')+'\n\n[STIK Prodaja]',reminders:+e.remind?{useDefault:false,overrides:[{method:'popup',minutes:+e.remind}]}:{useDefault:true}};
   if(e.allDay){b.start={date:e.date};b.end={date:isoAdd(e.endDate||e.date,1)}}else{b.start={dateTime:`${e.date}T${e.time||'09:00'}:00`,timeZone:tz};b.end={dateTime:`${e.endDate||e.date}T${e.endTime||e.time||'10:00'}:00`,timeZone:tz};if(b.end.dateTime<=b.start.dateTime){const d=new Date(`${e.date}T${e.time||'09:00'}:00`);d.setHours(d.getHours()+1);b.end.dateTime=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:00`}}return b}
 function fromGcal(g){const allDay=!!g.start?.date,s=g.start?.dateTime||g.start?.date||'',en=g.end?.dateTime||g.end?.date||'';const loc=x=>{if(!x)return['',''];if(x.length===10)return[x,''];const d=new Date(x);return[`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`]};
@@ -4846,9 +4883,9 @@ function driveHTML(sp,title,sub){
     <div class="crumbs"><a data-df="">${esc(title)}</a>${path.map(x=>` / <a data-df="${x.id}">${esc(x.name)}</a>`).join('')}${q?` · rezultati iskanja`:''}</div>
     ${folders.length?`<div class="fgrid">${folders.map(x=>`<div class="fcard" data-df="${x.id}">${ic('folder')}<div><b>${esc(x.name)}</b><small>${cnt(x.id)} elementov</small></div><button class="btn sm ghost icon" data-dfm="${x.id}" aria-label="Uredi mapo">⋯</button></div>`).join('')}</div>`:''}
     <div class="ddrop" data-ddrop>Povleci datoteke sem, da jih naložiš v to mapo</div>
-    <div class="dlist">${items.length?items.map(x=>`<div class="ditem" data-di="${x.id}"><div class="dth" data-thumb="${x.type==='file'&&/^image/.test(x.mime)?x.fileId:''}">${x.type==='link'?ic('link'):x.type==='note'?ic('pen'):`<span class="ftype">${fileIcon(x.mime||'')}</span>`}</div>
+    <div class="dlist">${items.length?items.map(x=>`<div class="ditem" data-di="${x.id}"><div class="dth" data-thumb="${x.type==='file'&&/^image/.test(x.mime)?x.fileId:''}">${x.type==='link'?ic('link'):x.type==='note'?ic('pen'):`<span class="ftype">${x.type==='rec'?'ZAP':fileIcon(x.mime||'')}</span>`}</div>
       <div class="dn"><b>${esc(x.name)}</b><small>${x.type==='file'?`${Math.max(1,Math.round((x.size||0)/1024))} kB · `:''}${dateSl(new Date(x.created).toISOString().slice(0,10))}${q&&x.folder?' · '+esc(fpath(x.folder)):''}${x.type==='link'?' · '+esc(x.url):''}</small></div>
-      <div class="acts"><button class="btn sm" data-dio="${x.id}">${x.type==='link'?'Odpri':'Poglej'}</button>${x.type==='file'?`<button class="btn sm" data-dip="${x.id}" aria-label="Natisni">${ic('print')}</button><button class="btn sm" data-did="${x.id}" aria-label="Prenesi">${ic('download')}</button>`:''}${x.type==='file'&&sp==='ceniki'&&/pdf|sheet|excel|csv/.test(x.mime)?`<button class="btn sm" data-dconv="${x.id}">V tabelo</button>`:''}<button class="btn sm" data-dmail="${x.id}" aria-label="Pošlji po e-pošti" title="Pošlji po e-pošti">${ic('mail')}</button><button class="btn sm ghost icon" data-dim="${x.id}" aria-label="Več">⋯</button></div></div>`).join(''):`<div class="empty" style="padding:22px"><p>${q?'Ni zadetkov.':'V tej mapi še ni datotek.'}</p></div>`}</div></div>`;
+      <div class="acts"><button class="btn sm" data-dio="${x.id}">${x.type==='link'?'Odpri':'Poglej'}</button>${x.type==='file'?`<button class="btn sm" data-dip="${x.id}" aria-label="Natisni">${ic('print')}</button><button class="btn sm" data-did="${x.id}" aria-label="Prenesi">${ic('download')}</button>`:''}${x.type==='file'&&sp==='ceniki'&&/pdf|sheet|excel|csv/.test(x.mime)?`<button class="btn sm" data-dconv="${x.id}">V tabelo</button>`:''}<button class="btn sm" data-dmail="${x.id}" aria-label="Pošlji po e-pošti" title="Pošlji po e-pošti">${ic('mail')}</button><button class="btn sm ghost icon" data-dim="${x.id}" aria-label="Več">⋯</button><button class="btn sm ghost icon px" data-ddel="${x.id}" title="Izbriši" aria-label="Izbriši">✕</button></div></div>`).join(''):`<div class="empty" style="padding:22px"><p>${q?'Ni zadetkov.':'V tej mapi še ni datotek.'}</p></div>`}</div></div>`;
 }
 function afterDrive(root){fillThumbs(root);const z=root.querySelector('[data-ddrop]');if(z&&!z.dataset.on){z.dataset.on=1;const sp=root.querySelector('.drive').dataset.space;
   ['dragover','dragenter'].forEach(ev=>z.addEventListener(ev,e=>{e.preventDefault();z.classList.add('over')}));z.addEventListener('dragleave',()=>z.classList.remove('over'));
@@ -4876,12 +4913,13 @@ document.addEventListener('click',async e=>{const dr=e.target.closest('.drive');
   if(a==='upload'){pickFiles('*/*',async f=>{await driveAddFile(sp,f);rerenderDrive(sp)});return}
   if(a==='pdf'){const L=D.items.filter(x=>!st.f||x.folder===st.f);const fp=id=>{const n=[];let x=D.folders.find(y=>y.id===id);while(x){n.unshift(x.name);x=D.folders.find(y=>y.id===x.parent)}return n.join(' / ')};printPage(dr.querySelector('h1').textContent+' – seznam',ptable(['Mapa','Naziv','Vrsta','Datum'],L.map(x=>[esc(fp(x.folder)||'—'),esc(x.name),x.type==='file'?fileIcon(x.mime||''):x.type==='link'?'povezava':'beležka',dateSl(new Date(x.created).toISOString().slice(0,10))])));return}
   const it=id=>D.items.find(x=>x.id===id);
-  const o=t.closest('[data-dio]');if(o){const x=it(o.dataset.dio);if(x.type==='link'){const gd=(x.url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]+)/)||[])[1],yt=ytId(x.url);if(gd||yt){openModal({title:x.name,wide:2,body:`<iframe class="pdfview" src="${gd?`https://drive.google.com/file/d/${gd}/preview`:`https://www.youtube.com/embed/${yt}`}" allow="autoplay; fullscreen" allowfullscreen></iframe>`,foot:`<span class="grow"></span><a class="btn" href="${esc(x.url)}" target="_blank" rel="noopener">Odpri</a>`});return}window.open(x.url,'_blank');return}else if(x.type==='note')editNote(sp,x);else viewFile(x.fileId,x.name);return}
+  const ddl=t.closest('[data-ddel]');if(ddl){const x=it(ddl.dataset.ddel);if(x.type==='rec'){x.hidden=true}const i=D.items.indexOf(x);D.items.splice(i,1);await saveDrive();rerenderDrive(sp);toast(`Odstranjeno: ${x.name}`,'',8000,{label:'Razveljavi',fn:async()=>{D.items.splice(i,0,x);await saveDrive();rerenderDrive(sp)}});return}
+  const o=t.closest('[data-dio]');if(o){const x=it(o.dataset.dio);if(x.type==='rec'){const r=R$(sp).find(y=>y.id===x.recId);if(r)editRec(sp,r);else toast('Zapis ne obstaja več.','err');return}if(x.type==='link'){const gd=(x.url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]+)/)||[])[1],yt=ytId(x.url);if(gd||yt){openModal({title:x.name,wide:2,body:`<iframe class="pdfview" src="${gd?`https://drive.google.com/file/d/${gd}/preview`:`https://www.youtube.com/embed/${yt}`}" allow="autoplay; fullscreen" allowfullscreen></iframe>`,foot:`<span class="grow"></span><a class="btn" href="${esc(x.url)}" target="_blank" rel="noopener">Odpri</a>`});return}window.open(x.url,'_blank');return}else if(x.type==='note')editNote(sp,x);else viewFile(x.fileId,x.name);return}
   const pp=t.closest('[data-dip]');if(pp){const f=await DB.get('files',it(pp.dataset.dip).fileId);if(f)printFile(f);return}
   const dm2=t.closest('[data-dmail]');if(dm2){const x=it(dm2.dataset.dmail),co=S.settings.company;const to=prompt('E-pošta prejemnika:','')||'';
     const body=x.type==='link'?`Pozdravljeni,\n\npošiljamo povezavo: ${x.name}\n${x.url}\n\nLep pozdrav,\n${co.name||''}`:x.type==='note'?`${x.name}\n\n${x.text}`:`Pozdravljeni,\n\nv prilogi pošiljamo: ${x.name}\n\nLep pozdrav,\n${co.name||''}`;
     if(x.type==='file'&&navigator.canShare){const f=await DB.get('files',x.fileId);const file=new File([dataURLtoBlob(f.data)],f.name,{type:f.type});if(navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:x.name,text:body});return}catch{}}}
-    location.href=`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(x.name)}&body=${encodeURIComponent(body)}`;if(x.type==='file')toast('Datoteko pripni k e-pošti (prenesi jo z gumbom ⬇). Za pošiljanje brez prilog uporabi povezavo z Google Drive.','',9000);return}
+    openMail(to,x.name,body);if(x.type==='file')toast('Datoteko pripni k e-pošti (prenesi jo z gumbom ⬇). Za pošiljanje brez prilog uporabi povezavo z Google Drive.','',9000);return}
   const dd=t.closest('[data-did]');if(dd){const f=await DB.get('files',it(dd.dataset.did).fileId);if(f)download(dataURLtoBlob(f.data),f.name);return}
   const cv=t.closest('[data-dconv]');if(cv){const x=it(cv.dataset.dconv),f=await DB.get('files',x.fileId);if(f){showPrices();importPriceFile(new File([dataURLtoBlob(f.data)],f.name,{type:f.type}))}return}
   const m=t.closest('[data-dim]');if(m){const x=it(m.dataset.dim);const fs=[['','(koren)'],...D.folders.map(y=>[y.id,y.name])];
@@ -4899,15 +4937,15 @@ async function exportXlsx(name,rows){try{await loadScript(CDN.xlsx);const ws=XLS
 function importModFile(k,f){const m=MODS[k];readTableFile(f).then(rows=>{
   const fields=m.f.filter(x=>x[2]!=='files').map(([key,l,type,x3])=>[key,l,x3===1?1:0,[l.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s*\(.*$/,''),key]]);
   mapColumns(rows,fields,`Uvoz: ${m.t}`,async L=>{let n=0;for(const r of L){if(!Object.values(r).some(Boolean))continue;const req=m.f.find(x=>x[3]===1);if(req&&!r[req[0]])continue;
-    const rec={id:uid(),created:Date.now(),files:[]};m.f.forEach(([key,,type])=>{let v=r[key];if(v===undefined)return;if(type==='num'||type==='money')v=v===''?'':num(v);if(type==='date'&&v){const d=String(v).match(/(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})/);if(d)v=`${d[3]}-${d[2].padStart(2,'0')}-${d[1].padStart(2,'0')}`}if(type==='check')v=/^(da|1|true|x|✓|yes)$/i.test(String(v).trim());rec[key]=v});R$(k).push(rec);n++}
+    const rec={id:uid(),created:Date.now(),files:[]};m.f.forEach(([key,,type])=>{let v=r[key];if(v===undefined)return;if(type==='num'||type==='money')v=v===''?'':num(v);if(type==='date'&&v)v=normDate(v)||v;if(type==='month'&&v){const d=normDate(v);if(d)v=d.slice(0,7)}if(type==='check')v=/^(da|1|true|x|✓|yes)$/i.test(String(v).trim());rec[key]=v});R$(k).push(rec);n++}
     await saveRecsNow();renderMod(k);toast(`Uvoženih ${n} vnosov.`)})}).catch(err=>toast('Uvoz ni uspel: '+err.message,'err'))}
 
 /* ================= Montažni termini (orders + manual) ================= */
-MODS.kartice={t:'Plačila s kartico',one:'Plačilo s kartico',ic:'euro',hidden:1,desc:'Plačila s poslovno kartico: trgovec, znesek, kartica in ali je račun priložen.',f:[['date','Datum','date',1],['merchant','Trgovec / ponudnik','text'],['amount','Znesek (€)','money'],['card','Kartica (zadnje 4 številke)','text'],['cat','Kategorija','sel',['gorivo','material','programska oprema','oglaševanje','potni stroški','pisarna','drugo']],['invoice','Račun priložen','check'],['booked','Knjiženo','check'],['note','Opombe','area'],['files','Račun / potrdilo','files']],cols:['date','merchant','amount','cat','invoice'],flag:r=>!r.invoice};
-MODS.obroki={t:'Plačila na obroke',one:'Nakup na obroke',ic:'repeat',hidden:1,desc:'Nakupi na obroke: skupni znesek, obrok, plačani in preostali obroki.',f:[['item','Predmet nakupa','text',1],['provider','Ponudnik obrokov','text'],['total','Skupni znesek (€)','money'],['count','Število obrokov','num'],['rate','Mesečni obrok (€)','money'],['first','Prvi obrok','date'],['day','Dan plačila v mesecu','num'],['paid','Plačanih obrokov','num'],['next','Naslednji obrok','date'],['contract','Št. pogodbe','text'],['status','Stanje','sel',['aktivno','zaključeno']],['note','Opombe','area'],['files','Pogodba, amortizacijski načrt','files']],cols:['item','provider','rate','next','status'],st:'status',cal:[['next','Obrok']],
-  calc:r=>{const left=Math.max(0,(+r.count||0)-(+r.paid||0));return +r.count?`Preostalo ${left} obrokov · ${fmt(left*(+r.rate||0))}${r.first&&+r.count?` · zadnji obrok ${dmy((()=>{const d=new Date(r.first+'T12:00:00');d.setMonth(d.getMonth()+(+r.count)-1);return d.toISOString().slice(0,10)})())}`:''}`:''}};
-MODS.leasing={t:'Leasingi',one:'Leasing',ic:'truck',hidden:1,desc:'Leasing pogodbe za vozila in opremo: obroki, trajanje, ostanek vrednosti in zavarovanje.',f:[['object','Predmet (vozilo / oprema)','text',1],['lessor','Leasingodajalec','text'],['contract','Št. pogodbe','text'],['kind','Vrsta','sel',['finančni leasing','operativni leasing','kredit']],['value','Vrednost predmeta (€)','money'],['down','Polog / lastna udeležba (€)','money'],['rate','Mesečni obrok (€)','money'],['count','Število obrokov','num'],['start','Začetek','date'],['end','Konec','date'],['interest','Obrestna mera (%)','text'],['residual','Ostanek vrednosti (€)','money'],['insurance','Zavarovanje (kasko, polica, poteče)','text'],['plate','Registrska / serijska št.','text'],['note','Opombe','area'],['files','Pogodba, amortizacijski načrt','files']],cols:['object','lessor','rate','end','kind'],cal:[['end','Konec leasinga']],
-  calc:r=>{const tot=(+r.rate||0)*(+r.count||0)+(+r.down||0)+(+r.residual||0);return tot?`Skupni strošek: <b>${fmt(tot)}</b>${+r.value?` (vrednost ${fmt(+r.value)}, razlika ${fmt(tot-(+r.value))})`:''}`:''}};
+MODS.kartice={t:'Plačila s kartico (podjetje)',one:'Plačilo s kartico',ic:'euro',hidden:1,desc:'Plačila s poslovno plačilno ali predplačniško kartico: trgovec, znesek, kartica in ali je račun priložen.',f:[['cardType','Kartica','sel',['plačilna kartica','predplačniška kartica']],['date','Datum','date',1],['merchant','Trgovec / ponudnik','text'],['amount','Znesek (€)','money'],['card','Kartica (zadnje 4 številke)','text'],['cat','Kategorija','sel',['gorivo','material','programska oprema','oglaševanje','potni stroški','pisarna','drugo']],['invoice','Račun priložen','check'],['booked','Knjiženo','check'],['topup','Polnitev predplačniške kartice (€)','money'],['note','Opombe','area'],['files','Račun / potrdilo','files']],cols:['date','cardType','merchant','amount','invoice'],st:'cardType',flag:r=>!r.invoice};
+MODS.obroki={t:'Plačila na obroke (stranke)',one:'Nakup stranke na obroke',ic:'repeat',hidden:1,desc:'Stranke, ki plačajo na obroke prek ponudnika obrokov: odobritev, nakazilo ponudnika in provizija.',f:[['customer','Kupec','customer',1],['provider','Ponudnik obrokov','text'],['amount','Znesek nakupa (€)','money'],['count','Število obrokov','num'],['invoice','Št. računa / naročila','text'],['approved','Odobreno dne','date'],['payout','Nakazilo ponudnika dne','date'],['fee','Provizija (€)','money'],['status','Stanje','sel',['v odobritvi','odobreno','nakazano','zavrnjeno']],['contract','Št. pogodbe','text'],['note','Opombe','area'],['files','Pogodba, potrdilo','files']],cols:['customer','provider','amount','count','status'],st:'status',
+  calc:r=>+r.amount?`Prejeto od ponudnika: <b>${fmt((+r.amount||0)-(+r.fee||0))}</b>${+r.count?` · obrok za kupca ≈ ${fmt((+r.amount||0)/(+r.count))}`:''}`:''};
+MODS.leasing={t:'Leasingi (stranke)',one:'Leasing stranke',ic:'truck',hidden:1,desc:'Stranke, ki kupijo prek leasinga: leasing hiša, pogodba, nakazilo in dokumenti.',f:[['customer','Kupec','customer',1],['lessor','Leasing hiša','text'],['object','Predmet (vozilo / oprema)','text'],['contract','Št. pogodbe','text'],['kind','Vrsta','sel',['finančni leasing','operativni leasing','kredit']],['amount','Vrednost (€)','money'],['down','Polog kupca (€)','money'],['count','Število obrokov','num'],['approved','Odobreno dne','date'],['payout','Nakazilo leasing hiše dne','date'],['status','Stanje','sel',['v odobritvi','odobreno','nakazano','zavrnjeno']],['note','Opombe','area'],['files','Pogodba, dokumenti za leasing','files']],cols:['customer','lessor','object','amount','status'],st:'status',
+  calc:r=>+r.amount?`Financira leasing hiša: <b>${fmt((+r.amount||0)-(+r.down||0))}</b>`:''};
 MODS.ifaman={t:'IFA plačila (izdani računi)',one:'Izdani račun',ic:'euro',hidden:1,desc:'Evidenca izdanih računov in plačil kupcev. Uvozi Excel iz računovodskega programa, plačila se samodejno označijo ob uvozu bančnega izpiska.',stf:r=>payStatus(r),stl:{odprto:'Odprto',zapadlo:'Zapadlo',postopek:'V postopku',placano:'Plačano'},cal:[['due','Zapade izdani račun']],f:[['number','Št. računa','text',1],['customer','Kupec','customer'],['date','Datum','date'],['due','Zapadlost','date'],['amount','Znesek (€)','money'],['status','Stanje plačila','sel',['odprto','v postopku','plačano']],['paidDate','Plačano dne','date'],['type','Vrsta','sel',['Račun','Račun – davčna blagajna','Avansni račun']],['note','Opombe','area'],['files','Račun (PDF)','files']],cols:['number','customer','date','amount']};
 MODS.montman={t:'Montažni termini',one:'Montažni termin',ic:'wrench',hidden:1,desc:'Ročno vneseni montažni termini.',
   f:[['customer','Stranka','customer',1],['vehicle','Vozilo','text'],['quoteNo','Št. ponudbe','text'],['date','Datum montaže','date'],['time','Ura','time'],['installer','Montažer','text'],['status','Status','sel',['Čaka na blago','Pripravljeno','Termin potrjen','Opravljeno','Odpovedano']],['avans','Avans plačan','check'],['goods','Blago je prispelo','check'],['phone','Telefon','tel'],['address','Kraj montaže','text'],['div','Program','div'],['note','Opombe','area'],['files','Priloge','files']],cols:['customer','vehicle','date','installer','status'],st:'status',cal:[['date','Montaža']]};
@@ -4922,7 +4960,7 @@ function renderMontaze(){
   const L=all.filter(r=>(!q||[r.customer,r.vehicle,r.quoteNo,r.installer,r.items,r.note].join(' ').toLowerCase().includes(q))&&(!mtS||r.status===mtS)&&(!mtI||r.installer===mtI))
     .sort((a,b)=>mtSort==='date'?((a.date||'9')+(a.time||'')).localeCompare((b.date||'9')+(b.time||'')):String(a[mtSort]||'').localeCompare(String(b[mtSort]||''),'sl'));
   const ST=MODS.montman.f.find(x=>x[0]==='status')[3],cls=s=>({'Čaka na blago':'wait','Pripravljeno':'ready','Termin potrjen':'conf','Opravljeno':'done','Odpovedano':'canc'})[s]||'wait';
-  const row=r=>`<div class="tr" data-mt="${r.src}|${r.id}"><div class="c1"><b>${esc(r.customer||'—')}</b>${r.src==='o'?'<small class="help"> · iz naročila</small>':''}${divTag(r.div)}</div><div>${esc(r.vehicle||'')}${r.items?`<br><small>${esc(r.items.slice(0,60))}</small>`:''}</div><div>${esc(r.quoteNo||'')}</div><div>${r.date?`<b>${dateSl(r.date)}</b>${r.time?' '+esc(r.time):''}`:''}</div><div>${esc(r.installer||'')}</div><div><span class="mst ${cls(r.status)}">${esc(r.status)}</span></div><div>${r.avans?'✓':''}</div><div>${r.goods?'✓':''}</div></div>`;
+  const row=r=>`<div class="tr" data-mt="${r.src}|${r.id}"><button class="btn sm ghost icon px mtx" ${r.src==='m'?`data-mtdel="${r.id}"`:`data-odel2="${r.id}"`} title="${r.src==='m'?'Izbriši':'Odstrani termin (datum montaže)'}" aria-label="Izbriši">✕</button><div class="c1"><b>${esc(r.customer||'—')}</b>${r.src==='o'?'<small class="help"> · iz naročila</small>':''}${divTag(r.div)}</div><div>${esc(r.vehicle||'')}${r.items?`<br><small>${esc(r.items.slice(0,60))}</small>`:''}</div><div>${esc(r.quoteNo||'')}</div><div>${r.date?`<b>${dateSl(r.date)}</b>${r.time?' '+esc(r.time):''}`:''}</div><div>${esc(r.installer||'')}</div><div><span class="mst ${cls(r.status)}">${esc(r.status)}</span></div><div>${r.avans?'✓':''}</div><div>${r.goods?'✓':''}</div></div>`;
   const hd=(k,l)=>`<span data-mts="${k}" class="srt">${l}${mtSort===k?' ▲':''}</span>`;
   $('#vMontaze').innerHTML=`<div class="wrap wide"><div class="list-head"><div><h1 style="margin:0">Montažni termini</h1><p class="help" style="margin:2px 0 0">${all.length} zapisov · ${all.filter(r=>r.src==='o').length} iz naročil, ${all.filter(r=>r.src==='m').length} ročnih</p></div><span class="grow"></span>
     <div class="seg2"><button data-mtv="list" class="${mtV==='list'?'on':''}" aria-label="Seznam">${ic('menu')}</button><button data-mtv="kanban" class="${mtV==='kanban'?'on':''}" aria-label="Tabla">${ic('grid')}</button></div>
@@ -4933,6 +4971,8 @@ function renderMontaze(){
 }
 const mtExportRows=()=>[['Stranka','Vozilo','Št. ponudbe','Datum montaže','Ura','Montažer','Status','Avans plačan','Blago je prispelo','Telefon','Izdelki / opombe','Vir'],...mtRows().map(r=>[r.customer,r.vehicle,r.quoteNo,r.date,r.time,r.installer,r.status,r.avans?'da':'ne',r.goods?'da':'ne',r.phone,r.items||r.note||'',r.src==='o'?'naročilo':'ročno'])];
 $('#vMontaze').addEventListener('click',async e=>{const t=e.target;
+  const md=t.closest('[data-mtdel]');if(md){e.stopPropagation();quickDel(R$('montman'),md.dataset.mtdel,saveRecsNow,renderMontaze,x=>x.customer);return}
+  const md2=t.closest('[data-odel2]');if(md2){e.stopPropagation();const o=S.orders.find(x=>x.id===md2.dataset.odel2);if(o&&confirm('Termin je iz naročila. Odstranim datum montaže iz naročila?')){o.planned='';o.plannedTime='';await saveOrders();renderMontaze()}return}
   const v=t.closest('[data-mtv]');if(v){mtV=v.dataset.mtv;renderMontaze();return}
   const so=t.closest('[data-mts]');if(so){mtSort=so.dataset.mts;renderMontaze();return}
   if(t.closest('#mtNew')){editRec('montman',null);return}
@@ -5118,14 +5158,14 @@ function showBank(){cur=null;setNav('izpiski');topSimple('Izpiski in plačila');
 function renderBank(){const L=R$('banktx').sort((a,b)=>(b.date||'').localeCompare(a.date||'')),F=L.filter(t=>!bankF||(bankF==='in'&&t.dir==='in')||(bankF==='out'&&t.dir==='out')||(bankF==='un'&&!t.match));
   const dfa=R$('dfa'),ifa=R$('ifaman'),open=r=>payStatus(r)!=='placano';
   const sum=(A,f)=>A.filter(f).reduce((a,x)=>a+(+x.amount||0),0),t=today();
-  $('#vBank').innerHTML=`<div class="wrap wide">${bankTabsHTML('izpiski')}<div class="list-head"><div><h1 style="margin:0">Bančni izpiski</h1><p class="help" style="margin:2px 0 0">Uvozi izpisek (PDF, Excel ali CSV iz spletne banke). Program razvrsti prilive in odlive ter jih poveže z DFA in IFA računi – plačani se obarvajo zeleno.</p></div><span class="grow"></span>
-    <button class="btn" id="bkImp">${ic('upload')}Uvozi izpisek</button><button class="btn" id="bkMatch">${ic('repeat')}Ponovno poveži</button><button class="btn" id="bkRem">${ic('mail')}Opomini</button>${printBtn('bkPrint')}<button class="btn" id="bkXls">${ic('download')}Excel</button></div>
+  $('#vBank').innerHTML=`<div class="wrap wide">${payTabsHTML('izpiski')}<div class="list-head"><div><h1 style="margin:0">Bančni izpiski – ${esc(S.settings.company.name||'podjetje')}</h1><p class="help" style="margin:2px 0 0">Uvozi izpisek (PDF, Excel ali CSV iz spletne banke). Program razvrsti prilive in odlive ter jih poveže z DFA in IFA računi – plačani se obarvajo zeleno.</p></div><span class="grow"></span>
+    <button class="btn" id="bkAdd">${ic('plus')}Dodaj ročno</button><button class="btn" id="bkImp">${ic('upload')}Uvozi izpisek</button><button class="btn" id="bkMatch">${ic('repeat')}Ponovno poveži</button><button class="btn" id="bkRem">${ic('mail')}Opomini</button>${printBtn('bkPrint')}<button class="btn" id="bkXls">${ic('download')}Excel</button></div>
     <div class="dash four"><div class="kpi"><span>Prilivi (prihodki)</span><b class="okc">${fmt(sum(L,x=>x.dir==='in'))}</b><small>${L.filter(x=>x.dir==='in').length} transakcij</small></div><div class="kpi"><span>Odlivi (odhodki)</span><b>${fmt(sum(L,x=>x.dir==='out'))}</b><small>${L.filter(x=>x.dir==='out').length} transakcij</small></div>
       <button class="kpi${sum(ifa,open)?' warn':''}" data-go="ifa"><span>Odprto pri kupcih (IFA)</span><b>${fmt(sum(ifa,open))}</b><small>${ifa.filter(open).length} računov · zapadlo ${fmt(sum(ifa,r=>open(r)&&r.due&&r.due<t))}</small></button>
       <button class="kpi${sum(dfa,open)?' warn':''}" data-go="dfa"><span>Neplačano dobaviteljem (DFA)</span><b>${fmt(sum(dfa,open))}</b><small>${dfa.filter(open).length} računov · zapadlo ${fmt(sum(dfa,r=>open(r)&&r.due&&r.due<t))}</small></button></div>
     <div class="chips tchips">${[['','Vse'],['in','Prilivi'],['out','Odlivi'],['un','Nepovezane']].map(([k,l])=>`<button class="chip sm${bankF===k?' on':''}" data-bf="${k}">${l} (${k===''?L.length:k==='un'?L.filter(x=>!x.match).length:L.filter(x=>x.dir===k).length})</button>`).join('')}</div>
     ${F.length?`<div class="tbl bankt"><div class="th-row"><span>Datum</span><span>Opis / partner</span><span>Kategorija</span><span class="r">Znesek</span><span>Povezan račun</span></div>${F.map(x=>`<div class="tr ${x.dir}"><div>${dmy(x.date)}</div><div class="c1"><b>${esc(x.party||'')}</b><small>${esc(x.desc||'')}${x.ref?' · '+esc(x.ref):''}</small></div><div><select class="inp" data-txdir="${x.id}"><option value="in"${x.dir==='in'?' selected':''}>Prihodek</option><option value="out"${x.dir==='out'?' selected':''}>Odhodek</option></select></div><div class="r"><b class="${x.dir==='in'?'okc':''}">${x.dir==='in'?'+':'−'}${fmt(+x.amount||0)}</b></div>
-      <div><select class="inp" data-txm="${x.id}"><option value="">— ni povezano —</option>${(x.dir==='in'?ifa.map(r=>['ifaman',r,`${r.number} · ${r.customer||''} · ${fmt(+r.amount||0)}`]):dfa.map(r=>['dfa',r,`${r.supplier||''} ${r.no||''} · ${fmt(+r.amount||0)}`])).filter(([,r])=>open(r)||x.match===r.id).map(([k,r,l])=>`<option value="${k}|${r.id}"${x.match===r.id?' selected':''}>${esc(l)}</option>`).join('')}</select></div></div>`).join('')}</div>`:'<div class="empty"><h2>Ni transakcij</h2><p>Uvozi PDF izpisek banke ali izvoz transakcij iz spletne banke (Excel/CSV).</p></div>'}</div>`;
+      <div class="txm"><button class="btn sm ghost icon px" data-txdel="${x.id}" title="Izbriši" aria-label="Izbriši">✕</button><select class="inp" data-txm="${x.id}"><option value="">— ni povezano —</option>${(x.dir==='in'?ifa.map(r=>['ifaman',r,`${r.number} · ${r.customer||''} · ${fmt(+r.amount||0)}`]):dfa.map(r=>['dfa',r,`${r.supplier||''} ${r.no||''} · ${fmt(+r.amount||0)}`])).filter(([,r])=>open(r)||x.match===r.id).map(([k,r,l])=>`<option value="${k}|${r.id}"${x.match===r.id?' selected':''}>${esc(l)}</option>`).join('')}</select></div></div>`).join('')}</div>`:'<div class="empty"><h2>Ni transakcij</h2><p>Uvozi PDF izpisek banke ali izvoz transakcij iz spletne banke (Excel/CSV).</p></div>'}</div>`;
 }
 function payStatus(r){if(r.paidDate||r.status==='plačano')return 'placano';if(r.status==='v postopku')return 'postopek';return r.due&&r.due<today()?'zapadlo':'odprto'}
 async function parseStatement(f){
@@ -5141,16 +5181,18 @@ async function parseStatement(f){
     const desc=r.filter(c=>!dre.test(c)&&!/^-?\d{1,3}(\.\d{3})*,\d{2}$/.test(c)).join(' ').trim();out.push({date:`${dm[3]}-${dm[2].padStart(2,'0')}-${dm[1].padStart(2,'0')}`,party:desc.slice(0,60),desc,ref:(line.match(/SI\d{2}\s?[\d-]+/)||[''])[0],amount:Math.abs(v),dir:v<0||/breme|odliv|plačilo|nakazilo/i.test(line)?'out':'in'})});
   return out;
 }
-function normDate(v){const s=String(v||'').trim();let m=s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;m=s.match(/(\d{1,2})[./]\s*(\d{1,2})[./]\s*(\d{2,4})/);if(m){const y=m[3].length===2?'20'+m[3]:m[3];return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`}return ''}
+function normDate(v){if(v instanceof Date)return new Date(v.getTime()+12*3600e3).toISOString().slice(0,10);if(typeof v==='number'&&v>20000&&v<80000){const d=new Date(Date.UTC(1899,11,30)+v*864e5);return d.toISOString().slice(0,10)}const s=String(v||'').trim();if(/^\d{5}(\.\d+)?$/.test(s))return normDate(+s);let m=s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;m=s.match(/(\d{1,2})[./]\s*(\d{1,2})[./]\s*(\d{2,4})/);if(m){const y=m[3].length===2?'20'+m[3]:m[3];return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`}return ''}
 function autoMatch(){const T=R$('banktx');let n=0;const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
   T.filter(t=>!t.match).forEach(t=>{const pool=t.dir==='in'?R$('ifaman'):R$('dfa');const cand=pool.filter(r=>payStatus(r)!=='placano'&&Math.abs((+r.amount||0)-(+t.amount||0))<0.01);
-    const txt=norm((t.party||'')+(t.desc||'')+(t.ref||''));let best=cand.find(r=>{const no=norm(t.dir==='in'?r.number:r.no);return no&&txt.includes(no)})||cand.find(r=>{const nm=norm(t.dir==='in'?r.customer:r.supplier).slice(0,8);return nm&&txt.includes(nm)})||(cand.length===1?cand[0]:null);
+    const txt=norm((t.party||'')+(t.desc||'')+(t.ref||''));let best=cand.find(r=>{const no=norm(t.dir==='in'?r.number:(r.no||r.number));return no&&txt.includes(no)})||cand.find(r=>{const nm=norm(t.dir==='in'?r.customer:r.supplier).slice(0,8);return nm&&txt.includes(nm)})||(cand.length===1?cand[0]:null);
     if(best){t.match=best.id;t.mk=t.dir==='in'?'ifaman':'dfa';best.paidDate=t.date;best.status='plačano';best.txId=t.id;n++}});return n}
 async function applyManualMatch(tx,val){const old=tx.match&&R$(tx.mk||'dfa').find(r=>r.id===tx.match);if(old&&old.txId===tx.id){old.paidDate='';old.status='odprto';delete old.txId}
   if(val){const [k,id]=val.split('|');const r=R$(k).find(x=>x.id===id);tx.match=id;tx.mk=k;r.paidDate=tx.date;r.status='plačano';r.txId=tx.id}else{tx.match='';tx.mk=''}await saveRecsNow()}
 $('#vBank').addEventListener('click',async e=>{const t=e.target;
   const bf=t.closest('[data-bf]');if(bf){bankF=bf.dataset.bf;renderBank();return}
   if(t.closest('#bkImp')){pickFile('.pdf,.xlsx,.xls,.csv,.txt',async f=>{try{const L=await parseStatement(f);const ex=R$('banktx');let add=0;L.forEach(x=>{if(!ex.some(y=>y.date===x.date&&Math.abs(y.amount-x.amount)<.01&&(y.party||'')===(x.party||'')&&y.dir===x.dir)){ex.push({id:uid(),created:Date.now(),src:f.name,...x});add++}});const m=autoMatch();await saveRecsNow();renderBank();toast(`Uvoženih ${add} transakcij, samodejno povezanih ${m} računov.`,'',8000)}catch(err){toast('Uvoz izpiska ni uspel: '+err.message,'err',8000)}});return}
+  const tdl=t.closest('[data-txdel]');if(tdl){const x=R$('banktx').find(y=>y.id===tdl.dataset.txdel);if(x&&x.match)await applyManualMatch(x,'');quickDel(R$('banktx'),tdl.dataset.txdel,saveRecsNow,renderBank,y=>y.party);return}
+  if(t.closest('#bkAdd')){const x={id:uid(),created:Date.now(),date:today(),party:'',desc:'',ref:'',amount:0,dir:'out'};openModal({title:'Nova transakcija',body:`<div class="row">${mf('Datum','date',x.date,{type:'date'})}${mf('Vrsta','dir','out',{type:'select',opts:[['in','Prihodek (priliv)'],['out','Odhodek (odliv)']]})}</div>${mf('Partner','party','')}<div style="height:8px"></div>${mf('Namen','desc','')}<div class="row">${mf('Sklic','ref','')}${mf('Znesek (€)','amount','',{num:1})}</div>`,foot:`<span class="grow"></span><button class="btn pri" data-md="save">${ic('check')}Shrani</button>`,onClick:async ev=>{if(!ev.target.closest('[data-md=save]'))return;Object.assign(x,mdVals());R$('banktx').push(x);autoMatch();await saveRecsNow();closeModal();renderBank()}});return}
   if(t.closest('#bkMatch')){const m=autoMatch();await saveRecsNow();renderBank();toast(`Povezanih ${m} računov.`);return}
   if(t.closest('#bkRem')){reminders();return}
   if(t.closest('#bkXls')){exportXlsx(`STIK-izpiski-${today()}`,[['Datum','Partner','Namen','Sklic','Kategorija','Znesek','Povezan račun'],...R$('banktx').map(x=>{const r=x.match&&R$(x.mk||'dfa').find(y=>y.id===x.match);return[dmy(x.date),x.party,x.desc,x.ref,x.dir==='in'?'Prihodek':'Odhodek',(x.dir==='in'?1:-1)*x.amount,r?(r.number||r.no||''):'']})]);return}
@@ -5166,7 +5208,7 @@ function reminders(){const open=R$('ifaman').filter(r=>payStatus(r)!=='placano')
     foot:`<span class="grow"></span><button class="btn" data-md="savetpl">Shrani predlogo</button>`,
     onClick:e=>{const a=e.target.closest('[data-md=savetpl]');const tv=$('#remT').value;if(a){S.settings.remTpl=tv;saveSettings();toast('Predloga shranjena.');return}
       const mm=e.target.closest('[data-remm]'),mp=e.target.closest('[data-remp]');if(!mm&&!mp)return;S.settings.remTpl=tv;const k=C[+(mm||mp).dataset[mm?'remm':'remp']];const body=fill(k);
-      if(mm){const c=S.customers.find(x=>x.name===k);location.href=`mailto:${encodeURIComponent(c?.email||'')}?subject=${encodeURIComponent('Opomin – odprte postavke')}&body=${encodeURIComponent(body)}`}else printPage('Opomin – '+k,`<div style="white-space:pre-wrap">${esc(body)}</div>`)}});
+      if(mm){const c=S.customers.find(x=>x.name===k);openMail(c?.email||'','Opomin – odprte postavke',body)}else printPage('Opomin – '+k,`<div style="white-space:pre-wrap">${esc(body)}</div>`)}});
 }
 
 /* ================= calendar: day / week views ================= */
@@ -5178,6 +5220,51 @@ function timeGridHTML(days){const H=[...Array(17)].map((_,i)=>i+6),t=today();con
   return `<div class="tg" style="--d:${days.length}"><div class="tg-h"><span></span>${days.map(d=>`<span class="${d===t?'today':''}" data-gday="${d}"><small>${['ned','pon','tor','sre','čet','pet','sob'][new Date(d+'T12:00:00').getDay()]}</small><b>${dmy(d).slice(0,5)}</b></span>`).join('')}</div>
     <div class="tg-all"><span>ves dan</span>${days.map(d=>`<div data-newev="${d}">${items.filter(x=>x.date===d&&!x.time).map(chipA).join('')}</div>`).join('')}</div>
     <div class="tg-b">${H.map(h=>`<div class="tg-r"><span>${String(h).padStart(2,'0')}:00</span>${days.map(d=>`<div class="tg-c" data-newevt="${d}|${String(h).padStart(2,'0')}:00">${items.filter(x=>x.date===d&&x.time&&+x.time.slice(0,2)===h).map(x=>chipA({...x,title:(x.time||'')+' '+x.title})).join('')}</div>`).join('')}</div>`).join('')}</div></div>`}
+
+
+/* ================= universal e-mail composer (Gmail / Outlook / program) ================= */
+function openMail(to,subject,body){
+  const cs=S.customers.filter(c=>c.email),sup=S.suppliers.filter(s=>s.email);
+  openModal({title:'Pošlji e-pošto',wide:1,body:`<datalist id="mailTo">${[...cs.map(c=>[c.email,c.name]),...sup.map(s=>[s.email,s.name]),...(S.settings.accEmails?[[S.settings.accEmails,'računovodja']]:[])].map(([e,n])=>`<option value="${esc(e)}">${esc(n)}</option>`).join('')}</datalist>
+    <label class="fld"><span>Za (lahko spremeniš; več naslovov loči z vejico)</span><input id="mTo" type="email" multiple list="mailTo" value="${esc(to||'')}" placeholder="ime@podjetje.si"></label><div style="height:8px"></div>
+    <label class="fld"><span>Zadeva</span><input id="mSub" value="${esc(subject||'')}"></label><div style="height:8px"></div>
+    <label class="fld"><span>Besedilo</span><textarea id="mBody" rows="12">${esc(body||'')}</textarea></label>
+    <p class="help">Izberi, s čim pošlješ. <b>Gmail</b> in <b>Outlook</b> se odpreta v brskalniku (ni potreben program za e-pošto). Priloge (PDF, ZIP) pripneš v odprtem sporočilu.</p>`,
+    foot:`<button class="btn" data-mv="copy">${ic('copy')}Kopiraj</button><span class="grow"></span><button class="btn" data-mv="app">E-poštni program</button><button class="btn" data-mv="outlook">Outlook</button><button class="btn pri" data-mv="gmail">Gmail</button>`,
+    onClick:async e=>{const v=e.target.closest('[data-mv]')?.dataset.mv;if(!v)return;const T=$('#mTo').value.trim(),Su=$('#mSub').value,B=$('#mBody').value;S.settings.mailVia=v;saveSettings();
+      if(v==='copy'){try{await navigator.clipboard.writeText(`${Su}\n\n${B}`);toast('Zadeva in besedilo kopirana.')}catch{}return}
+      const url=v==='gmail'?`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(T)}&su=${encodeURIComponent(Su)}&body=${encodeURIComponent(B)}`:v==='outlook'?`https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(T)}&subject=${encodeURIComponent(Su)}&body=${encodeURIComponent(B)}`:`mailto:${encodeURIComponent(T)}?subject=${encodeURIComponent(Su)}&body=${encodeURIComponent(B)}`;
+      closeModal();if(v==='app')location.href=url;else{const w=window.open(url,'_blank');if(!w)location.href=url}}});
+  setTimeout(()=>{const b=$(`#modal [data-mv="${S.settings.mailVia||'gmail'}"]`);if(b){$$('#modal [data-mv]').forEach(x=>x.classList.remove('pri'));b.classList.add('pri')}},0);
+}
+
+/* ================= back / forward navigation ================= */
+let NAV_REPLAY=false,NAV_LAST='';
+function navWrap(name){const orig=window[name];if(typeof orig!=='function'||orig.__w)return;const w=function(...a){const r=orig.apply(this,a);if(!NAV_REPLAY){const key=name+':'+JSON.stringify(a.slice(0,1));if(key!==NAV_LAST){NAV_LAST=key;try{history.pushState({nr:[name,a.slice(0,1)]},'',location.search)}catch{}}}return r};w.__w=1;window[name]=w;}
+window.addEventListener('popstate',e=>{const r=e.state&&e.state.nr;if(!r)return;NAV_REPLAY=true;try{const fn=window[r[0]];if(typeof fn==='function')fn(...r[1]);NAV_LAST=r[0]+':'+JSON.stringify(r[1])}finally{NAV_REPLAY=false}});
+document.addEventListener('click',e=>{if(e.target.closest('#navBack')){history.back();return}if(e.target.closest('#navFwd'))history.forward()});
+
+/* ================= customers auto-save from anywhere ================= */
+async function ensureCustomer(name,extra={}){name=String(name||'').trim();if(name.length<2)return null;let c=S.customers.find(x=>(x.name||'').trim().toLowerCase()===name.toLowerCase());
+  const data={};Object.entries(extra).forEach(([k,v])=>{if(v&&String(v).trim())data[k]=String(v).trim()});
+  if(c){let ch=false;Object.entries(data).forEach(([k,v])=>{if(!c[k]){c[k]=v;ch=true}});if(ch)await saveCustomers();return c}
+  c={id:uid(),created:Date.now(),name,type:/\b(d\.o\.o|s\.p|d\.d|k\.d|gmbh|ltd|srl|ag)\b/i.test(name)?'podjetje':'oseba',country:'Slovenija',...data,div:S.settings.divF||''};
+  S.customers.push(c);S.customers.sort((a,b)=>a.name.localeCompare(b.name,'sl'));await saveCustomers();toast(`${name} je dodan med stranke.`);return c}
+
+/* ================= follow-up: manual entries ================= */
+MODS.followman={t:'Follow-up (ročni)',one:'Follow-up',ic:'phone',hidden:1,desc:'Ročno dodane stranke za follow-up.',f:[['customer','Stranka','customer',1],['phone','Telefon','tel'],['email','E-pošta','email'],['topic','Zadeva','text'],['last','Zadnji stik','date'],['next','Naslednji stik','date'],['status','Stanje','sel',['odprto','v teku','zaključeno']],['note','Opombe','area']],cols:['customer','topic','next','status'],st:'status',cal:[['next','Follow-up']]};
+
+/* ================= payments: tabs ================= */
+const PAY_TABS=[['Podjetje',[['izpiski','Bančni izpiski'],['kartice','Plačila s kartico'],['gotovina','Gotovina']]],['Način plačil (stranke)',[['kartstr','Plačila s kartico'],['obroki','Plačila na obroke'],['leasing','Leasingi']]]];
+function payTabsHTML(cur){return `<div class="paytabs">${PAY_TABS.map(([g,L])=>`<div class="mkg"><span>${g}</span>${L.map(([k,l])=>`<button class="chip${cur===k?' on':''}" data-go="${k}">${l}</button>`).join('')}</div>`).join('')}</div>`}
+MODS.gotovina={t:'Gotovina',one:'Gotovinski promet',ic:'euro',hidden:1,desc:'Gotovinski prejemki in izdatki (blagajna): prodaja za gotovino, pologi na banko, gotovinski nakupi.',f:[['date','Datum','date',1],['dir','Vrsta','sel',['prejemek','izdatek','polog na banko','dvig z banke']],['amount','Znesek (€)','money'],['party','Kupec / dobavitelj','text'],['doc','Št. dokumenta (račun, blagajniški prejemek)','text'],['purpose','Namen','text'],['note','Opombe','area'],['files','Dokumenti','files']],cols:['date','dir','party','amount','doc'],st:'dir',
+  calc:r=>''};
+MODS.kartstr={t:'Plačila s kartico (stranke)',one:'Plačilo stranke s kartico',ic:'euro',hidden:1,desc:'Plačila strank s kartico (POS terminal, spletno plačilo): kdaj banka nakaže denar in provizija.',f:[['date','Datum plačila','date',1],['customer','Kupec','customer'],['amount','Znesek (€)','money'],['invoice','Št. računa','text'],['channel','Način','sel',['POS terminal','spletno plačilo','Shopify Payments','PayPal','drugo']],['fee','Provizija (€)','money'],['payout','Nakazano na TRR dne','date'],['status','Stanje','sel',['čaka nakazilo','nakazano','vračilo']],['note','Opombe','area'],['files','Potrdilo','files']],cols:['date','customer','amount','channel','status'],st:'status'};
+function sumBar(k){const L=R$(k);if(!L.length)return '';const s=f=>L.filter(f).reduce((a,r)=>a+(+r.amount||+r.total||+r.value||0),0);
+  if(k==='gotovina'){const inn=s(r=>r.dir==='prejemek'||r.dir==='dvig z banke'),out=s(r=>r.dir==='izdatek'||r.dir==='polog na banko');return `<p class="xsum">Prejemki: <b class="okc">${fmt(inn)}</b> · Izdatki in pologi: <b>${fmt(out)}</b> · Stanje blagajne: <b>${fmt(inn-out)}</b></p>`}
+  if(k==='kartice')return `<p class="xsum">Plačilna kartica: <b>${fmt(s(r=>r.cardType!=='predplačniška kartica'))}</b> · Predplačniška kartica: <b>${fmt(s(r=>r.cardType==='predplačniška kartica'))}</b></p>`;
+  if(k==='kartstr')return `<p class="xsum">Skupaj: <b>${fmt(s(()=>1))}</b> · Čaka nakazilo: <b class="warnc">${fmt(s(r=>r.status==='čaka nakazilo'||!r.status))}</b> · Provizije: <b>${fmt(L.reduce((a,r)=>a+(+r.fee||0),0))}</b></p>`;
+  return ''}
 
 /* ================= toast ================= */
 function toast(msg,type='',ms=3500,action){
@@ -5242,8 +5329,9 @@ addEventListener('visibilitychange',()=>{if(document.hidden&&cur)saveQuoteNow()}
   }
   renderNav();
   if(P.get('new')){history.replaceState(null,'',location.pathname);const q=newQuote();S.quotes.push(q);cur=q;await saveQuoteNow();openQuote(q.id,true);return}
+  ['go','openQuote','openOrder','openShip','openPO','openClaim','showBuilder'].forEach(navWrap);
   const v0=P.get('view');if(v0&&(NAV.some(n=>n[0]===v0)||v0==='list')){go(v0);return}
-  go(S.settings.startView||'dash');
+  go(S.settings.startView||'dash');try{history.replaceState({nr:['go',[S.settings.startView||'dash']]},'',location.search)}catch{}
   setTimeout(()=>{if(S.settings.driveId&&S.settings.gcalAuto!==false&&S.events.some(e=>e.dirty))gcalSync(true)},3000);
 })();
 </script>
