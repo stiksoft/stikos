@@ -4679,7 +4679,7 @@ function renderCal(){
     body=Object.keys(by).length?Object.keys(by).sort().map(d=>`<div class="agday${d===t?' today':''}"><h3>${['nedelja','ponedeljek','torek','sreda','četrtek','petek','sobota'][new Date(d+'T12:00:00').getDay()]}, ${dmy(d)}</h3>${by[d].map(chip).join('')}</div>`).join(''):'<div class="empty"><h2>Ni dogodkov</h2></div>'}
   const g=gcal.state();
   $('#vCal').innerHTML=`<div class="wrap wide"><div class="list-head"><h1>Koledar in roki</h1>${printBtn('calPrint')}<button class="btn sig" data-newev="${calV2==='mesec'?t:calDay}">${ic('plus')}Nov dogodek</button></div>
-    <div class="gbar ${g.cls}">${ic('cal')}<span>${g.txt}</span>${S.settings.driveId?`<button class="btn sm" id="gSync">${ic('repeat')}Sinhroniziraj</button>`:`<button class="btn sm" data-go="settings">Nastavi Google</button>`}</div>
+    <div class="gbar ${g.cls}">${ic('cal')}<span>${g.txt}</span>${S.settings.driveId?`<button class="btn sm" id="gSync">${ic('repeat')}Sinhroniziraj</button>${gcal.err?`<button class="btn sm" id="gReset" title="Po menjavi Google računa ali projekta">Ponastavi povezavo</button>`:''}`:`<button class="btn sm" data-go="settings">Nastavi Google</button>`}</div>
     <div class="calbar"><button class="btn sm" data-cm="0">Danes</button><button class="btn sm icon" data-cm="-1" aria-label="Nazaj">‹</button><button class="btn sm icon" data-cm="1" aria-label="Naprej">›</button><b class="calt">${esc(label)}</b><span class="grow"></span>
       <div class="seg2">${[['dan','Dan'],['teden','Teden'],['mesec','Mesec'],['agenda','Seznam']].map(([k,l])=>`<button data-cv="${k}" class="${calV2===k?'on':''}">${l}</button>`).join('')}</div></div>
     <div class="chips tchips">${Object.entries(SRC).map(([k,[l,c]])=>`<button class="chip sm${S.settings.calSrc?.[k]===false?'':' on'}" data-csrc="${k}"><i class="dot" style="background:${c}"></i>${l}</button>`).join('')}</div>${body}</div>`;
@@ -4713,6 +4713,7 @@ $('#vCal').addEventListener('click',async e=>{const t=e.target;
   const cv=t.closest('[data-cv]');if(cv){calV2=cv.dataset.cv;if(calV2==='mesec')calM2=calDay.slice(0,7);renderCal();return}
   const cs=t.closest('[data-csrc]');if(cs){S.settings.calSrc={...(S.settings.calSrc||{}),[cs.dataset.csrc]:S.settings.calSrc?.[cs.dataset.csrc]===false};saveSettings();renderCal();return}
   if(t.closest('#gSync')){gcalSync(false);return}
+  if(t.closest('#gReset')){if(!confirm('Ponastavim povezavo z Google koledarjem? Dogodki iz programa se ob naslednji sinhronizaciji znova zapišejo v koledar prijavljenega računa, dogodki iz starega Google računa pa se odstranijo iz programa.'))return;S.events=S.events.filter(e=>e.origin!=='google');S.events.forEach(e=>{delete e.gcalId;e.dirty=true});S.settings.gcalId='';driveToken.tok=null;gcal.err='';await saveEvents();saveSettings();renderCal();gcalSync(false);return}
   if(t.closest('#calPrint')){const [a,b]=calV2==='agenda'?[today(),isoAdd(today(),45)]:[calM2+'-01',calM2+'-31'];printPage(calV2==='agenda'?'Koledar – naslednjih 45 dni':'Koledar – '+monthName(calM2),ptable(['Datum','Ura','Kaj','Vrsta'],calItems(a,b).map(x=>[dmy(x.date),esc(x.time||''),esc(x.title),SRC[x.src][0]])));return}
 });
 const gcal={last:0,busy:false,err:'',
@@ -4728,13 +4729,14 @@ async function gcalSync(quiet){
   const tok=await driveToken().catch(err=>{gcal.err=err.message;return null});if(!tok){if($('#vCal').classList.contains('on'))renderCal();return}
   gcal.busy=true;gcal.err='';if($('#vCal').classList.contains('on'))renderCal();
   const cal=encodeURIComponent((S.settings.gcalId||'primary').trim()),base=`https://www.googleapis.com/calendar/v3/calendars/${cal}/events`,H={Authorization:'Bearer '+tok,'Content-Type':'application/json'};
-  const api=async(url,o={})=>{const r=await fetch(url,{...o,headers:H});if(r.status===204||r.status===410)return{};const j=await r.json().catch(()=>({}));if(!r.ok){if(r.status===404&&o.method==='DELETE')return{};throw new Error(j.error?.message||('HTTP '+r.status))}return j};
+  const api=async(url,o={})=>{const r=await fetch(url,{...o,headers:H});if(r.status===204||r.status===410)return{};const j=await r.json().catch(()=>({}));if(!r.ok){if(r.status===404&&o.method==='DELETE')return{};const er=new Error(j.error?.message||('HTTP '+r.status));er.status=r.status;throw er}return j};
+  try{await api(`${base}?maxResults=1&timeMin=${today()}T00:00:00Z`)}catch(err){if(err.status===404){gcal.busy=false;gcal.err=`koledar »${decodeURIComponent(cal)}« ni najden v prijavljenem Google računu`;if($('#vCal').classList.contains('on'))renderCal();if(!quiet)toast(`Koledar »${decodeURIComponent(cal)}« ni najden. V Nastavitve → Shranjevanje pusti polje »Google koledar« prazno (glavni koledar) in se prijavi s pravim Google računom.`,'err',12000);return}gcal.busy=false;gcal.err=err.message;if($('#vCal').classList.contains('on'))renderCal();if(!quiet)toast('Google koledar: '+err.message,'err',9000);return}
   let up=0,down=0,del=0;
   try{
     for(const e of [...S.events]){
       if(e.deleted){if(e.gcalId)await api(`${base}/${encodeURIComponent(e.gcalId)}`,{method:'DELETE'});S.events=S.events.filter(x=>x!==e);del++;continue}
       if(!e.gcalId){const j=await api(base,{method:'POST',body:JSON.stringify(gcalBody(e))});e.gcalId=j.id;e.gUpdated=j.updated;e.dirty=false;up++}
-      else if(e.dirty){const j=await api(`${base}/${encodeURIComponent(e.gcalId)}`,{method:'PATCH',body:JSON.stringify(gcalBody(e))});e.gUpdated=j.updated;e.dirty=false;up++}}
+      else if(e.dirty){let j;try{j=await api(`${base}/${encodeURIComponent(e.gcalId)}`,{method:'PATCH',body:JSON.stringify(gcalBody(e))})}catch(err){if(err.status!==404&&err.status!==403)throw err;j=await api(base,{method:'POST',body:JSON.stringify(gcalBody(e))});e.gcalId=j.id}e.gUpdated=j.updated;e.dirty=false;up++}}
     const from=isoAdd(today(),-60),to=isoAdd(today(),400);let items=[],pt='';
     do{const j=await api(`${base}?singleEvents=true&orderBy=startTime&maxResults=2500&showDeleted=false&timeMin=${from}T00:00:00Z&timeMax=${to}T23:59:59Z${pt?'&pageToken='+pt:''}`);items=items.concat(j.items||[]);pt=j.nextPageToken||''}while(pt);
     const seen=new Set();
