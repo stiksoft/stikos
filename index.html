@@ -391,6 +391,16 @@ body.editing .nav .navs a{justify-content:center;padding:8px 0;min-height:34px}}
 .kvp{width:100%;border-collapse:collapse}.kvp th{width:55mm;text-align:left;font-weight:normal;color:#556;padding:1.5mm 0;border-bottom:.2mm solid #e3e7ed;vertical-align:top}.kvp td{padding:1.5mm 0;border-bottom:.2mm solid #e3e7ed}
 @media (max-width:900px){.nav .navs{flex-direction:row;overflow:visible;margin:0;padding:0;display:contents}.nav .ng{display:none}.tbl.modt .tr,.tbl.modt .th-row{grid-template-columns:minmax(0,1fr) 100px}.tbl.modt .tr>div:not(.c1):not(:last-child),.tbl.modt .th-row span:not(:first-child):not(:last-child){display:none}.recgrid{grid-template-columns:1fr}.kanban{grid-template-columns:repeat(6,160px)}.agrow .d{width:74px}}
 .sh-foot{flex-wrap:wrap;row-gap:8px}
+.divbanner{display:flex;align-items:center;gap:8px;background:#EEF3FE;border:1px solid #BFD0F5;border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:14px;flex-wrap:wrap}.divbanner .i{width:16px;height:16px}
+.chkrow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line2)}.chkrow>span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:700;flex:none}.chkrow.ok>span{background:#DDF1E6;color:#11663d}.chkrow.bad>span{background:#F8D9D5;color:var(--bad)}.chkrow.na>span{background:#EEF1F6;color:var(--mute)}.chkrow small{display:block;color:var(--ink2)}
+.dropov{position:fixed;inset:12px;z-index:180;border:3px dashed var(--acc);border-radius:18px;background:rgba(30,79,216,.08);display:grid;place-items:center;font-size:20px;font-weight:700;color:var(--acc);pointer-events:none}
+.dtable{background:var(--surf);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:12px}.dth,.drow{display:grid;grid-template-columns:minmax(0,1fr) 110px 100px 110px 130px;gap:8px;align-items:center;padding:6px 12px}.dth{font-size:12px;color:var(--ink2);background:var(--soft)}.drow{border-top:1px solid var(--line2);cursor:pointer;font-size:14px}.drow:hover{background:#F7F9FC}.drow .nm{display:flex;align-items:center;gap:8px;min-width:0}.drow .nm b{font-weight:500;word-break:break-word}.drow .nm .i{width:18px;height:18px;color:#E0A100;flex:none}.drow .acts{display:flex;justify-content:flex-end;gap:2px}.ftype.sm{width:26px;height:26px;font-size:9px}
+[data-dropf].dropon{outline:2px dashed var(--acc);background:var(--acc-soft)!important}
+.crumbs{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.crumbs .btn{min-width:28px}
+.fld.need input,.fld.need textarea{border-color:#E57368;background:#FFF7F6}
+.tbl.shopt .tr,.tbl.shopt .th-row{grid-template-columns:30px 56px minmax(0,1.6fr) minmax(0,1fr) 100px minmax(0,1.3fr) 40px;cursor:pointer}.tbl.shopt .im{width:48px;height:48px;border-radius:8px;background:#fff center/contain no-repeat;border:1px solid var(--line2)}.mst.bad{white-space:normal;display:inline-block;background:#F8D9D5;color:#9A2317}
+.tbl.cpt .tr,.tbl.cpt .th-row{grid-template-columns:minmax(0,1.6fr) 100px 130px 90px minmax(0,1.3fr) 100px}.tbl.cpt .tr.hi{background:#FCECEA}.tbl.cpt .tr.lo{background:#F3FBF6}.tbl.cpt a{color:var(--acc);font-size:12.5px}.tbl.cpt small{display:block;color:var(--ink2)}
+@media (max-width:900px){.dth,.drow{grid-template-columns:minmax(0,1fr) 90px}.dth span:nth-child(n+2):not(:last-child),.drow>span:nth-child(n+2):not(:last-child){display:none}.tbl.shopt .tr,.tbl.shopt .th-row{grid-template-columns:28px 48px minmax(0,1fr) 36px}.tbl.shopt .tr>div:nth-child(n+4):not(:last-child),.tbl.shopt .th-row span:nth-child(n+4):not(:last-child){display:none}}
 .sck{display:grid;place-items:center;cursor:pointer}.sck input{width:17px;height:17px;accent-color:var(--acc);cursor:pointer}
 .tbl.modt .tr,.tbl.modt .th-row{grid-template-columns:30px minmax(0,1.6fr) repeat(calc(var(--n) - 1),minmax(0,1fr)) 150px!important}
 .tbl .tr.sel{background:#E3EBFD!important}
@@ -924,6 +934,8 @@ body.editing .nav .navs a{justify-content:center;padding:8px 0;min-height:34px}}
   <section id="vShipD" class="view"></section>
   <section id="vRep" class="view"></section>
   <section id="vMk" class="view"></section>
+  <section id="vComp2" class="view"></section>
+  <section id="vShopB" class="view"></section>
   <section id="vBank" class="view"></section>
   <section id="vDrive" class="view"></section>
   <section id="vPlb" class="view"></section>
@@ -1238,7 +1250,7 @@ async function recalcFx(q,silent){
   return n;
 }
 
-const S={settings:clone(DEF_SETTINGS),customers:[],quotes:[],prices:[],todos:[],orders:[],ships:[],campaigns:[],suppliers:[],pos:[],claims:[],mk:null,recs:{},events:[],drive:{},dir:null};
+const S={settings:clone(DEF_SETTINGS),customers:[],quotes:[],prices:[],todos:[],orders:[],ships:[],campaigns:[],suppliers:[],pos:[],claims:[],mk:null,recs:{},events:[],drive:{},comp:{sites:[],items:[]},shopMeta:null,dir:null};
 let cur=null;               // currently edited quote
 let zoom=null;              // null = fit
 let deferredInstall=null;
@@ -1567,6 +1579,7 @@ function show(v){$$('.view').forEach(x=>x.classList.remove('on'));$(v).classList
 document.addEventListener('click',e=>{
   const gel=e.target.closest('[data-go]');
   if(e.target.closest('[data-morenav]')){openMoreNav();return}
+  if(e.target.closest('[data-divall]')){setDivF('');return}
   const ngc=e.target.closest('[data-ngc]');if(ngc){const c=S.settings.navCol=S.settings.navCol||{};c[ngc.dataset.ngc]=!c[ngc.dataset.ngc];saveSettings();renderNav();return}
   const opo=e.target.closest('[data-openpo]');if(opo){openPO(opo.dataset.openpo);return}
   if(e.target.closest('#bkResume')){resumeDir().then(ok=>{toast(ok?'Samodejna kopija ponovno deluje.':'Dovoljenje ni bilo dano.');if($('#vList').classList.contains('on'))renderList();if($('#vSet').classList.contains('on'))showSettings()});return}
@@ -1596,10 +1609,10 @@ function renderList(){
   const f=qs.filter(q=>(listFilter==='vse'||q.status===listFilter)&&(!listQ||[q.number,q.title,q.customer?.name,...q.items.map(i=>i.title)].join(' ').toLowerCase().includes(listQ.toLowerCase())));
   const stat={osnutek:'Osnutek',poslano:'Poslano',sprejeto:'Sprejeto',zavrnjeno:'Zavrnjeno'};
   $('#vList').innerHTML=`<div class="wrap">
-    ${backupBanner()}
+    ${backupBanner()}${divBanner()}
     <div class="list-head"><h1>Ponudbe</h1>
       <label class="search">${ic('search')}<input id="lq" placeholder="Išči po kupcu, številki, izdelku" value="${esc(listQ)}"></label>
-      <button class="btn" id="openFile">${ic('upload')}Odpri datoteko</button>
+      <button class="btn" id="openFile">${ic('upload')}Uvozi ponudbo</button>
       <button class="btn sig" id="newQ">${ic('plus')}Nova ponudba</button></div>
     ${dashHTML()}
     ${qs.length?`<div class="chips">${['vse','osnutek','poslano','sprejeto','zavrnjeno'].map(k=>`<button class="chip${listFilter===k?' on':''}" data-f="${k}">${k==='vse'?'Vse':stat[k]}</button>`).join('')}</div>`:''}
@@ -1614,7 +1627,7 @@ function renderList(){
 $('#vList').addEventListener('click',async e=>{
   const t=e.target;
   if(t.closest('#newQ,#newQ2')){const q=newQuote();S.quotes.push(q);cur=q;await saveQuoteNow();openQuote(q.id,true);return}
-  if(t.closest('#openFile,#openFile2')){pickFile('.json,application/json',f=>importProjectFile(f));return}
+  if(t.closest('#openFile,#openFile2')){pickFile('.json,.pdf,.docx,.doc,.xlsx,.xls,.csv,image/*,application/json,application/pdf',f=>importQuoteFile(f));return}
   const fb=t.closest('[data-f]');if(fb){listFilter=fb.dataset.f;renderList();return}
   const du=t.closest('[data-dup]');if(du){e.stopPropagation();await duplicateQuote(du.dataset.dup);renderList();return}
   const de=t.closest('[data-del]');if(de){e.stopPropagation();if(confirm('Izbrišem ponudbo? Tega ni mogoče razveljaviti.')){await DB.del('quotes',de.dataset.del);S.quotes=S.quotes.filter(q=>q.id!==de.dataset.del);renderList()}return}
@@ -2423,7 +2436,7 @@ function showSettings(){
     <label class="switch" style="margin-top:6px"><input type="checkbox" data-s="importVat" ${st.importVat?'checked':''}>Cene s spletnih strani vsebujejo DDV</label>
     <p class="help">Spletne trgovine za končne kupce običajno prikazujejo cene z DDV. Pri pobiranju iz B2B cenikov to izklopi.</p>
   </div>
-  <div class="panel"><h2>Shranjevanje in varnostne kopije</h2>
+  <div class="panel"><h2>Shranjevanje in varnostne kopije</h2><button class="btn sig" id="stCheck" style="margin-bottom:10px">${ic('check')}Preveri, ali shranjevanje deluje</button>
     <p>Vsi podatki (ponudbe, naročila, stranke, ceniki …) se sproti shranjujejo <b>v tej napravi</b>. Zadnja varnostna kopija: <b>${st.lastBackup?dtm(+st.lastBackup):'še nikoli'}</b>.</p>
     <div class="sub">1. Samodejna kopija na disk (računalnik, Chrome/Edge)</div>
     ${window.showDirectoryPicker?`<div class="kv">Mapa: <b>${S.dir?esc(S.dir.name):'ni izbrana'}</b>${S.dir?` · ${bkState==='paused'?'<span class="warnc">zaustavljeno</span>':'aktivno'}`:''}</div>
@@ -2507,6 +2520,7 @@ $('#vSet').addEventListener('click',async e=>{
   if(t.closest('#bkIn'))pickFile('.json,application/json',f=>importProjectFile(f));
   if(t.closest('#bkRestore'))pickFile('.json,application/json',async f=>{try{const j=JSON.parse(await f.text());if(j.app!=='stik-ponudbe-backup')throw new Error('to ni varnostna kopija');if(!confirm(`Kopija z dne ${j.date?dtm(j.date):'?'}: ${j.quotes?.length||0} ponudb, ${j.orders?.length||0} naročil, ${j.customers?.length||0} strank.\n\nZamenjam VSE podatke v tej napravi?`))return;await restoreAll(j);toast('Podatki obnovljeni.');showList()}catch(err){toast('Obnova ni uspela: '+err.message,'err')}});
   if(t.closest('#drvUp')){driveSyncUp();return}
+  if(t.closest('#stCheck')){storageCheck();return}
   if(t.closest('#drvDown')){driveSyncDown();return}
   if(t.closest('#instHelp')){installHelp();return}
 });
@@ -2515,8 +2529,8 @@ $('#vSet').addEventListener('click',async e=>{
 /* ================= navigation ================= */
 const MOB_MAIN=['dash','calendar','list','orders','todo'];
 const NAV=[['dash','Nadzorna plošča','grid','','Plošča'],['calendar','Koledar in roki','cal','','Koledar'],['todo','To-Do list','todo','','To-Do'],
- ['customers','Stranke','users','Prodaja'],['list','Ponudbe','file','Prodaja','Ponudbe'],['orders','Naročila','box','Prodaja','Naročila'],['b2b','Kupci B2B','users','Prodaja'],['prices','Ceniki','tag','Prodaja'],['montaze','Montažni termini','wrench','Prodaja','Montaže'],['ideje','Ideje','bulb','Prodaja'],['lastni','Lastni proizvodi','box','Prodaja'],
- ['buy','Nabava','cart','Nabava in logistika'],['prihodi','Prihodi blaga','truck','Nabava in logistika'],['zaloga','Zaloga','layers','Nabava in logistika'],['uvozi','Uvozi','globe','Nabava in logistika'],['ships','Pošiljanje','truck','Nabava in logistika'],['prevozniki','Prevozniki','truck','Nabava in logistika'],['postopki','Montaže – postopki','wrench','Nabava in logistika'],['warranty','Garancije, reklamacije','shield','Nabava in logistika'],
+ ['customers','Stranke','users','Prodaja'],['list','Ponudbe','file','Prodaja','Ponudbe'],['orders','Naročila','box','Prodaja','Naročila'],['b2b','Kupci B2B','users','Prodaja'],['prices','Ceniki','tag','Prodaja'],['cene','Uskladitev cen','chart','Prodaja'],['shopify','Tabele za Shopify','cart','Prodaja'],['montaze','Montažni termini','wrench','Prodaja','Montaže'],['ideje','Ideje','bulb','Prodaja'],['lastni','Lastni proizvodi','box','Prodaja'],
+ ['buy','Nabava','cart','Nabava in logistika'],['dobavitelji','Dobavitelji','users','Nabava in logistika'],['prihodi','Prihodi blaga','truck','Nabava in logistika'],['zaloga','Zaloga','layers','Nabava in logistika'],['uvozi','Uvozi','globe','Nabava in logistika'],['ships','Pošiljanje','truck','Nabava in logistika'],['prevozniki','Prevozniki','truck','Nabava in logistika'],['postopki','Montaže – postopki','wrench','Nabava in logistika'],['warranty','Garancije, reklamacije','shield','Nabava in logistika'],
  ['marketing','Marketing in oglasi','mega','Marketing'],['splet','Spletne strani','globe','Marketing'],
  ['izpiski','Izpiski in plačila','calc','Finance'],['dfa','DFA plačila','down','Finance'],['ifa','IFA plačila','euro','Finance'],['narocnine','Naročnine','repeat','Finance'],['telefoni','Telefoni','phone','Finance'],['potovanja','Službena potovanja','plane','Finance'],['reports','Poročila','chart','Finance'],['racunovodstvo','Računovodstvo','calc','Finance'],
  ['dokumenti','Dokumenti','folder','Dokumenti'],['tehpor','Tehnična poročila','clip','Dokumenti'],['cert','Certifikati','award','Dokumenti'],['katalogi','Katalogi','doc','Dokumenti'],['epp','Logo in EPP tisk','print','Dokumenti'],['sejmi','Sejmi','flag','Dokumenti'],['sestanki','Sestanki','users','Dokumenti'],['tutoriali','Tutoriali','play','Dokumenti'],
@@ -2544,6 +2558,9 @@ function go(k){
   if(k==='ifa'){showMod('ifaman');navOn='ifa';renderNav();return}
   if(k==='izpiski')return showBank();
   if(k==='assistant')return showAssistant();
+  if(k==='cene')return showComp();
+  if(k==='shopify')return showShopB();
+  if(k==='dobavitelji'){buyTab='dobavitelji';showBuy();navOn='dobavitelji';renderNav();return}
   if(k==='katalogi')return showDriveView('katalogi','Katalogi','Originalni katalogi dobaviteljev (PDF in drugi formati) – pregled in tisk');
   if(k==='dejavnosti'||k==='register'){compTab=k;return showCompany()}
   if(MODS[k])return showMod(k);
@@ -2608,7 +2625,7 @@ function renderCustomers(){
   $('#vCust').innerHTML=`<div class="wrap">
     <div class="list-head"><h1>Stranke <small>${S.customers.length}</small></h1>
       <label class="search">${ic('search')}<input id="cuQ" placeholder="Išči po imenu, kraju, e-pošti" value="${esc(custQ)}"></label>
-      ${printBtn('cuPrint')}<button class="btn" id="cuImp">${ic('upload')}Uvozi CSV</button><button class="btn" id="cuExp"${S.customers.length?'':' disabled'}>${ic('download')}Izvozi</button><button class="btn sig" id="cuNew">${ic('plus')}Nova stranka</button></div>
+      ${printBtn('cuPrint')}<button class="btn" id="cuImp">${ic('upload')}Uvozi (Excel, CSV, PDF)</button><button class="btn" id="cuExp"${S.customers.length?'':' disabled'}>${ic('download')}Izvozi</button><button class="btn sig" id="cuNew">${ic('plus')}Nova stranka</button></div>
     ${S.customers.length?`<div class="tbl cu">${L.map(c=>{const qs=custQuotes(c);const sum=qs.reduce((a,q)=>a+totals(q).gross,0);return `<div class="tr" data-cu="${c.id}" tabindex="0"><button class="btn sm ghost icon px cux" data-cudel="${c.id}" title="Izbriši" aria-label="Izbriši">✕</button>
       <div class="av">${esc((c.name||'?').trim().slice(0,1).toUpperCase())}</div>
       <div class="c1"><b>${esc(c.name)}</b><span>${esc([c.contact,[c.post,c.city].filter(Boolean).join(' ')].filter(Boolean).join(' · ')||'—')}</span></div>
@@ -2650,7 +2667,7 @@ $('#vCust').addEventListener('click',async e=>{const cdl=e.target.closest('[data
   const t=e.target;if(t.closest('[data-stop]'))return;
   if(t.closest('#cuNew2'))return editCustomer();
   if(t.closest('#cuPrint'))return printPage('Stranke',ptable(['Naziv','Kontakt','Naslov','Telefon','E-pošta','ID za DDV'],S.customers.map(c=>[`<b>${esc(c.name)}</b>`,esc(c.contact||''),esc([c.address,[c.post,c.city].filter(Boolean).join(' ')].filter(Boolean).join(', ')),esc(c.phone||''),esc(c.email||''),esc(c.taxId||'')])),{landscape:1});
-  if(t.closest('#cuImp,#cuImp2'))return pickFile('.csv,text/csv,text/plain',async f=>importCustomersCSV(await f.text()));
+  if(t.closest('#cuImp,#cuImp2'))return pickFile('.csv,.txt,.xlsx,.xls,.ods,.pdf,.docx,text/csv',f=>importCustomersFile(f));
   if(t.closest('#cuExp')){const rows=[['Naziv','Kontakt','Naslov','Pošta','Kraj','Država','Telefon','E-pošta','ID za DDV','Opomba'],...S.customers.map(c=>[c.name,c.contact,c.address,c.post,c.city,c.country,c.phone,c.email,c.taxId,c.note])];download(new Blob([toCSV(rows)],{type:'text/csv'}),`STIK-stranke-${today()}.csv`);return}
   const nq=t.closest('[data-cunq]');if(nq){e.stopPropagation();newQuoteFor(S.customers.find(c=>c.id===nq.dataset.cunq));return}
   const r=t.closest('[data-cu]');if(r)editCustomer(S.customers.find(c=>c.id===r.dataset.cu));
@@ -3666,7 +3683,7 @@ async function autoSaveCustomer(q){
 
 /* ================= storage: auto backup, Drive sync, restore ================= */
 const APP_NAME='STIK Prodaja';
-function backupData(){return{app:'stik-ponudbe-backup',name:APP_NAME,v:3,date:new Date().toISOString(),settings:S.settings,customers:S.customers,quotes:S.quotes,prices:S.prices,todos:S.todos,orders:S.orders,ships:S.ships,campaigns:S.campaigns,suppliers:S.suppliers,pos:S.pos,claims:S.claims,mk:S.mk,recs:S.recs,events:S.events,drive:S.drive}}
+function backupData(){return{app:'stik-ponudbe-backup',name:APP_NAME,v:3,date:new Date().toISOString(),settings:S.settings,customers:S.customers,quotes:S.quotes,prices:S.prices,todos:S.todos,orders:S.orders,ships:S.ships,campaigns:S.campaigns,suppliers:S.suppliers,pos:S.pos,claims:S.claims,mk:S.mk,recs:S.recs,events:S.events,drive:S.drive,comp:S.comp,shopMeta:S.shopMeta}}
 async function backupBlob(){const d=backupData();try{d.files=(await DB.all('files')).filter(f=>!/^video/.test(f.type))}catch{d.files=[]}return new Blob([JSON.stringify(d)],{type:'application/json'})}
 async function restoreAll(j){
   const oldQ=S.quotes.map(q=>q.id);
@@ -3674,7 +3691,7 @@ async function restoreAll(j){
   S.quotes=j.quotes||[];for(const q of S.quotes)await DB.put('quotes',q);
   S.customers=j.customers||[];await saveCustomers();S.prices=j.prices||[];await savePrices();S.todos=j.todos||[];await saveTodos();
   S.orders=j.orders||[];await saveOrders();S.ships=j.ships||[];await saveShips();S.campaigns=j.campaigns||[];await saveCampaigns();
-  S.suppliers=j.suppliers||[];await saveSup();S.pos=j.pos||[];await savePO();S.claims=j.claims||[];await saveClaims();S.mk=mergeDeep(DEF_MK,j.mk||{});await saveMk();S.recs=j.recs||{};await saveRecsNow();S.events=j.events||[];await saveEvents();S.drive=j.drive||{};await saveDrive();
+  S.suppliers=j.suppliers||[];await saveSup();S.pos=j.pos||[];await savePO();S.claims=j.claims||[];await saveClaims();S.mk=mergeDeep(DEF_MK,j.mk||{});await saveMk();S.recs=j.recs||{};await saveRecsNow();S.events=j.events||[];await saveEvents();S.drive=j.drive||{};await saveDrive();S.comp=j.comp||{sites:[],items:[]};await saveComp();S.shopMeta=j.shopMeta||null;await DB.put('kv',S.shopMeta,'shopMeta');
   for(const f of j.files||[])await DB.put('files',f);
   if(j.settings){const keep={driveId:S.settings.driveId,driveFolder:S.settings.driveFolder,aiKey:S.settings.aiKey};S.settings=mergeDeep(DEF_SETTINGS,j.settings);Object.assign(S.settings,keep);await DB.put('kv',S.settings,'settings')}
   renderNav();
@@ -3898,6 +3915,11 @@ function editSupplier(s){
     <div class="row">${mf('E-pošta za naročila','email',s.email,{type:'email'})}${mf('Spletna stran / portal','web',s.web)}</div>
     ${mf('Naslov','address',s.address)}<div style="height:8px"></div>
     <div class="row">${mf('Običajni dobavni rok (dni)','leadDays',s.leadDays,{num:1})}${mf('Jezik dopisov','lang',s.lang||'sl',{type:'select',opts:[['sl','slovenščina'],['en','angleščina'],['de','nemščina']]})}</div>
+    <div class="row" style="--c:3">${mf('Država','country',s.country||'')}${mf('ID za DDV','vatId',s.vatId||'')}${mf('TRR / IBAN','iban',s.iban||'')}</div>
+    <div class="row" style="--c:3">${mf('Plačilni rok (dni)','terms',s.terms||'',{num:1})}${mf('Rabat (%)','discount',s.discount||'',{num:1})}${mf('Min. naročilo (€)','minOrder',s.minOrder||'',{num:1})}</div>
+    <div class="row">${mf('B2B portal / prijava (povezava)','portal',s.portal||'',{ph:'https://'})}${mf('Št. stranke pri dobavitelju','custNo',s.custNo||'')}</div>
+    <div class="row">${mf('Skupina izdelkov','cat',s.cat||'',{ph:'npr. strehe, elektro, 12 V'})}${divs().length?divSelect('data-m="div"',s.div||'','Program'):'<span></span>'}</div>
+    ${mf('Katalog / cenik (povezava)','catalog',s.catalog||'',{ph:'https://'})}<div style="height:8px"></div>
     ${mf('Opomba','note',s.note,{type:'textarea',rows:2,ph:'npr. št. stranke pri dobavitelju, pogoji, rabat'})}`,
     foot:`${s.id?`<button class="btn ghost danger" data-md="del">${ic('trash')}Izbriši</button>`:''}<span class="grow"></span><button class="btn pri" data-md="save">${ic('check')}Shrani</button>`,
     onClick:async e=>{const a=e.target.closest('[data-md]')?.dataset.md;if(!a)return;
@@ -3921,7 +3943,7 @@ function renderBuy(){
   const all=S.pos.filter(p=>!p.deleted),m=p=>!buyQ||[p.number,p.supplierName,p.supplierRef,p.note,...(p.lines||[]).map(l=>l.title)].join(' ').toLowerCase().includes(buyQ.toLowerCase());
   let body='';
   if(buyTab==='dobavitelji'){body=`<div class="list-head sub"><p class="help" style="margin:0;flex:1">Dobavitelji, pri katerih naročaš. Dobavni rok se uporabi za predviden datum dobave.</p><button class="btn sig" id="supNew">${ic('plus')}Nov dobavitelj</button></div>
-    ${S.suppliers.length?`<div class="tbl cu">${S.suppliers.map(s=>{const ps=all.filter(p=>p.supplierId===s.id);return `<div class="tr" data-sup="${s.id}"><div class="av">${esc(s.name[0]||'?')}</div><div class="c1"><b>${esc(s.name)}</b><span>${esc([s.contact,s.leadDays?'dobava ~'+s.leadDays+' dni':''].filter(Boolean).join(' · '))}</span></div><div class="c2">${s.phone?`<a href="tel:${esc(s.phone)}" data-stop>${ic('phone')}${esc(s.phone)}</a>`:''}${s.email?`<a href="mailto:${esc(s.email)}" data-stop>${ic('mail')}${esc(s.email)}</a>`:''}</div><div class="c3"><b>${ps.length}</b> naročil</div><div></div></div>`}).join('')}</div>`:'<div class="empty"><h2>Še ni dobaviteljev</h2><p>Dodaj dobavitelje, da lahko pri njih naročaš in spremljaš dobave.</p></div>'}`}
+    ${S.suppliers.length?`<div class="tbl cu">${S.suppliers.map(s=>{const ps=all.filter(p=>p.supplierId===s.id);return `<div class="tr" data-sup="${s.id}"><div class="av">${esc(s.name[0]||'?')}</div><div class="c1"><b>${esc(s.name)}</b><span>${esc([s.contact,s.leadDays?'dobava ~'+s.leadDays+' dni':''].filter(Boolean).join(' · '))}</span></div><div class="c2">${s.phone?`<a href="tel:${esc(s.phone)}" data-stop>${ic('phone')}${esc(s.phone)}</a>`:''}${s.email?`<a href="mailto:${esc(s.email)}" data-stop>${ic('mail')}${esc(s.email)}</a>`:''}${s.web?`<a href="${esc(/^https?:/.test(s.web)?s.web:'https://'+s.web)}" target="_blank" rel="noopener" data-stop>${ic('globe')}splet</a>`:''}${s.portal?`<a href="${esc(s.portal)}" target="_blank" rel="noopener" data-stop>${ic('link')}portal</a>`:''}</div><div class="c3"><b>${ps.length}</b> naročil</div><div></div></div>`}).join('')}</div>`:'<div class="empty"><h2>Še ni dobaviteljev</h2><p>Dodaj dobavitelje, da lahko pri njih naročaš in spremljaš dobave.</p></div>'}`}
   else{const L=all.filter(m),g=(h,x,c='')=>x.length?`<div class="tgrp ${c}"><h3>${h} <small>${x.length}</small></h3>${x.map(poRow).join('')}</div>`:'';
     const by=s=>L.filter(p=>poStatus(p)===s),exp=[...by('potrjeno'),...by('delno'),...by('naroceno')].sort((a,b)=>(a.expected||'9').localeCompare(b.expected||'9'));
     const late=exp.filter(p=>p.expected&&p.expected<today());
@@ -4241,7 +4263,7 @@ function mkCtx(){const p=S.mk.plan,c=S.settings.company;return `Podjetje: ${c.na
 function adKpi(a){const r=a.results||{},im=+r.impr||0,cl=+r.clicks||0,sp=+r.spend||0,cv=+r.conv||0,rv=+r.revenue||0;return{ctr:im?cl/im*100:0,cpc:cl?sp/cl:0,cpa:cv?sp/cv:0,roas:sp?rv/sp:0,sp,cv,rv}}
 function mkOglasi(){
   const A=[...S.mk.ads].sort((a,b)=>(b.start||'').localeCompare(a.start||''));
-  return `<div class="list-head sub"><p class="help" style="margin:0;flex:1">Načrtuj oglase za vse platforme na enem mestu: cilj, ciljno skupino, proračun, besedila v pravih dolžinah in rezultate. Oglas nato vneseš v Ads Manager / Google Ads.</p><button class="btn sig" data-newad="1">${ic('plus')}Nov oglas</button></div>
+  return `<div class="list-head sub"><p class="help" style="margin:0;flex:1">Načrtuj oglase za vse platforme na enem mestu: cilj, ciljno skupino, proračun, besedila v pravih dolžinah in rezultate. Oglas nato vneseš v Ads Manager / Google Ads.</p><button class="btn" id="adShop">${ic('cart')}Iz izdelkov Shopify</button><button class="btn sig" data-newad="1">${ic('plus')}Nov oglas</button></div>
   ${A.length?A.map(a=>{const k=adKpi(a),p=ADP.find(x=>x[0]===a.platform)||ADP[0];return `<div class="ordr ad" data-ad="${a.id}"><div class="o1"><b>${esc(a.name||'Oglas')}</b><span><i class="dot" style="background:${p[2]}"></i>${esc(p[1])} · ${esc(a.objective||'')}</span></div>
     <div class="o2">${a.start?dateSl(a.start):''}${a.end?' – '+dateSl(a.end):''} · ${+a.daily?fmt(+a.daily)+'/dan':''}${+a.total?' · skupaj '+fmt(+a.total):''}<br><small>${esc(a.audience?.location||'')}${a.audience?.radius?' +'+a.audience.radius+' km':''}</small></div>
     <div class="o3">${k.sp?`CTR ${fmtN(k.ctr,2)} % · CPC ${fmt(k.cpc)}<br>${k.cv} konverzij${k.cv?` · CPA ${fmt(k.cpa)}`:''}`:'<span class="due none">ni rezultatov</span>'}</div><div class="o4">${k.sp?`<b>${fmt(k.sp)}</b><span>${k.rv?'ROAS '+fmtN(k.roas,1)+'×':'porabljeno'}</span>`:''}</div><span class="status ad-${a.status}">${({plan:'Načrt',aktivno:'Aktivno',zakljuceno:'Zaključeno'})[a.status]}</span></div>`}).join(''):`<div class="empty"><h2>Še ni oglasov</h2><p>Začni z oglasom za povpraševanja na Meta (Facebook + Instagram) v svoji regiji in iskalnim oglasom na Googlu za svoje glavne storitve.</p></div>`}`;
@@ -4409,6 +4431,7 @@ $('#vMk').addEventListener('click',async e=>{const t=e.target;
   const np=t.closest('[data-newpost]');if(np&&!t.closest('[data-post]')){editPost(null,np.dataset.newpost);return}
   const po=t.closest('[data-post]');if(po){editPost(S.mk.posts.find(x=>x.id===po.dataset.post));return}
   if(t.closest('[data-newad]')){editAd(null);return}
+  if(t.closest('#adShop')){pickShopProducts(adFromProducts);return}
   const ad=t.closest('[data-ad]');if(ad){editAd(S.mk.ads.find(x=>x.id===ad.dataset.ad));return}
   const cm=t.closest('[data-calm]');if(cm){const d=new Date(calM+'-01T12:00:00');d.setMonth(d.getMonth()+(+cm.dataset.calm));calM=d.toISOString().slice(0,7);renderMarketing();return}
   const cv=t.closest('[data-calv]');if(cv){calView=cv.dataset.calv;renderMarketing();return}
@@ -4508,7 +4531,7 @@ delete MODS.mont;
 const MOD_Q={},MOD_F={};
 const fldVal=(r,[k,,type,,opts])=>{const v=r[k];if(v==null||v==='')return '';if(type==='div')return divTag(v);if(type==='money'&&r.currency&&r.currency!=='EUR')return fmtN(+v,2);if(type==='date')return dateSl(v);if(type==='month')return monthName(v);if(type==='money')return fmt(+v);if(type==='check')return v?'✓':'';if(type==='files')return (v||[]).length?`${v.length} dat.`:'';if(type==='url')return `<a href="${esc(v)}" target="_blank" rel="noopener" data-stop>odpri</a>`;return esc(String(v))};
 function modStatus(m,r){if(m.stf){const k=m.stf(r);return[k,m.stl[k]]}if(m.st){const v=r[m.st]||(m.f.find(x=>x[0]===m.st)[3]||[])[0];return[v,v]}return null}
-function showMod(k){cur=null;curOrder=null;setNav(k);topSimple(MODS[k].t);show('#vMod');renderMod(k)}
+function showMod(k){if(DRV[k])DRV[k].f='';cur=null;curOrder=null;setNav(k);topSimple(MODS[k].t);show('#vMod');renderMod(k)}
 function renderMod(k){
   const m=MODS[k],L=R$(k),q=(MOD_Q[k]||'').toLowerCase(),fl=MOD_F[k]||'';
   const cols=m.cols.map(c=>m.f.find(f=>f[0]===c));const stOpts=m.stf?Object.entries(m.stl):m.st?(m.f.find(f=>f[0]===m.st)[3]||[]).map(x=>[x,x]):[];
@@ -4864,7 +4887,8 @@ const DIV_COLORS=['#E8A200','#1E4FD8','#C13584','#0B8043','#7A5AF8','#D92D20','#
 const divs=()=>S.settings.divs||[];
 const divName=id=>(divs().find(d=>d.id===id)||{}).name||'';
 const divColor=id=>(divs().find(d=>d.id===id)||{}).color||'#98A2B3';
-const divOk=x=>!S.settings.divF||(x&&x.div)===S.settings.divF;
+const divOk=x=>!S.settings.divF||!(x&&x.div)||x.div===S.settings.divF;
+const divBanner=()=>S.settings.divF&&divName(S.settings.divF)?`<div class="divbanner">${ic('layers')}Prikazan je program <b>${esc(divName(S.settings.divF))}</b> (in zapisi brez programa). <button class="btn sm" data-divall>Pokaži vse programe</button></div>`:'';
 const divTag=id=>id&&divName(id)?`<span class="divtag" style="--c:${divColor(id)}">${esc(divName(id))}</span>`:'';
 const divSelect=(attr,val,label='Dejavnost / program')=>`<label class="fld"><span>${label}</span><select ${attr}><option value="">— splošno —</option>${divs().map(d=>`<option value="${d.id}"${val===d.id?' selected':''}>${esc(d.name)}</option>`).join('')}</select></label>`;
 function setDivF(v){S.settings.divF=v;saveSettings();renderNav();const on=$('.view.on');if(!on)return;const id=on.id;
@@ -4892,13 +4916,15 @@ function driveHTML(sp,title,sub){
   const fpath=id=>{const n=[];let x=D.folders.find(y=>y.id===id);while(x){n.unshift(x.name);x=D.folders.find(y=>y.id===x.parent)}return n.join(' / ')};
   return `<div class="drive" data-space="${sp}"><div class="list-head"><div><h1 style="margin:0">${esc(title)}</h1><p class="help" style="margin:2px 0 0">${esc(sub||'Mape, datoteke, povezave in beležke')}</p></div><span class="grow"></span>
     <input class="inp dq" data-dq value="${esc(st.q)}" placeholder="Išči v vseh mapah …" style="width:220px">
+    <div class="seg2"><button data-dview="grid" class="${(S.settings.driveView||'grid')==='grid'?'on':''}" title="Ikone" aria-label="Ikone">${ic('grid')}</button><button data-dview="list" class="${S.settings.driveView==='list'?'on':''}" title="Seznam" aria-label="Seznam">${ic('menu')}</button></div>
     <button class="btn" data-da="pdf">${ic('print')}PDF</button><button class="btn" data-da="folder">${ic('folder')}Nova mapa</button><button class="btn" data-da="link">${ic('link')}Povezava</button><button class="btn" data-da="note">${ic('pen')}Beležka</button><button class="btn sig" data-da="upload">${ic('upload')}Naloži datoteke</button></div>
-    <div class="crumbs"><a data-df="">${esc(title)}</a>${path.map(x=>` / <a data-df="${x.id}">${esc(x.name)}</a>`).join('')}${q?` · rezultati iskanja`:''}</div>
-    ${folders.length?`<div class="fgrid">${folders.map(x=>`<div class="fcard" data-df="${x.id}">${ic('folder')}<div><b>${esc(x.name)}</b><small>${cnt(x.id)} elementov</small></div><button class="btn sm ghost icon" data-dfm="${x.id}" aria-label="Uredi mapo">⋯</button></div>`).join('')}</div>`:''}
-    <div class="ddrop" data-ddrop>Povleci datoteke sem, da jih naložiš v to mapo</div>
-    <div class="dlist">${items.length?items.map(x=>`<div class="ditem" data-di="${x.id}"><div class="dth" data-thumb="${x.type==='file'&&/^image/.test(x.mime)?x.fileId:''}">${x.type==='link'?ic('link'):x.type==='note'?ic('pen'):`<span class="ftype">${x.type==='rec'?'ZAP':fileIcon(x.mime||'')}</span>`}</div>
+    <div class="crumbs"><button class="btn sm ghost icon" data-dup title="Nazaj na nadrejeno mapo" aria-label="Gor" ${st.f?'':'disabled'}>↑</button><a data-df="" data-dropf="">${esc(title)}</a>${path.map(x=>` / <a data-df="${x.id}" data-dropf="${x.id}">${esc(x.name)}</a>`).join('')}${q?` · rezultati iskanja`:''}</div>
+    ${S.settings.driveView==='list'?`<div class="dtable"><div class="dth"><span>Ime</span><span>Vrsta</span><span>Velikost</span><span>Spremenjeno</span><span></span></div>${folders.map(x=>`<div class="drow" data-df="${x.id}" data-dropf="${x.id}" draggable="true" data-dragit="f|${x.id}"><span class="nm">${ic('folder')}<b>${esc(x.name)}</b></span><span>mapa</span><span>${cnt(x.id)} el.</span><span></span><span><button class="btn sm ghost icon" data-dfm="${x.id}" aria-label="Uredi mapo">⋯</button></span></div>`).join('')}${items.map(x=>`<div class="drow" data-dio="${x.id}" draggable="true" data-dragit="i|${x.id}"><span class="nm">${x.type==='link'?ic('link'):x.type==='note'?ic('pen'):`<span class="ftype sm">${x.type==='rec'?'ZAP':fileIcon(x.mime||'')}</span>`}<b>${esc(x.name)}</b></span><span>${x.type==='file'?fileIcon(x.mime||''):x.type==='link'?'povezava':x.type==='rec'?'zapis':'beležka'}</span><span>${x.size?Math.max(1,Math.round(x.size/1024))+' kB':''}</span><span>${dmy(new Date(x.created).toISOString().slice(0,10))}</span><span class="acts"><button class="btn sm ghost icon" data-dmail="${x.id}" aria-label="Pošlji">${ic('mail')}</button><button class="btn sm ghost icon" data-dim="${x.id}" aria-label="Več">⋯</button><button class="btn sm ghost icon px" data-ddel="${x.id}" aria-label="Izbriši">✕</button></span></div>`).join('')}${!folders.length&&!items.length?'<p class="help" style="padding:12px">Mapa je prazna.</p>':''}</div><div class="ddrop" data-ddrop>Povleci datoteke sem, da jih naložiš v to mapo</div>`:''}
+    ${S.settings.driveView!=='list'&&folders.length?`<div class="fgrid">${folders.map(x=>`<div class="fcard" data-df="${x.id}" data-dropf="${x.id}" draggable="true" data-dragit="f|${x.id}">${ic('folder')}<div><b>${esc(x.name)}</b><small>${cnt(x.id)} elementov</small></div><button class="btn sm ghost icon" data-dfm="${x.id}" aria-label="Uredi mapo">⋯</button></div>`).join('')}</div>`:''}
+    ${S.settings.driveView!=='list'?`<div class="ddrop" data-ddrop>Povleci datoteke sem, da jih naložiš v to mapo</div>
+    <div class="dlist">${items.length?items.map(x=>`<div class="ditem" data-di="${x.id}" draggable="true" data-dragit="i|${x.id}"><div class="dth" data-thumb="${x.type==='file'&&/^image/.test(x.mime)?x.fileId:''}">${x.type==='link'?ic('link'):x.type==='note'?ic('pen'):`<span class="ftype">${x.type==='rec'?'ZAP':fileIcon(x.mime||'')}</span>`}</div>
       <div class="dn"><b>${esc(x.name)}</b><small>${x.type==='file'?`${Math.max(1,Math.round((x.size||0)/1024))} kB · `:''}${dateSl(new Date(x.created).toISOString().slice(0,10))}${q&&x.folder?' · '+esc(fpath(x.folder)):''}${x.type==='link'?' · '+esc(x.url):''}</small></div>
-      <div class="acts"><button class="btn sm" data-dio="${x.id}">${x.type==='link'?'Odpri':'Poglej'}</button>${x.type==='file'?`<button class="btn sm" data-dip="${x.id}" aria-label="Natisni">${ic('print')}</button><button class="btn sm" data-did="${x.id}" aria-label="Prenesi">${ic('download')}</button>`:''}${x.type==='file'&&sp==='ceniki'&&/pdf|sheet|excel|csv/.test(x.mime)?`<button class="btn sm" data-dconv="${x.id}">V tabelo</button>`:''}<button class="btn sm" data-dmail="${x.id}" aria-label="Pošlji po e-pošti" title="Pošlji po e-pošti">${ic('mail')}</button><button class="btn sm ghost icon" data-dim="${x.id}" aria-label="Več">⋯</button><button class="btn sm ghost icon px" data-ddel="${x.id}" title="Izbriši" aria-label="Izbriši">✕</button></div></div>`).join(''):`<div class="empty" style="padding:22px"><p>${q?'Ni zadetkov.':'V tej mapi še ni datotek.'}</p></div>`}</div></div>`;
+      <div class="acts"><button class="btn sm" data-dio="${x.id}">${x.type==='link'?'Odpri':'Poglej'}</button>${x.type==='file'?`<button class="btn sm" data-dip="${x.id}" aria-label="Natisni">${ic('print')}</button><button class="btn sm" data-did="${x.id}" aria-label="Prenesi">${ic('download')}</button>`:''}${x.type==='file'&&sp==='ceniki'&&/pdf|sheet|excel|csv/.test(x.mime)?`<button class="btn sm" data-dconv="${x.id}">V tabelo</button>`:''}<button class="btn sm" data-dmail="${x.id}" aria-label="Pošlji po e-pošti" title="Pošlji po e-pošti">${ic('mail')}</button><button class="btn sm ghost icon" data-dim="${x.id}" aria-label="Več">⋯</button><button class="btn sm ghost icon px" data-ddel="${x.id}" title="Izbriši" aria-label="Izbriši">✕</button></div></div>`).join(''):`<div class="empty" style="padding:22px"><p>${q?'Ni zadetkov.':'V tej mapi še ni datotek.'}</p></div>`}</div>`:''}</div>`;
 }
 function afterDrive(root){fillThumbs(root);const z=root.querySelector('[data-ddrop]');if(z&&!z.dataset.on){z.dataset.on=1;const sp=root.querySelector('.drive').dataset.space;
   ['dragover','dragenter'].forEach(ev=>z.addEventListener(ev,e=>{e.preventDefault();z.classList.add('over')}));z.addEventListener('dragleave',()=>z.classList.remove('over'));
@@ -4918,7 +4944,9 @@ document.addEventListener('change',e=>{if(e.target.id==='divSel')setDivF(e.targe
 document.addEventListener('input',e=>{const q=e.target.closest('[data-dq]');if(!q)return;const sp=q.closest('.drive').dataset.space;DRV[sp].q=q.value;const p=q.selectionStart;rerenderDrive(sp);const n=document.querySelector(`.drive[data-space="${sp}"] [data-dq]`);n.focus();n.setSelectionRange(p,p)});
 document.addEventListener('click',async e=>{const dr=e.target.closest('.drive');if(!dr)return;const sp=dr.dataset.space,D=driveSpace(sp),st=DRV[sp],t=e.target;
   const fm=t.closest('[data-dfm]');if(fm){e.stopPropagation();const x=D.folders.find(y=>y.id===fm.dataset.dfm);const n=prompt('Ime mape (prazno = izbriši mapo):',x.name);if(n===null)return;if(!n.trim()){if(D.items.some(i=>i.folder===x.id)||D.folders.some(y=>y.parent===x.id)){toast('Mapa ni prazna – najprej premakni ali izbriši vsebino.','err');return}D.folders=D.folders.filter(y=>y!==x)}else x.name=n.trim();await saveDrive();rerenderDrive(sp);return}
-  const df=t.closest('[data-df]');if(df){st.f=df.dataset.df;st.q='';rerenderDrive(sp);return}
+  const dv=t.closest('[data-dview]');if(dv){S.settings.driveView=dv.dataset.dview;saveSettings();rerenderDrive(sp);return}
+  if(t.closest('[data-dup]')){const cf=D.folders.find(y=>y.id===st.f);driveNav(sp,cf?cf.parent||'':'');return}
+  if(t.closest('.drow [data-dfm],.drow [data-dim],.drow [data-dmail],.drow [data-ddel]')){}else{const df=t.closest('[data-df]');if(df){driveNav(sp,df.dataset.df);return}}
   const a=t.closest('[data-da]')?.dataset.da;
   if(a==='folder'){const n=prompt('Ime nove mape:');if(n&&n.trim()){D.folders.push({id:uid(),name:n.trim(),parent:st.f});await saveDrive();rerenderDrive(sp)}return}
   if(a==='link'){const u=prompt('Povezava (https://…):');if(!u||!/^https?:/.test(u))return;const n=prompt('Naziv povezave:',u.replace(/^https?:\/\/(www\.)?/,'').slice(0,60))||u;D.items.push({id:uid(),folder:st.f,type:'link',name:n,url:u.trim(),created:Date.now()});await saveDrive();rerenderDrive(sp);return}
@@ -4943,7 +4971,7 @@ function editNote(sp,x){const D=driveSpace(sp),isNew=!x;x=x||{id:uid(),folder:DR
   openModal({title:isNew?'Nova beležka':x.name,body:`${mf('Naslov','name',x.name,{auto:isNew})}<div style="height:8px"></div>${mf('Besedilo','text',x.text,{type:'textarea',rows:12})}`,foot:`<span class="grow"></span><button class="btn" data-md="print">${ic('print')}Natisni</button><button class="btn pri" data-md="save">${ic('check')}Shrani</button>`,
     onClick:async e=>{const a=e.target.closest('[data-md]')?.dataset.md;if(!a||a==='close')return;const v=mdVals();Object.assign(x,{name:v.name||'Beležka',text:v.text});if(a==='print'){printPage(x.name,`<div style="white-space:pre-wrap">${esc(x.text)}</div>`);return}if(isNew)D.items.push(x);await saveDrive();closeModal();rerenderDrive(sp)}})}
 /* drive-only views */
-function showDriveView(k,title,sub){cur=null;setNav(k);topSimple(title);show('#vDrive');$('#vDrive').innerHTML=`<div class="wrap wide">${driveHTML(k,title,sub)}</div>`;afterDrive($('#vDrive'))}
+function showDriveView(k,title,sub){if(DRV[k])DRV[k].f='';cur=null;setNav(k);topSimple(title);show('#vDrive');$('#vDrive').innerHTML=`<div class="wrap wide">${driveHTML(k,title,sub)}</div>`;afterDrive($('#vDrive'))}
 
 /* ================= Excel import / export for modules ================= */
 async function exportXlsx(name,rows){try{await loadScript(CDN.xlsx);const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Podatki');XLSX.writeFile(wb,name+'.xlsx')}catch{download(new Blob([toCSV(rows)],{type:'text/csv'}),name+'.csv');toast('Excel knjižnica ni na voljo – izvoženo kot CSV (odpre se v Excelu).')}}
@@ -5259,7 +5287,7 @@ function openMail(to,subject,body,files=[]){const gapi=!!(S.settings.driveId||''
 
 /* ================= back / forward navigation ================= */
 let NAV_REPLAY=false,NAV_LAST='';
-function navWrap(name){const orig=window[name];if(typeof orig!=='function'||orig.__w)return;const w=function(...a){const r=orig.apply(this,a);if(!NAV_REPLAY){const key=name+':'+JSON.stringify(a.slice(0,1));if(key!==NAV_LAST){NAV_LAST=key;try{history.pushState({nr:[name,a.slice(0,1)]},'',location.search)}catch{}}}return r};w.__w=1;window[name]=w;}
+function navWrap(name){const orig=window[name];if(typeof orig!=='function'||orig.__w)return;const w=function(...a){const r=orig.apply(this,a);if(!NAV_REPLAY){const aa=a.filter(x=>typeof x!=='object'||x===null).slice(0,3);const key=name+':'+JSON.stringify(aa);if(key!==NAV_LAST){NAV_LAST=key;try{history.pushState({nr:[name,aa]},'',location.search)}catch{}}}return r};w.__w=1;window[name]=w;}
 window.addEventListener('popstate',e=>{const r=e.state&&e.state.nr;if(!r)return;NAV_REPLAY=true;try{const fn=window[r[0]];if(typeof fn==='function')fn(...r[1]);NAV_LAST=r[0]+':'+JSON.stringify(r[1])}finally{NAV_REPLAY=false}});
 document.addEventListener('click',e=>{if(e.target.closest('#navBack')){history.back();return}if(e.target.closest('#navFwd'))history.forward()});
 
@@ -5342,6 +5370,193 @@ async function shareRec(k,r){const m=MODS[k],co=S.settings.company;const files=(
   openMail('',String(r[m.f[0][0]]||m.one),`Pozdravljeni,\n\npošiljamo vam: ${r[m.f[0][0]]||m.one}\n\n${txt}${links?'\n\nPovezave:\n'+links:''}\n\nLep pozdrav,\n${co.contact||''}\n${co.name||''}`,files)}
 MODS.gotstr={t:'Gotovina (stranke)',one:'Gotovinsko plačilo stranke',ic:'euro',hidden:1,desc:'Plačila strank z gotovino: račun, blagajniški prejemek in polog gotovine na banko.',f:[['date','Datum plačila','date',1],['customer','Kupec','customer'],['amount','Znesek (€)','money'],['invoice','Št. računa','text'],['receipt','Blagajniški prejemek št.','text'],['eor','EOR (davčna blagajna)','text'],['deposit','Položeno na banko dne','date'],['status','Stanje','sel',['v blagajni','položeno na banko']],['note','Opombe','area'],['files','Račun, potrdilo o pologu','files']],cols:['date','customer','amount','invoice','deposit','status'],st:'status'};
 
+
+/* ================= storage self-check ================= */
+async function storageCheck(){const R=[];const add=(ok,t,d='')=>R.push([ok,t,d]);
+  try{const k='__test_'+uid();await DB.put('kv',{t:Date.now()},k);const v=await DB.get('kv',k);await DB.del('kv',k);add(!!v,'Shramba v brskalniku (IndexedDB)','zapis in branje delujeta')}catch(e){add(false,'Shramba v brskalniku',e.message)}
+  try{const q=(await DB.all('quotes')).length,c=((await DB.get('kv','customers'))||[]).length;add(q===S.quotes.length&&c===S.customers.length,'Ponudbe in stranke so shranjene',`${q} ponudb, ${c} strank v shrambi (v programu ${S.quotes.length} / ${S.customers.length})`)}catch(e){add(false,'Ponudbe in stranke',e.message)}
+  try{const p=navigator.storage&&navigator.storage.persisted?await navigator.storage.persisted():null;add(p!==false,'Trajna shramba',p?'brskalnik podatkov ne bo samodejno brisal':p===false?'brskalnik lahko ob pomanjkanju prostora briše podatke – redno delaj kopije':'ni podatka');const est=navigator.storage&&navigator.storage.estimate?await navigator.storage.estimate():null;if(est)add(true,'Poraba prostora',`${(est.usage/1e6).toFixed(1)} MB od ${(est.quota/1e9).toFixed(1)} GB`)}catch{}
+  if(S.settings.divF)add(false,'Filter programa je vklopljen',`prikazan je samo program »${divName(S.settings.divF)}« in zapisi brez programa – na vrhu menija izberi »Vsi programi«`);
+  if(S.dir){try{const pm=await S.dir.queryPermission({mode:'readwrite'});if(pm!=='granted')add(false,'Samodejna kopija na disk','dovoljenje ni dano – klikni Nadaljuj na seznamu ponudb');else{const fh=await S.dir.getFileHandle('STIK-Prodaja-test.txt',{create:true});const w=await fh.createWritable();await w.write('test '+new Date().toISOString());await w.close();await S.dir.removeEntry('STIK-Prodaja-test.txt');add(true,'Samodejna kopija na disk',`mapa »${S.dir.name}« – zapis deluje${S.settings.lastBackup?', zadnja kopija '+dtm(+S.settings.lastBackup):''}`)}}catch(e){add(false,'Samodejna kopija na disk',e.message)}}else add(null,'Samodejna kopija na disk','mapa ni izbrana');
+  if(S.settings.driveId){try{const tok=await driveToken();const f=await driveFind(tok,'STIK-Prodaja-podatki.json').catch(()=>null);add(true,'Google Drive',f?`povezano – kopija z dne ${dtm(f.modifiedTime)}`:'povezano – kopija še ni bila poslana (klikni Pošlji podatke v Drive)')}catch(e){add(false,'Google Drive',e.message)}}else add(null,'Google Drive','Client ID ni vpisan');
+  const a=backupAgeDays();add(a!==null&&a<7,'Varnostna kopija',a===null?'še nikoli':`pred ${a} dnevi`);
+  openModal({title:'Preverjanje shranjevanja',body:R.map(([ok,t,d])=>`<div class="chkrow ${ok===true?'ok':ok===false?'bad':'na'}"><span>${ok===true?'✓':ok===false?'!':'–'}</span><div><b>${esc(t)}</b><small>${esc(d)}</small></div></div>`).join(''),foot:`<span class="grow"></span><button class="btn pri" data-md="close">V redu</button>`})}
+
+/* ================= generic table import for customers ================= */
+const CUST_IMP=[['name','Naziv / ime',1,['naziv','ime','name','stranka','kupec','podjetje','firma','ime in priimek']],['contact','Kontaktna oseba',0,['kontakt','contact']],['address','Naslov',0,['naslov','ulica','address']],['post','Poštna št.',0,['posta','postna','zip','postal']],['city','Kraj',0,['kraj','mesto','city']],['country','Država',0,['drzava','country']],['phone','Telefon',0,['telefon','tel','gsm','phone','mobile']],['email','E-pošta',0,['e-posta','email','e-mail','mail']],['taxId','ID za DDV / davčna',0,['ddv','davcna','vat','tax']],['note','Opomba',0,['opomba','note']]];
+async function importCustomersFile(f){if(/\.(csv|txt)$/i.test(f.name))return importCustomersCSV(await f.text());let rows;busy(true,'Berem datoteko …');try{rows=await readTableFile(f)}catch(e){busy(false);return toast('Uvoz ni uspel: '+e.message,'err')}busy(false);
+  mapColumns(rows,CUST_IMP,'Uvoz strank: '+f.name,async L=>{let n=0,u=0;for(const c of L){if(!c.name)continue;const ex=S.customers.find(x=>x.name.toLowerCase()===c.name.toLowerCase());if(ex){Object.keys(c).forEach(k=>{if(c[k])ex[k]=c[k]});u++}else{S.customers.push({id:uid(),created:Date.now(),country:'Slovenija',...Object.fromEntries(Object.entries(c).filter(([,v])=>v))});n++}}
+    S.customers.sort((a,b)=>a.name.localeCompare(b.name,'sl'));await saveCustomers();renderCustomers();toast(`Uvoženih ${n} novih strank${u?`, posodobljenih ${u}`:''}.`)},{ai:1})}
+
+/* ================= quote import (STIK json / PDF / Word / Excel / images) ================= */
+async function importQuoteFile(f){const n=f.name.toLowerCase();
+  if(/\.json$/.test(n))return importProjectFile(f);
+  busy(true,'Berem ponudbo …');let text='',imgs=[];
+  try{if(/\.pdf$/.test(n))text=(await pdfRows(await f.arrayBuffer())).map(r=>r.join(' | ')).join('\n');
+    else if(/\.docx$/.test(n)){const d=await docxParse(await f.arrayBuffer());text=d.rows.map(r=>r.filter(c=>!/^__IMG__/.test(c)).join(' | ')).join('\n');d.rows.forEach((r,i)=>r.forEach(c=>{if(/^__IMG__/.test(c))imgs.push([i,c.slice(7)])}));const m=[...d.html.matchAll(/<img src="(data:image[^"]+)"/g)].map(x=>x[1]);m.forEach(u=>{if(!imgs.some(x=>x[1]===u))imgs.push([-1,u])})}
+    else if(/\.(xlsx|xls|ods|csv)$/.test(n))text=(await readTableFile(f)).map(r=>r.join(' | ')).join('\n');
+    else if(/^image\//.test(f.type)){imgs.push([-1,await fileToDataURL(f)])}
+    else if(/\.doc$/.test(n))throw new Error('stari .doc – shrani ga v Wordu kot .docx ali PDF');
+  }catch(e){busy(false);return toast('Branje ni uspelo: '+e.message,'err',8000)}
+  let data=null;
+  if((S.settings.aiMode||'local')!=='local'){try{busy(true,'AI pretvarja ponudbo …');AI_EXTRA=text?null:{imgs:imgs.slice(0,3).map(x=>dataParts(x[1])).filter(Boolean),text:''};
+    const out=await aiRaw(`Pretvori staro ponudbo v strukturirane podatke. Vrni SAMO JSON: {"customer":{"name":"","address":"","post":"","city":"","phone":"","email":"","taxId":""},"number":"","date":"LLLL-MM-DD","title":"","items":[{"title":"","desc":"kratek opis ali alineje","qty":1,"unit":"kos","net":0,"vat":22,"disc":0}],"avansPct":0,"terms":"","note":""}. net = cena na enoto brez DDV (decimalna pika). Če je navedena cena z DDV, jo preračunaj. Ne izmišljuj postavk.\n\n${text.slice(0,30000)}`,6000);
+    data=JSON.parse(out.slice(out.indexOf('{'),out.lastIndexOf('}')+1))}catch(e){toast('AI pretvorba ni uspela ('+e.message+') – uporabljam samodejno prepoznavo.','err',7000)}finally{AI_EXTRA=null}}
+  if(!data){const lines=text.split('\n');const items=[];const pr=/(\d{1,3}(?:\.\d{3})*,\d{2}|\d+\.\d{2})\s*€?/g;
+    lines.forEach(l=>{const nums=[...l.matchAll(pr)].map(m=>num(m[1]));if(!nums.length)return;const t=l.split('|').map(x=>x.trim()).filter(x=>x&&!/^[\d.,\s€%x×]+$/i.test(x));if(!t.length||/skupaj|ddv|total|za plačilo|osnova/i.test(l))return;const qm=l.match(/(\d+(?:,\d+)?)\s*(kos|kpl|x|m|ura|h)\b/i);const tt=[...t].sort((a,b)=>b.length-a.length)[0];const sku=t.find(x=>x!==tt&&/^[A-Z0-9][\w./-]{1,20}$/i.test(x)&&/\d/.test(x));items.push({title:tt.slice(0,120),desc:t.filter(x=>x!==tt&&x!==sku).join(' ').slice(0,300),sku,qty:qm?num(qm[1]):1,unit:'kos',net:nums[0],vat:22,disc:0})});
+    const cm=text.match(/(?:kupec|naročnik|stranka)[:\s|]+([^\n|]{3,60})/i);data={customer:{name:cm?cm[1].trim():''},items,title:'',number:'',date:''}}
+  const q=newQuote();q.imported=f.name;if(data.customer)q.customer={...q.customer,...Object.fromEntries(Object.entries(data.customer).filter(([,v])=>v))};if(data.title)q.title=data.title;if(data.date&&/^\d{4}-\d{2}-\d{2}$/.test(data.date))q.date=data.date;if(data.note)q.note=data.note;if(data.terms)q.terms=data.terms;
+  q.items=(data.items||[]).filter(x=>x&&x.title).map((x,i)=>({id:uid(),title:String(x.title),desc:String(x.desc||''),images:[],qty:+x.qty||1,unit:x.unit||'kos',net:r2(+x.net||0),disc:+x.disc||0,vat:+x.vat&&+x.vat!==+q.vat?+x.vat:null}));
+  imgs.forEach(([ri,u],k)=>{const it=q.items[Math.min(k,q.items.length-1)];if(it)it.images.push(u)});
+  if(data.customer?.name)await ensureCustomer(data.customer.name,data.customer);
+  S.quotes.push(q);cur=q;await saveQuoteNow();busy(false);toast(`Ponudba uvožena: ${q.items.length} postavk. Preveri cene, DDV in slike.`,'',9000);openQuote(q.id);
+}
+
+/* ================= drive: list view, drag & drop between folders, history ================= */
+window.driveNav=function(sp,f){const st=DRV[sp]=DRV[sp]||{f:'',q:''};st.f=f;st.q='';rerenderDrive(sp)};
+navWrap('driveNav');
+document.addEventListener('dragstart',e=>{const d=e.target.closest&&e.target.closest('[data-dragit]');if(!d)return;e.dataTransfer.setData('text/stik-item',d.dataset.dragit);e.dataTransfer.effectAllowed='move'});
+document.addEventListener('dragover',e=>{const f=e.target.closest&&e.target.closest('[data-dropf]');if(!f)return;e.preventDefault();f.classList.add('dropon')});
+document.addEventListener('dragleave',e=>{const f=e.target.closest&&e.target.closest('[data-dropf]');if(f)f.classList.remove('dropon')});
+document.addEventListener('drop',async e=>{const f=e.target.closest&&e.target.closest('[data-dropf]');if(!f)return;e.preventDefault();e.stopPropagation();f.classList.remove('dropon');const sp=f.closest('.drive').dataset.space,D=driveSpace(sp),fid=f.dataset.dropf;
+  const it=e.dataTransfer.getData('text/stik-item');if(it){const [kind,id]=it.split('|');if(kind==='i'){const x=D.items.find(y=>y.id===id);if(x){x.folder=fid;await saveDrive();toast(`Premaknjeno v »${(D.folders.find(y=>y.id===fid)||{name:'koren'}).name}«.`)}}else{const x=D.folders.find(y=>y.id===id);if(x&&x.id!==fid){let p=fid,bad=false;while(p){if(p===x.id){bad=true;break}p=(D.folders.find(y=>y.id===p)||{}).parent}if(!bad){x.parent=fid;await saveDrive()}}}rerenderDrive(sp);return}
+  if(e.dataTransfer.files.length){const old=DRV[sp].f;DRV[sp].f=fid;for(const file of e.dataTransfer.files)await driveAddFile(sp,file);DRV[sp].f=old;rerenderDrive(sp);toast('Datoteke naložene v mapo.')}},true);
+
+/* ================= price comparison ================= */
+const saveComp=()=>DB.put('kv',S.comp,'comp');
+function showComp(){cur=null;setNav('cene');topSimple('Uskladitev cen');show('#vComp2');renderComp()}
+function renderComp(){const C=S.comp,L=C.results||[];const high=L.filter(r=>r.diff>(+C.tol||3));
+  $('#vComp2').innerHTML=`<div class="wrap wide"><div class="list-head"><div><h1 style="margin:0">Uskladitev cen</h1><p class="help" style="margin:2px 0 0">AI poišče enake artikle pri konkurentih in na spletu ter jih primerja s cenami v tvoji trgovini.</p></div></div>
+  <div class="rep-grid"><div class="panel"><h2>${ic('globe')}Moja trgovina</h2><label class="fld"><span>Naslov trgovine (za primerjavo)</span><input data-cp="myShop" value="${esc(C.myShop||'https://'+(S.settings.company.web||''))}" placeholder="https://tvoja-trgovina.si"></label>
+    <div class="row" style="margin-top:8px"><label class="fld"><span>Dovoljeno odstopanje (%)</span><input data-cp="tol" value="${esc(C.tol??3)}" inputmode="decimal"></label><label class="fld"><span>Največ artiklov na preverjanje</span><input data-cp="max" value="${esc(C.max??10)}" inputmode="numeric"></label></div>
+    <div class="inline" style="margin-top:10px"><button class="btn" id="cpLoad">${ic('download')}Preberi artikle iz trgovine</button><button class="btn" id="cpFromPrice">${ic('tag')}Iz cenika</button><button class="btn" id="cpFromShop">${ic('cart')}Iz tabel za Shopify</button></div>
+    <p class="help">${(C.items||[]).length} artiklov za primerjavo. Trgovine na Shopify program prebere samodejno, pri drugih vpiši ali uvozi artikle iz cenika.</p></div>
+  <div class="panel"><h2>${ic('users')}Konkurenca</h2>${(C.sites||[]).map((s2,i)=>`<div class="copyrow"><input class="inp" data-cps="${i}.name" value="${esc(s2.name||'')}" placeholder="Ime" style="max-width:160px"><input class="inp" data-cps="${i}.url" value="${esc(s2.url||'')}" placeholder="https://konkurent.si"><button class="btn sm ghost icon px" data-cpsd="${i}" aria-label="Odstrani">✕</button></div>`).join('')}
+    <div class="inline"><button class="btn sm" id="cpAddSite" style="flex:none">${ic('plus')}Dodaj trgovino</button></div>
+    <label class="chk" style="margin-top:8px"><input type="checkbox" data-cpc="web" ${C.web!==false?'checked':''}>Preišči tudi celoten splet (Claude ali Gemini s spletnim iskanjem)</label>
+    <button class="btn sig" id="cpRun" style="margin-top:10px">${ic('spark')}Preveri cene z AI</button></div></div>
+  ${(C.items||[]).length?`<div class="panel" style="margin-top:14px"><h2>Artikli za primerjavo</h2><div class="tbl modt" style="--n:3"><div class="th-row"><span></span><span>Artikel</span><span>Moja cena (z DDV)</span><span>Povezava</span><span></span></div>${C.items.map((it,i)=>`<div class="tr"><label class="sck"><input type="checkbox" data-cpi="${i}" ${it.on!==false?'checked':''}></label><div class="c1"><b>${esc(it.name)}</b></div><div>${fmt(+it.price||0)}</div><div>${it.url?`<a href="${esc(it.url)}" target="_blank" rel="noopener">odpri</a>`:''}</div><div class="stx"><button class="btn sm ghost icon px" data-cpid="${i}" aria-label="Odstrani">✕</button></div></div>`).join('')}</div></div>`:''}
+  ${L.length?`<div class="panel" style="margin-top:14px"><h2>Rezultat ${C.ran?'· '+dtm(C.ran):''} <small class="warnc">${high.length} previsokih</small></h2><div class="inline" style="margin-bottom:8px"><button class="btn sm" id="cpXls" style="flex:none">${ic('download')}Excel</button><button class="btn sm" id="cpPrint" style="flex:none">${ic('print')}Natisni</button></div>
+    <div class="tbl cpt"><div class="th-row"><span>Artikel</span><span class="r">Moja cena</span><span class="r">Najnižja konkurenca</span><span class="r">Razlika</span><span>Vir</span><span>Predlog</span></div>${L.map(r=>`<div class="tr ${r.diff>(+C.tol||3)?'hi':r.diff<-(+C.tol||3)?'lo':''}"><div class="c1"><b>${esc(r.name)}</b><small>${esc(r.note||'')}</small></div><div class="r">${fmt(r.my)}</div><div class="r">${r.best?fmt(r.best):'—'}</div><div class="r"><b>${r.best?(r.diff>0?'+':'')+fmtN(r.diff,1)+' %':'—'}</b></div><div>${(r.offers||[]).slice(0,3).map(o=>`<a href="${esc(o.url||'#')}" target="_blank" rel="noopener">${esc(o.shop||'vir')}: ${fmt(+o.price||0)}</a>`).join('<br>')}</div><div>${r.best&&r.diff>(+C.tol||3)?`<b>${fmt(r.best*0.99)}</b>`:'OK'}</div></div>`).join('')}</div>
+    <p class="help">Rdeče: tvoja cena je višja od najnižje konkurenčne za več kot ${esc(C.tol??3)} %. AI lahko napačno prepozna artikel ali ceno (npr. drugačna izvedba, cena brez DDV) – vedno preveri vir.</p></div>`:''}</div>`}
+async function fetchShopProducts(url){const base=url.replace(/\/+$/,'');const out=[];for(let p=1;p<=4;p++){const r=await fetchVia(`${base}/products.json?limit=250&page=${p}`,'json',20000).catch(()=>null);const L=r&&r.body&&r.body.products;if(!L||!L.length)break;L.forEach(x=>{const v=x.variants?.[0]||{};out.push({name:x.title,price:+v.price||0,url:`${base}/products/${x.handle}`,sku:v.sku||'',on:true})});if(L.length<250)break}return out}
+async function runComp(){const C=S.comp,items=(C.items||[]).filter(x=>x.on!==false).slice(0,+C.max||10);if(!items.length)return toast('Najprej dodaj artikle za primerjavo.','err');if((S.settings.aiMode||'local')==='local')return toast('Vklopi AI v Nastavitvah (Claude ali Gemini).','err');
+  const sites=(C.sites||[]).filter(s=>s.url);const res=[];let i=0;
+  for(const it of items){busy(true,`AI preverja cene … ${++i}/${items.length}: ${it.name.slice(0,40)}`);let ctx='';
+    for(const s of sites){const base=s.url.replace(/\/+$/,'');let found='';try{const r=await fetchVia(`${base}/search/suggest.json?q=${encodeURIComponent(it.name.slice(0,60))}&resources[type]=product&resources[limit]=4`,'json',12000);const P=r.body?.resources?.results?.products||[];if(P.length)found=P.map(p=>`${p.title} – ${p.price} € – ${base}${p.url}`).join('\n')}catch{}
+      if(!found){try{const r=await fetchVia(`${base}/search?q=${encodeURIComponent(it.name.slice(0,60))}`,'text',15000);found=parsePage(r.body,r.final).longText?.slice(0,2500)||''}catch{}}ctx+=`\n### ${s.name||base} (${base})\n${found||'(ni rezultatov)'}\n`}
+    try{const out=await aiCallWeb(`Primerjaj ceno artikla z enakimi artikli pri konkurentih. Artikel: "${it.name}"${it.sku?` (šifra ${it.sku})`:''}, moja cena ${it.price} € z DDV, moja stran: ${it.url||C.myShop||''}.\nPodatki s strani konkurentov:${ctx||' (ni vpisanih)'}\n${C.web!==false?'Poišči še na spletu (slovenske in EU spletne trgovine) ENAK artikel (isti proizvajalec in model).':''}\nVrni SAMO JSON: {"offers":[{"shop":"ime trgovine","price":123.45,"url":"povezava","same":true}],"note":"kratka opomba"}. Cene v EUR z DDV. Vključi samo enake artikle (same=true), ne podobnih.`);
+      const j=JSON.parse(out.slice(out.indexOf('{'),out.lastIndexOf('}')+1));const offers=(j.offers||[]).filter(o=>o.same!==false&&+o.price>0).sort((a,b)=>a.price-b.price);const best=offers[0]?+offers[0].price:0;
+      res.push({name:it.name,my:+it.price,best,diff:best?((+it.price-best)/best*100):0,offers,note:j.note||''})}catch(e){res.push({name:it.name,my:+it.price,best:0,diff:0,offers:[],note:'Napaka: '+e.message})}}
+  busy(false);C.results=res.sort((a,b)=>b.diff-a.diff);C.ran=Date.now();await saveComp();renderComp();toast(`Preverjenih ${res.length} artiklov.`)}
+async function aiCallWeb(prompt){const st=S.settings,mode=st.aiMode;
+  if(mode==='gemini'){const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(st.gmModel||'gemini-2.5-flash')}:generateContent?key=${encodeURIComponent(st.gmKey||'')}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],tools:S.comp.web!==false?[{google_search:{}}]:undefined})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error?.message||('HTTP '+r.status));return (j.candidates?.[0]?.content?.parts||[]).map(x=>x.text||'').join('')}
+  if(mode==='worker'||mode==='key'){const body={model:st.aiModel||'claude-haiku-4-5-20251001',max_tokens:2000,messages:[{role:'user',content:prompt}]};if(S.comp.web!==false)body.tools=[{type:'web_search_20250305',name:'web_search',max_uses:4}];let r;
+    if(mode==='worker'){const px=(st.proxy||'').trim().replace(/\/+$/,'');r=await fetch(px+'/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}else r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':st.aiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error?.message||('HTTP '+r.status));return (j.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('')}
+  return aiCall(prompt,2000)}
+$('#vComp2').addEventListener('change',async e=>{const t=e.target,C=S.comp;if(t.dataset.cp){C[t.dataset.cp]=t.value;await saveComp();return}if(t.dataset.cps){const [i,k]=t.dataset.cps.split('.');C.sites[+i][k]=t.value.trim();await saveComp();return}if(t.dataset.cpc){C[t.dataset.cpc]=t.checked;await saveComp();return}if(t.dataset.cpi){C.items[+t.dataset.cpi].on=t.checked;await saveComp()}});
+$('#vComp2').addEventListener('click',async e=>{const t=e.target,C=S.comp;
+  if(t.closest('#cpAddSite')){C.sites=[...(C.sites||[]),{name:'',url:''}];await saveComp();renderComp();return}
+  const sd=t.closest('[data-cpsd]');if(sd){C.sites.splice(+sd.dataset.cpsd,1);await saveComp();renderComp();return}
+  const id=t.closest('[data-cpid]');if(id){C.items.splice(+id.dataset.cpid,1);await saveComp();renderComp();return}
+  if(t.closest('#cpLoad')){const u=(C.myShop||'').trim();if(!u)return toast('Vpiši naslov trgovine.','err');busy(true,'Berem artikle iz trgovine …');try{const L=await fetchShopProducts(u);if(!L.length)throw new Error('trgovina ne ponuja seznama izdelkov (deluje za Shopify trgovine) – uporabi Iz cenika');C.items=L;await saveComp();renderComp();toast(`Prebranih ${L.length} artiklov.`)}catch(err){toast(err.message,'err',9000)}finally{busy(false)}return}
+  if(t.closest('#cpFromPrice')){pickPrices(async ps=>{C.items=[...(C.items||[]),...ps.map(p=>({name:p.name,price:r2(p.net*(1+(+p.vat||0)/100)),url:p.url||'',sku:p.sku||'',on:true}))];await saveComp();renderComp()});return}
+  if(t.closest('#cpFromShop')){C.items=[...(C.items||[]),...R$('shopItems').map(p=>({name:p.title,price:+p.price||0,url:shopUrl(p),sku:p.sku||'',on:true}))];await saveComp();renderComp();return}
+  if(t.closest('#cpRun')){runComp();return}
+  if(t.closest('#cpXls')){exportXlsx(`STIK-uskladitev-cen-${today()}`,[['Artikel','Moja cena','Najnižja konkurenca','Razlika %','Predlog','Viri'],...(C.results||[]).map(r=>[r.name,r.my,r.best||'',r.best?r2(r.diff):'',r.best&&r.diff>(+C.tol||3)?r2(r.best*0.99):'',(r.offers||[]).map(o=>`${o.shop} ${o.price} ${o.url}`).join(' | ')])]);return}
+  if(t.closest('#cpPrint')){printPage('Uskladitev cen',ptable(['Artikel','Moja cena','Najnižja','Razlika','Predlog'],(C.results||[]).map(r=>[esc(r.name),fmt(r.my),r.best?fmt(r.best):'—',r.best?fmtN(r.diff,1)+' %':'—',r.best&&r.diff>(+C.tol||3)?fmt(r.best*0.99):'OK'])),{landscape:1});return}});
+
+/* ================= Shopify table builder ================= */
+const SHOP_H=['Handle','Title','Body (HTML)','Vendor','Product Category','Type','Tags','Published','Option1 Name','Option1 Value','Option2 Name','Option2 Value','Option3 Name','Option3 Value','Variant SKU','Variant Grams','Variant Inventory Tracker','Variant Inventory Qty','Variant Inventory Policy','Variant Fulfillment Service','Variant Price','Variant Compare At Price','Variant Requires Shipping','Variant Taxable','Variant Barcode','Image Src','Image Position','Image Alt Text','Gift Card','SEO Title','SEO Description','Variant Image','Variant Weight Unit','Variant Tax Code','Cost per item','Status'];
+const shopUrl=p=>{const b=(S.settings.shopUrl||('https://'+(S.settings.company.web||''))).replace(/\/+$/,'');return p.handle?`${b}/products/${p.handle}`:''};
+function shopCheck(p){const W=[],E=[];const ex=S.shopMeta?.handles||[];
+  if(!p.title)E.push('naziv (Title)');if(!p.handle)E.push('Handle');if(!(+p.price>0))E.push('cena');if(!(p.images||[]).length)E.push('vsaj ena slika');
+  if((p.images||[]).some(u=>!/^https?:/.test(u)))E.push('slike morajo imeti javno povezavo (https) – lokalne slike Shopify ne uvozi');
+  if(!p.body)W.push('opis');if(!p.vendor&&!S.shopMeta?.vendor)W.push('proizvajalec (Vendor)');if(!p.type)W.push('vrsta (Type)');if(!p.sku)W.push('šifra (SKU)');if(!+p.grams)W.push('teža');if(!p.seoTitle)W.push('SEO naslov');if(!p.seoDesc)W.push('SEO opis');
+  const dup=ex.includes(p.handle);const dupT=!dup&&(S.shopMeta?.titles||[]).some(t=>t&&t.toLowerCase()===String(p.title||'').toLowerCase());const dupS=p.sku&&(S.shopMeta?.skus||[]).includes(p.sku);if(dupT)W.unshift('izdelek z enakim nazivom že obstaja v trgovini');if(dupS)W.unshift('SKU že obstaja v trgovini');return{E,W,dup,ok:!E.length}}
+function showShopB(){cur=null;setNav('shopify');topSimple('Izdelava tabel za Shopify');show('#vShopB');renderShopB()}
+let shopQ='',shopF='';
+function renderShopB(){const L=R$('shopItems'),M=S.shopMeta||{},q=shopQ.toLowerCase();const F=L.filter(p=>(!q||[p.title,p.sku,p.vendor,p.type,p.tags].join(' ').toLowerCase().includes(q))&&(!shopF||(shopF==='err'&&!shopCheck(p).ok)||(shopF==='ok'&&shopCheck(p).ok)||(shopF==='dup'&&shopCheck(p).dup)));
+  $('#vShopB').innerHTML=`<div class="wrap wide"><div class="list-head"><div><h1 style="margin:0">Izdelava tabel za Shopify</h1><p class="help" style="margin:2px 0 0">Povleci sem povezave ali slike izdelkov, program pripravi vrstice točno v obliki Shopify CSV. ${M.count?`Vzorec trgovine: <b>${M.count}</b> obstoječih izdelkov, ${M.headers?.length||0} stolpcev (${dtm(M.at)}).`:'<b class="warnc">Najprej uvozi izvoz izdelkov iz svoje trgovine (vzorec), da program pozna stolpce in obstoječe izdelke.</b>'}</p></div><span class="grow"></span>
+    <button class="btn" id="spSample">${ic('upload')}Uvozi vzorec / izvoz iz Shopify</button><button class="btn" id="spPrice">${ic('tag')}Iz cenika</button><button class="btn" id="spNew">${ic('plus')}Ročno</button><button class="btn sig" id="spExport">${ic('download')}Izvozi CSV za Shopify</button></div>
+    <div class="ddrop" id="spDrop">Povleci sem <b>povezave</b> do izdelkov (iz brskalnika), <b>slike</b> ali prilepi povezavo: <input class="inp" id="spUrl" placeholder="https://… (Enter)" style="max-width:420px;display:inline-block;margin-left:8px"></div>
+    <div class="filters"><input class="inp" id="spQ" placeholder="Išči …" value="${esc(shopQ)}"><select class="inp" id="spF"><option value="">Vsi (${L.length})</option><option value="err"${shopF==='err'?' selected':''}>Manjkajo podatki (${L.filter(p=>!shopCheck(p).ok).length})</option><option value="ok"${shopF==='ok'?' selected':''}>Pripravljeni (${L.filter(p=>shopCheck(p).ok).length})</option><option value="dup"${shopF==='dup'?' selected':''}>Že obstajajo v trgovini (${L.filter(p=>shopCheck(p).dup).length})</option></select></div>
+    ${F.length?selToolbarHTML('shopItems',`<button class="btn sm" data-selact="shopexp|shopItems">${ic('download')}Izvozi izbrane</button>`)+`<div class="tbl shopt"><div class="th-row"><span>${selHeadHTML('shopItems',F.map(p=>p.id))}</span><span></span><span>Izdelek</span><span>Handle / SKU</span><span class="r">Cena</span><span>Stanje</span><span></span></div>${F.map(p=>{const c=shopCheck(p);return `<div class="tr${selSet('shopItems').has(p.id)?' sel':''}" data-spi="${p.id}">${selCellHTML('shopItems',p.id)}<div class="im" style="${p.images?.[0]?`background-image:url('${esc(p.images[0])}')`:''}"></div><div class="c1"><b>${esc(p.title||'(brez naziva)')}</b><small>${esc([p.vendor,p.type,(p.variants||[]).length>1?(p.variants.length+' različic'):''].filter(Boolean).join(' · '))}</small></div><div><small>${esc(p.handle||'')}<br>${esc(p.sku||'')}</small></div><div class="r"><b>${fmt(+p.price||0)}</b></div><div>${c.E.length?`<span class="mst canc bad">manjka: ${esc(c.E.join(', '))}</span>`:`<span class="mst done">pripravljeno</span>`}${c.dup?'<br><span class="mst wait">obstaja v trgovini</span>':''}${!c.E.length&&c.W.length?`<br><small class="warnc">priporočeno: ${esc(c.W.join(', '))}</small>`:''}</div><div class="stx"><button class="btn sm ghost icon px" data-spdel="${p.id}" aria-label="Izbriši">✕</button></div></div>`}).join('')}</div>`:`<div class="empty"><h2>Ni izdelkov</h2><p>Povleci povezavo do izdelka v okvir zgoraj ali jo prilepi. Program pobere naziv, opis, slike, ceno in pripravi vrstico za Shopify.</p></div>`}</div>`;
+  const dz=$('#spDrop');['dragover','dragenter'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('over')}));dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+  dz.addEventListener('drop',async e=>{e.preventDefault();dz.classList.remove('over');const u=e.dataTransfer.getData('text/uri-list')||e.dataTransfer.getData('text/plain');if(u&&/^https?:/.test(u.trim())){for(const x of u.split(/\s+/).filter(y=>/^https?:/.test(y)))await shopFromUrl(x.trim());return}for(const f of e.dataTransfer.files){if(/^image\//.test(f.type)){const p=newShopItem();p.localImg=await fileToDataURL(f);p.images=[];p.title=f.name.replace(/\.[^.]+$/,'');R$('shopItems').push(p)}}await saveRecsNow();renderShopB()});
+}
+function newShopItem(){return{id:uid(),created:Date.now(),title:'',handle:'',body:'',vendor:'',category:'',type:'',tags:'',status:'active',published:true,price:'',compareAt:'',sku:'',barcode:'',grams:'',qty:'',track:true,policy:'deny',shipping:true,taxable:true,images:[],seoTitle:'',seoDesc:'',variants:[],opt1:'',cost:''}}
+async function shopFromUrl(url){busy(true,'Berem izdelek …');try{const [pg,sh]=await Promise.allSettled([fetchVia(url,'text',15000),tryShopify(url)]);const d=pg.status==='fulfilled'?parsePage(pg.value.body,pg.value.final):{};const s=sh.status==='fulfilled'?sh.value:null;
+    const p=newShopItem();p.src=url;p.title=cleanTitle((s&&s.title)||d.title||'');p.handle=uniqHandle(hslug(p.title));p.body=descToHtml(cleanDesc((s&&s.desc)||d.longText||d.desc||''));p.vendor=(s&&s.vendor)||'';p.images=[...new Set([...(s?.images||[]),...(d.images||[])])].filter(u=>/^https?:/.test(u)).slice(0,10);
+    const pr=(s&&s.price)||(d.prices||[])[0];p.price=pr?r2(num(pr)):'';p.sku=(s&&s.sku)||'';p.seoTitle=p.title.slice(0,70);p.seoDesc=String((s&&s.desc)||d.desc||'').replace(/\s+/g,' ').slice(0,160);p.type=(s&&s.type)||'';
+    R$('shopItems').push(p);await saveRecsNow();renderShopB();toast('Izdelek dodan – dopolni rdeče označene podatke.');editShopItem(p)}catch(e){toast('Branje ni uspelo: '+e.message,'err')}finally{busy(false)}}
+const descToHtml=t=>{const ls=String(t||'').split('\n').map(x=>x.trim()).filter(Boolean);const b=ls.filter(x=>/^[-•*]\s*/.test(x));return ls.filter(x=>!/^[-•*]\s*/.test(x)).map(x=>`<p>${esc(x)}</p>`).join('')+(b.length?`<ul>${b.map(x=>`<li>${esc(x.replace(/^[-•*]\s*/,''))}</li>`).join('')}</ul>`:'')};
+function uniqHandle(h){let x=h||'izdelek',i=2;const used=new Set([...(S.shopMeta?.handles||[]),...R$('shopItems').map(p=>p.handle)]);while(used.has(x))x=`${h}-${i++}`;return x}
+function editShopItem(p){const isNew=!R$('shopItems').includes(p);const c=shopCheck(p);const tpl=S.shopMeta?.headers||SHOP_H;
+  const F=(l,k,o={})=>`<label class="fld${(o.req&&!p[k])?' need':''}"><span>${l}${o.req?' *':''}</span>${o.area?`<textarea data-sp="${k}" rows="${o.rows||5}">${esc(p[k]??'')}</textarea>`:o.sel?`<select data-sp="${k}">${o.sel.map(([v,t])=>`<option value="${v}"${String(p[k])===String(v)?' selected':''}>${t}</option>`).join('')}</select>`:`<input data-sp="${k}" value="${esc(p[k]??'')}" ${o.num?'inputmode="decimal"':''} placeholder="${esc(o.ph||'')}">`}</label>`;
+  openModal({title:p.title||'Izdelek za Shopify',wide:2,body:`${c.E.length?`<div class="warnbox" style="background:#FCECEA;border-color:#F3B3AC;color:#9A2317">Manjka: <b>${esc(c.E.join(', '))}</b></div>`:''}${c.dup?`<div class="warnbox">Izdelek s tem Handle že obstaja v trgovini. Ob uvozu z »Overwrite« bi ga Shopify prepisal – spremeni Handle, če gre za nov izdelek.</div>`:''}
+    <div class="recgrid">${F('Naziv (Title)','title',{req:1})}${F('Handle (URL ime)','handle',{req:1,ph:'samo male črke in vezaji'})}${F('Proizvajalec (Vendor)','vendor')}${F('Vrsta (Type)','type')}${F('Kategorija (Product Category)','category',{ph:'npr. Vehicles & Parts > Vehicle Parts & Accessories'})}${F('Oznake (Tags, vejica)','tags')}
+    ${F('Cena z DDV (€)','price',{req:1,num:1})}${F('Primerjalna cena (€)','compareAt',{num:1})}${F('Nabavna cena (Cost per item)','cost',{num:1})}${F('SKU','sku')}${F('Črtna koda (Barcode)','barcode')}${F('Teža (g)','grams',{num:1})}${F('Zaloga (kos)','qty',{num:1})}${F('Ko ni zaloge','policy',{sel:[['deny','ne prodajaj'],['continue','prodajaj naprej']]})}${F('Stanje','status',{sel:[['active','aktiven'],['draft','osnutek']]})}${F('Objavljen','published',{sel:[['true','da'],['false','ne']]})}
+    ${F('Različice – ime lastnosti (Option1 Name)','opt1',{ph:'npr. Barva'})}${F('Različice – vrednosti (vejica; cena z =)','optVals',{ph:'npr. Ne=380, Da=420'})}
+    <div class="full">${F('Opis (Body HTML)','body',{area:1,rows:6})}</div>${F('SEO naslov (do 70)','seoTitle')}${F('SEO opis (do 160)','seoDesc')}
+    <div class="fld full"><span>Slike (javne povezave https, vsaka v svoji vrstici) *</span><textarea data-sp="imagesTxt" rows="4">${esc((p.images||[]).join('\n'))}</textarea></div></div>
+    <div class="inline" style="margin-top:8px"><button class="btn sm" id="spAi">${ic('spark')}AI: dopolni opis, SEO, oznake</button>${p.src?`<a class="btn sm" href="${esc(p.src)}" target="_blank" rel="noopener">Vir</a>`:''}</div>
+    <p class="help">Stolpci izvoza so enaki kot v tvojem vzorcu (${tpl.length}). Dodatne slike in različice se izvozijo v dodatne vrstice z istim Handle, kot zahteva Shopify.</p>`,
+    foot:`${!isNew?`<button class="btn ghost danger" data-md="del">${ic('trash')}</button>`:''}<span class="grow"></span><button class="btn pri" data-md="save">${ic('check')}Shrani</button>`,
+    onClick:async e=>{const t=e.target;const val=()=>{$$('#modal [data-sp]').forEach(el=>{const k=el.dataset.sp;let v=el.value;if(k==='imagesTxt'){p.images=v.split('\n').map(x=>x.trim()).filter(Boolean);return}if(['price','compareAt','cost','grams','qty'].includes(k))v=v===''?'':num(v);if(k==='handle')v=hslug(v);p[k]=v})};
+      if(t.closest('#spAi')){val();busy(true,'AI dopolnjuje …');try{const j=await aiJSON(`${mkCtx()}\nIzdelek za spletno trgovino Shopify: ${p.title}. Obstoječi opis: ${String(p.body).replace(/<[^>]+>/g,' ').slice(0,3000)}\nVrni {"body":"HTML opis (<p>, <ul><li>) v slovenščini, 120–250 besed, prednosti in tehnični podatki","seoTitle":"do 65 znakov","seoDesc":"do 155 znakov","tags":"5–10 oznak ločenih z vejico","type":"vrsta izdelka"}`,2500);Object.assign(p,{body:j.body||p.body,seoTitle:j.seoTitle||p.seoTitle,seoDesc:j.seoDesc||p.seoDesc,tags:p.tags||j.tags||'',type:p.type||j.type||''});await saveRecsNow();closeModal();editShopItem(p)}catch(err){toast('AI: '+err.message,'err')}finally{busy(false)}return}
+      const a=t.closest('[data-md]')?.dataset.md;if(!a||a==='close')return;if(a==='del'){S.recs.shopItems=R$('shopItems').filter(x=>x!==p);await saveRecsNow();closeModal();renderShopB();return}
+      val();if(!p.handle)p.handle=uniqHandle(hslug(p.title));if(isNew)R$('shopItems').push(p);p.updated=Date.now();await saveRecsNow();closeModal();renderShopB()}})}
+function shopRows(L){const H=S.shopMeta?.headers?.length?S.shopMeta.headers:SHOP_H;const rows=[H];const lc=S.shopMeta?.lowerBool!==false;const B=v=>lc?(v?'true':'false'):(v?'TRUE':'FALSE');const set=(o,k,v)=>{if(H.includes(k))o[H.indexOf(k)]=v;if(k==='Variant Barcode'&&H.includes('Variant Barcodes'))o[H.indexOf('Variant Barcodes')]=v};const M=S.shopMeta||{};
+  L.forEach(p=>{const vals=String(p.optVals||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>{const m=x.match(/^(.*?)\s*=\s*([\d.,]+)$/);return m?[m[1],num(m[2])]:[x,null]});const variants=vals.length?vals:[null];
+    variants.forEach((vv,vi)=>{const o=Array(H.length).fill('');set(o,'Handle',p.handle);
+      if(vi===0){set(o,'Title',p.title);set(o,'Body (HTML)',p.body);set(o,'Vendor',p.vendor||M.vendor||'');set(o,'Product Category',p.category||M.category||'');set(o,'Type',p.type);set(o,'Tags',p.tags);set(o,'Published',B(String(p.published)!=='false'));set(o,'SEO Title',p.seoTitle);set(o,'SEO Description',p.seoDesc);set(o,'Gift Card',B(false));set(o,'Status',p.status||'active');set(o,'Option1 Name',vv?p.opt1||'Izvedba':'Title');H.filter(h=>/^Included \//.test(h)).forEach(h=>set(o,h,B(true)))}
+      const vp=vv&&vv[1]!=null?vv[1]:+p.price||0;
+      set(o,'Option1 Value',vv?vv[0]:'Default Title');set(o,'Variant SKU',p.sku?(vv&&variants.length>1?`${p.sku}-${vi+1}`:p.sku):'');set(o,'Variant Grams',(+p.grams||0).toFixed(1));set(o,'Variant Inventory Tracker',p.qty!==''&&p.qty!=null?'shopify':'');set(o,'Variant Inventory Qty',p.qty!==''&&p.qty!=null?p.qty:0);set(o,'Variant Inventory Policy',p.policy||'deny');set(o,'Variant Fulfillment Service','manual');
+      set(o,'Variant Price',vp.toFixed(2));set(o,'Variant Compare At Price',+p.compareAt?(+p.compareAt).toFixed(2):'');set(o,'Variant Requires Shipping',B(true));set(o,'Variant Taxable',B(true));set(o,'Variant Barcode',p.barcode||'');set(o,'Variant Weight Unit','kg');set(o,'Cost per item',p.cost||'');
+      if(vi===0&&p.images?.[0]){set(o,'Image Src',p.images[0]);set(o,'Image Position',1);set(o,'Image Alt Text',p.title)}rows.push(o)});
+    (p.images||[]).slice(1).forEach((u,i)=>{const o=Array(H.length).fill('');set(o,'Handle',p.handle);set(o,'Image Src',u);set(o,'Image Position',i+2);set(o,'Image Alt Text',p.title);rows.push(o)})});return rows}
+async function shopExport(L){const bad=L.filter(p=>!shopCheck(p).ok),dup=L.filter(p=>shopCheck(p).dup);
+  if(bad.length&&!confirm(`${bad.length} izdelkov nima vseh obveznih podatkov (npr. ${bad.slice(0,3).map(p=>p.title||'brez naziva').join(', ')}). Ti bodo IZPUŠČENI. Nadaljujem?`))return;
+  let use=L.filter(p=>shopCheck(p).ok);
+  if(dup.length){const skip=confirm(`${dup.length} izdelkov ima Handle, ki že obstaja v tvoji trgovini (${dup.slice(0,3).map(p=>p.handle).join(', ')}…).\n\nOK = te izdelke IZPUSTI (varno, obstoječi ostanejo nespremenjeni)\nPrekliči = izvozi vse (pri uvozu v Shopify NE označi »Overwrite products with matching handles«, sicer se obstoječi prepišejo)`);if(skip)use=use.filter(p=>!shopCheck(p).dup)}
+  if(!use.length)return toast('Ni izdelkov za izvoz.','err');
+  download(new Blob([toCSV(shopRows(use),',').replace(/^\ufeff/,'')],{type:'text/csv;charset=utf-8'}),`shopify-uvoz-${today()}.csv`);toast(`Izvoženih ${use.length} izdelkov. Shopify → Izdelki → Uvozi → izberi datoteko.`,'',10000)}
+$('#vShopB').addEventListener('click',async e=>{const t=e.target;
+  if(t.closest('#spSample')){pickFile('.csv',async f=>{const rows=parseCSV(await f.text());if(!rows.length)return toast('Prazna datoteka.','err');const H=rows[0].map(x=>x.trim()),hi=H.indexOf('Handle'),ti=H.indexOf('Title'),si=H.indexOf('Variant SKU'),pi=H.indexOf('Variant Price'),ii=H.indexOf('Image Src');if(hi<0)return toast('To ni izvoz izdelkov iz Shopify (manjka stolpec Handle).','err',8000);
+      const prods={};rows.slice(1).forEach(r=>{const h=r[hi];if(!h)return;const p=prods[h]=prods[h]||{handle:h,title:'',sku:'',price:'',image:''};if(r[ti])p.title=r[ti];if(!p.sku&&r[si])p.sku=r[si];if(!p.price&&r[pi])p.price=r[pi];if(!p.image&&r[ii])p.image=r[ii]});
+      const freq=i=>{const c={};rows.slice(1).forEach(r=>{if(r[ti]&&r[i])c[r[i]]=(c[r[i]]||0)+1});return Object.entries(c).sort((a,b)=>b[1]-a[1])[0]?.[0]||''};const pubI=H.indexOf('Published');const lowerBool=pubI<0||!rows.slice(1).some(r=>r[pubI]==='TRUE');
+      S.shopMeta={vendor:freq(H.indexOf('Vendor')),category:freq(H.indexOf('Product Category')),lowerBool,headers:H,handles:Object.keys(prods),titles:Object.values(prods).map(p=>p.title),skus:Object.values(prods).map(p=>p.sku).filter(Boolean),products:Object.values(prods).slice(0,3000),count:Object.keys(prods).length,at:Date.now()};await DB.put('kv',S.shopMeta,'shopMeta');renderShopB();toast(`Vzorec prebran: ${S.shopMeta.count} izdelkov, ${H.length} stolpcev.`)});return}
+  if(t.closest('#spNew')){editShopItem(newShopItem());return}
+  if(t.closest('#spPrice')){pickPrices(async ps=>{ps.forEach(x=>{const p=newShopItem();Object.assign(p,{title:x.name,handle:uniqHandle(x.handle||hslug(x.name)),body:descToHtml(x.desc),vendor:x.vendor||'',type:x.type||x.list||'',tags:x.tags||'',price:r2(x.net*(1+(+x.vat||0)/100)),compareAt:x.compareAt||'',sku:x.sku||'',barcode:x.barcode||'',grams:x.weight?Math.round(num(x.weight)*1000):'',qty:x.stock??'',images:[x.imageUrl].filter(u=>/^https?:/.test(u||'')),seoTitle:x.name.slice(0,70)});R$('shopItems').push(p)});await saveRecsNow();renderShopB()});return}
+  if(t.closest('#spExport')){shopExport(R$('shopItems'));return}
+  const d=t.closest('[data-spdel]');if(d){e.stopPropagation();quickDel(R$('shopItems'),d.dataset.spdel,saveRecsNow,renderShopB,x=>x.title);return}
+  const r=t.closest('[data-spi]');if(r){editShopItem(R$('shopItems').find(x=>x.id===r.dataset.spi))}});
+$('#vShopB').addEventListener('input',e=>{if(e.target.id==='spQ'){shopQ=e.target.value;const p=e.target.selectionStart;renderShopB();const i=$('#spQ');i.focus();i.setSelectionRange(p,p)}if(e.target.id==='spF'){shopF=e.target.value;renderShopB()}});
+$('#vShopB').addEventListener('keydown',e=>{if(e.target.id==='spUrl'&&e.key==='Enter'){const u=e.target.value.trim();if(/^https?:/.test(u))shopFromUrl(u)}});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-selact="shopexp|shopItems"]');if(b){e.stopPropagation();shopExport(R$('shopItems').filter(p=>selSet('shopItems').has(p.id)))}},true);
+
+/* ================= ads from Shopify products ================= */
+function pickShopProducts(cb){const A=[...R$('shopItems').map(p=>({title:p.title,url:shopUrl(p),price:p.price,image:p.images?.[0],desc:String(p.body||'').replace(/<[^>]+>/g,' ')})),...(S.shopMeta?.products||[]).map(p=>({title:p.title,url:(S.settings.shopUrl||('https://'+(S.settings.company.web||''))).replace(/\/+$/,'')+'/products/'+p.handle,price:p.price,image:p.image,desc:''}))].filter(x=>x.title);
+  const sel=new Set();let q='';const list=()=>A.map((p,i)=>[p,i]).filter(([p])=>!q||p.title.toLowerCase().includes(q)).slice(0,300).map(([p,i])=>`<label class="mrow pick${sel.has(i)?' on':''}"><input type="checkbox" data-pp="${i}" ${sel.has(i)?'checked':''}><span class="im" style="${p.image?`background-image:url('${esc(p.image)}')`:''}"></span><span class="grow"><b>${esc(p.title)}</b></span><b>${p.price?fmt(+p.price):''}</b></label>`).join('')||'<p class="help">Ni izdelkov. Uvozi vzorec iz Shopify ali pripravi izdelke v Izdelava tabel za Shopify.</p>';
+  openModal({title:'Izdelki iz Shopify',wide:1,body:`<input class="inp" id="ppQ" placeholder="Išči"><div class="mini" id="ppL" style="margin-top:8px;max-height:50vh">${list()}</div>`,foot:`<span class="grow"></span><button class="btn pri" data-md="ok">${ic('check')}Ustvari oglas</button>`,
+    onInput:e=>{if(e.target.id==='ppQ'){q=e.target.value.toLowerCase();$('#ppL').innerHTML=list()}const c=e.target.closest('[data-pp]');if(c)c.checked?sel.add(+c.dataset.pp):sel.delete(+c.dataset.pp)},
+    onClick:e=>{if(e.target.closest('[data-md=ok]')){const L=[...sel].map(i=>A[i]);if(!L.length)return toast('Izberi izdelek.','err');closeModal();cb(L)}}})}
+function adFromProducts(L){const p=L[0];editAd({id:'',name:(L.length>1?`${L.length} izdelkov – `:'')+p.title.slice(0,50),platform:'meta',objective:AD_SPEC.meta.objectives[0],status:'plan',start:today(),end:isoAdd(today(),30),daily:10,audience:{location:'Slovenija',radius:80,age:'25-60',interests:''},landing:p.url||'',copy:{primary:[`${p.title}${p.price?' – '+fmt(+p.price):''}. ${p.desc.slice(0,90)}`.trim()],headline:[p.title.slice(0,40)]},kw:L.map(x=>x.title).join('\n'),neg:'',assets:[],results:{},products:L.map(x=>x.url)});setTimeout(()=>{const b=$('#modal [data-aa=ai]');if(b&&(S.settings.aiMode||'local')!=='local')toast('Klikni »Napiši variante z AI« za več različic besedil.','',6000)},300)}
+
+/* ================= drop files onto views ================= */
+function dropTarget(){if(!$('#modal').hidden)return null;const on=$('.view.on');if(!on)return null;const id=on.id;
+  if(id==='vList')return['Spusti za uvoz ponudbe (PDF, Word, Excel, STIK)',f=>importQuoteFile(f)];
+  if(id==='vCust')return['Spusti za uvoz strank (Excel, CSV, PDF)',f=>importCustomersFile(f)];
+  if(id==='vPrice'&&priceTab!=='drive')return['Spusti za uvoz cenika (Excel, PDF, Word, CSV)',f=>importPriceFile(f)];
+  if(id==='vMod'&&MOD_T[$('#vMod').dataset.mod]!=='drive'&&!DRIVE_FIRST.includes($('#vMod').dataset.mod)||id==='vMod'&&MOD_T[$('#vMod').dataset.mod]==='recs')return['Spusti za uvoz v evidenco (Excel, CSV)',f=>importModFile($('#vMod').dataset.mod,f)];
+  if(id==='vBank')return['Spusti bančni izpisek (PDF, Excel, CSV)',async f=>{const L=await parseStatement(f);const ex=R$('banktx');L.forEach(x=>ex.push({id:uid(),created:Date.now(),src:f.name,...x}));const m=autoMatch();await saveRecsNow();renderBank();toast(`Uvoženih ${L.length} transakcij, povezanih ${m}.`)}];
+  return null}
+let dropOv=null;
+document.addEventListener('dragover',e=>{if(!e.dataTransfer||![...e.dataTransfer.types].includes('Files'))return;if(e.target.closest&&(e.target.closest('.drive,.ddrop,#capBox,.dropzone2,#spDrop,[data-dropf],#sheet')))return;const t=dropTarget();if(!t)return;e.preventDefault();if(!dropOv){dropOv=document.createElement('div');dropOv.className='dropov';document.body.appendChild(dropOv)}dropOv.textContent=t[0]});
+document.addEventListener('dragleave',e=>{if(dropOv&&(e.clientX<=0||e.clientY<=0||e.clientX>=innerWidth||e.clientY>=innerHeight)){dropOv.remove();dropOv=null}});
+document.addEventListener('drop',e=>{if(dropOv){dropOv.remove();dropOv=null}if(!e.dataTransfer||!e.dataTransfer.files.length)return;if(e.target.closest&&(e.target.closest('.drive,.ddrop,#capBox,.dropzone2,#spDrop,[data-dropf],#sheet')))return;const t=dropTarget();if(!t)return;e.preventDefault();[...e.dataTransfer.files].forEach(f=>t[1](f))});
 /* ================= toast ================= */
 function toast(msg,type='',ms=3500,action){
   const el=document.createElement('div');el.className='tst'+(type==='err'?' err':'');el.innerHTML=`<span>${esc(msg)}</span>`;
@@ -5374,7 +5589,8 @@ addEventListener('visibilitychange',()=>{if(document.hidden&&cur)saveQuoteNow()}
     const arr=async k=>{try{const v=await DB.get('kv',k);return Array.isArray(v)?v:[]}catch{return[]}};
     S.prices=await arr('prices');S.todos=await arr('todos');S.orders=await arr('orders');S.ships=await arr('ships');S.campaigns=await arr('campaigns');S.suppliers=await arr('suppliers');S.pos=await arr('pos');S.claims=await arr('claims');
     try{S.mk=mergeDeep(DEF_MK,(await DB.get('kv','mk'))||{})}catch{S.mk=clone(DEF_MK)}
-    try{const r=await DB.get('kv','recs');S.recs=r&&typeof r==='object'?r:{}}catch{S.recs={}}S.events=await arr('events');setTimeout(()=>{try{fixSerialDates()}catch{}},500);try{const d=await DB.get('kv','drive');S.drive=d&&typeof d==='object'?d:{}}catch{S.drive={}}
+    try{const r=await DB.get('kv','recs');S.recs=r&&typeof r==='object'?r:{}}catch{S.recs={}}S.events=await arr('events');try{navigator.storage&&navigator.storage.persist&&navigator.storage.persisted().then(p=>{if(!p)navigator.storage.persist()})}catch{}setTimeout(()=>{try{fixSerialDates()}catch{}},500);try{const d=await DB.get('kv','drive');S.drive=d&&typeof d==='object'?d:{}}catch{S.drive={}}
+    try{S.comp=(await DB.get('kv','comp'))||{sites:[],items:[]}}catch{S.comp={sites:[],items:[]}}try{S.shopMeta=(await DB.get('kv','shopMeta'))||null}catch{}
     if(!S.settings.mig4)try{
       const fix=t=>typeof t==='string'&&!t.includes('{preostanek}')?t.replace('preostanek ob prevzemu','preostanek ({preostanek}) ob prevzemu').replace('balance on collection','balance ({preostanek}) on collection').replace('Restbetrag bei Abholung','Restbetrag ({preostanek}) bei Abholung'):t;
       S.settings.terms=fix(S.settings.terms);
@@ -5405,7 +5621,8 @@ addEventListener('visibilitychange',()=>{if(document.hidden&&cur)saveQuoteNow()}
   }
   renderNav();
   if(P.get('new')){history.replaceState(null,'',location.pathname);const q=newQuote();S.quotes.push(q);cur=q;await saveQuoteNow();openQuote(q.id,true);return}
-  ['go','openQuote','openOrder','openShip','openPO','openClaim','showBuilder'].forEach(navWrap);
+  ['go','openQuote','openOrder','openShip','openPO','openClaim'].forEach(navWrap);
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persisted().then(p=>{if(!p)navigator.storage.persist()})}catch{}
   const v0=P.get('view');if(v0&&(NAV.some(n=>n[0]===v0)||v0==='list')){go(v0);return}
   go(S.settings.startView||'dash');try{history.replaceState({nr:['go',[S.settings.startView||'dash']]},'',location.search)}catch{}
   setTimeout(()=>{if(S.settings.driveId&&S.settings.gcalAuto!==false&&S.events.some(e=>e.dirty))gcalSync(true)},3000);

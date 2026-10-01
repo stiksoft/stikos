@@ -1,5 +1,5 @@
 // STIK Ponudbe – service worker (omogoča namestitev in delo brez interneta)
-const CACHE = 'stik-prodaja-v17';
+const CACHE = 'stik-prodaja-v18';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 const CDN_HOSTS = ['cdnjs.cloudflare.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 
