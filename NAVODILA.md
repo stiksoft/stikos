@@ -10,10 +10,87 @@
 |---|---|
 | `index.html` | celoten program |
 | `manifest.webmanifest`, `sw.js`, `icon-*.png` | omogočajo namestitev kot aplikacija in delo brez interneta |
-| `worker.js` | neobvezen lasten posrednik (Cloudflare): branje spletnih strani, prevodi DeepL, AI (Claude) in e-pošta prek Brevo |
+| `worker.js` | neobvezen lasten posrednik (Cloudflare): branje spletnih strani, AI (Claude) in e-pošta prek Brevo |
 | `NAVODILA.md`, `NAVODILA.pdf` | ta navodila |
 
 ---
+
+## Hitri začetek: namestitev, posodobitev in shranjevanje
+
+To poglavje je **glavno navodilo** za namestitev in shranjevanje. Če se kje v nadaljevanju opis razlikuje, velja to poglavje.
+
+### Kje so podatki
+
+| Kje | Kaj je | Kdo skrbi |
+|---|---|---|
+| **Program na napravi** | podatki, s katerimi delaš na tej napravi | samodejno |
+| **Google Drive → mapa STIK Prodaja → STIK-Prodaja-podatki.json** | **skupna kopija za vse naprave** | program jo usklajuje (glej spodaj) |
+| **Mapa na disku računalnika** (npr. *STIK Prodaja Arhiv Doma*) | dodatna varnostna kopija **samo tega računalnika**, vsak dan še datirana | samodejno, samo na računalniku |
+
+Pravila:
+
+- **Programa nikoli ne odpiraj z dvoklikom na `index.html` z diska.** Vedno ga odpri z ikono nameščenega programa ali s spletnim naslovom (`https://stiksoft.github.io/…`).
+- Mapa na disku ni ista kot mapa *STIK Prodaja* na Google Drive. Za mapo na disku izberi **navadno mapo na računalniku**.
+- Na **telefonu in tablici** (Android, iPhone, iPad) mape na disku ni mogoče izbrati, ker brskalniki tam tega ne dovolijo. Tam je kopija samo na Google Drive. To je dovolj, ker program usklajuje sam.
+
+### Namestitev – računalnik DOMA (prvi, glavni)
+
+1. Na GitHubu poišči naslov programa: repozitorij → **Settings → Pages** → *Your site is live at …*
+2. Ta naslov odpri v **Chromu** ali **Edgeu** → v naslovni vrstici klikni **Namesti** (ali meni **⋮ → Shrani in deli → Namesti stran kot aplikacijo**). Nastane ikona **STIK Prodaja**.
+3. Odpri program z ikono → **Nastavitve → Shranjevanje**:
+    - **Google Client ID** – prilepi kodo iz Google Cloud (*Clients*);
+    - **Uskladi z Google Drive zdaj** – prijavi se z Google računom; na Drive nastane mapa *STIK Prodaja*;
+    - **Izberi mapo** – izberi ali ustvari npr. `Dokumenti\STIK Prodaja Arhiv Doma` → **Dovoli**.
+4. **Preveri, ali shranjevanje deluje** – vse vrstice morajo biti zelene (*Trajna shramba* je lahko oranžna, to ni napaka).
+
+### Namestitev – računalnik FIRMA
+
+1. Odpri **isti naslov** in namesti program (kot zgoraj, korak 2).
+2. **Nastavitve → Shranjevanje → Google Client ID** – prilepi isto kodo.
+3. **Uskladi z Google Drive zdaj** – prenesejo se vsi podatki z računalnika doma.
+4. **Izberi mapo** – `Dokumenti\STIK Prodaja Arhiv Firma` (svoja mapa, ne ista kot doma).
+5. **Preveri, ali shranjevanje deluje.**
+
+### Namestitev – TELEFON in TABLICA
+
+1. Odpri isti naslov:
+    - **Android:** Chrome → **⋮ → Namesti aplikacijo** (ali *Dodaj na začetni zaslon*);
+    - **iPhone / iPad:** Safari → **Deli → Dodaj na začetni zaslon**.
+2. Odpri program z ikono → **Več → Nastavitve → Shranjevanje → Google Client ID** (kodo si pošlji po e-pošti in jo kopiraj).
+3. **Uskladi z Google Drive zdaj** – prenesejo se vsi podatki.
+4. Mape ne izbiraš.
+
+### Vsakodnevno delo – samodejno usklajevanje
+
+- **Ko odpreš program**, se na vrhu pokaže rumeno obvestilo. Na telefonu je oblaček zgoraj desno, na računalniku gumb nad menijem. Klikni **Uskladi zdaj**. Brskalnik zahteva klik zaradi Googlove prijave.
+- Program sam ugotovi, kaj je treba narediti:
+    - na Drive so novejši podatki z druge naprave → **prenese jih**;
+    - na tej napravi so nove spremembe → **pošlje jih**;
+    - spremembe so na obeh straneh → **združi** (doda manjkajoče, pri enakih zapisih obdrži novejšega) in pošlje skupno kopijo.
+- **Med delom** program po vsaki spremembi v ~20 sekundah sam pošlje podatke v Drive, dokler je Google prijava veljavna (približno 1 uro). Pošlje jih tudi, ko zapreš ali skriješ program.
+- **Stanje** vidiš na gumbu nad menijem (na telefonu zgoraj desno):
+    - zeleno – *Usklajeno*;
+    - rumeno – *Neposlane spremembe – klikni*;
+    - rdeče – napaka.
+- Če zapiraš program z neposlanimi spremembami, brskalnik opozori. Takrat klikni **Uskladi zdaj**.
+- Gumba *Pošlji podatke v Drive* in *Prenesi iz Drive* ostaneta za izjeme: na silo pošlji ali na silo prenesi (zamenjaj vse).
+
+Pri združevanju se zapis, ki si ga izbrisal na eni napravi, lahko vrne z druge naprave. Izbriši ga znova in uskladi. Pred vsakim združevanjem program shrani kopijo stanja te naprave.
+
+### Posodobitev na novo različico (podatki ostanejo)
+
+1. Na napravi, kjer delaš: **Uskladi z Google Drive zdaj** (zeleno stanje).
+2. GitHub → repozitorij → **Add file → Upload files** → povleci **samo `index.html` in `sw.js`** → **Commit changes**. Počakaj 1–2 minuti.
+3. Na **vsaki napravi** program zapri in odpri z ikono; na računalniku še **Ctrl + F5**. Če se pokaže *Zapri stare zavihke programa*, zapri ostala okna in klikni *Poskusi znova*.
+4. **Uskladi zdaj** in **Preveri, ali shranjevanje deluje**.
+
+Ikone ni treba ponovno nameščati. Podatki niso v datotekah programa, zato jih posodobitev ne izbriše.
+
+### Če se kaj zalomi
+
+- **Manjkajo stranke ali ponudbe:** preveri izbiro programa na vrhu menija (*Vsi programi*).
+- **Napačni podatki po uskladitvi:** *Nastavitve → Shranjevanje → Obnovi (zamenjaj vse)* in izberi dnevno kopijo iz mape *Arhiv* na računalniku. Na Google Drive je pri datoteki tudi *Upravljanje različic*.
+- **Google javi napako pri prijavi:** glej poglavje *Dobro je vedeti* (napačen Client ID, program odprt z diska).
 
 ## 1. Objava na spletu (GitHub Pages – brezplačno, enkrat)
 
@@ -98,19 +175,37 @@ Vedno delaj na eni napravi naenkrat, sicer novejša kopija prepiše starejšo.
 
 ## 3. Pobiranje vsebine s spletnih strani
 
-Brskalniki iz varnostnih razlogov ne dovolijo, da stran bere druge strani. Program zato uporablja posrednika. Brez nastavitve uporabi javne brezplačne posrednike (delujejo, a so včasih počasni ali nedosegljivi). Priporočam lasten posrednik – je brezplačen (100.000 zahtev na dan):
+Program zna iz povezave do izdelka (katerakoli spletna trgovina) pobrati naziv, opis, slike, ceno in videe ter iz njih narediti postavko ponudbe ali artikel v ceniku.
 
-1. Registracija na **dash.cloudflare.com** (že uporabljaš Cloudflare).
+**Uporaba – korak za korakom:**
+
+1. V brskalniku odpri stran izdelka, ki ga želiš ponuditi, in **kopiraj naslov** iz naslovne vrstice (Ctrl+L, Ctrl+C). Na telefonu: *Deli → Kopiraj*.
+2. V programu odpri ponudbo (**Nova ponudba** ali obstoječo) in pojdi v korak **2 Izdelki**.
+3. Naslov **prilepi** (Ctrl+V) v polje *Prilepi povezavo …* in klikni **Poberi vsebino**. Več povezav naenkrat vpiši vsako v svojo vrstico.
+4. Odpre se okno izdelka s pobranimi podatki:
+    - **naziv** – program vzame samo ime izdelka, brez izbir s strani (Da/Ne, različice);
+    - **slike** – klikni jih v vrstnem redu, kot jih želiš v ponudbi (prva je glavna). Z ✎ sliko obrežeš ali izboljšaš;
+    - **opis** – *Celoten* (s strani) ali *Kratek* (samo bistvo);
+    - **cena** – klikni eno od najdenih cen in preveri **valuto** ter **DDV** (s spletne strani je cena običajno z DDV);
+    - **video** – če ga stran ima, se doda kot povezava.
+5. Popravi, kar želiš, in klikni **Dodaj v ponudbo**.
+
+Enako deluje v **Ceniki → S povezave** (artikel v cenik) in pri gumbu **Slike iz povezav** (dopolni slike artiklov).
+
+**Posrednik (priporočeno):** brskalniki iz varnostnih razlogov ne dovolijo, da stran bere druge strani, zato program uporablja posrednika. Brez nastavitve uporabi javne brezplačne posrednike, ki pa so včasih počasni. Lasten posrednik je brezplačen in zanesljiv:
+
+1. Registracija na **dash.cloudflare.com**.
 2. **Workers & Pages → Create → Create Worker**, ime npr. `stik-proxy`, **Deploy**.
-3. **Edit code**, izbriši vsebino, prilepi celoten `worker.js`, **Deploy**.
-4. Kopiraj naslov (npr. `https://stik-proxy.tvoj-racun.workers.dev`).
-5. V programu: **Nastavitve → Pobiranje s spletnih strani** → prilepi naslov → **Preizkusi** (mora pisati »Deluje.«).
+3. **Edit code**, izbriši vsebino, prilepi celoten `worker.js` iz paketa, **Deploy**.
+4. Kopiraj naslov Workerja (npr. `https://stik-proxy.tvoj-racun.workers.dev`).
+5. V programu **Nastavitve → Pobiranje s spletnih strani** → prilepi naslov → **Preizkusi** (mora pisati »Deluje.«).
 
-V `worker.js` je seznam `ALLOWED` – tam je že `https://stiksoft.github.io`. Če program objaviš drugje, dodaj tisti naslov.
+V `worker.js` je seznam `ALLOWED` z dovoljenimi naslovi programa (že vsebuje `https://stiksoft.github.io`). Če program objaviš na drugem naslovu, ga dodaj v ta seznam.
 
-**Kaj program prebere:** naziv, opis, vse slike, cene in videe (YouTube, Vimeo, mp4). Pri Shopify trgovinah (npr. pickupoprema.si) prebere tudi vse slike, ceno izbrane različice in videe iz galerije. Deluje na katerikoli strani – če na njej ni cene ali besedila, ju vpišeš sam.
+**Če stran ne dovoli branja** (nekatere velike trgovine to blokirajo):
 
-**Če stran ne dovoli branja** (nekatere velike trgovine to blokirajo): na strani označi vsebino (Ctrl+A ali z miško), kopiraj (Ctrl+C) in prilepi v polje v programu – prebere besedilo in slike iz odložišča. Lahko pa narediš posnetek zaslona in ga prilepiš.
+- na strani označi vsebino (Ctrl+A), kopiraj (Ctrl+C) in prilepi v polje v programu – prebere besedilo in slike;
+- ali naredi posnetek zaslona in ga prilepi ali povleci v polje.
 
 ## 4. Jezik in prevajanje
 
@@ -129,22 +224,9 @@ Tako lahko isto ponudbo podvojiš (**Podvoji**) in iz nje z dvema klikoma naredi
 **Nastavitve → Jezik in prevajanje:**
 
 - **Privzeti jezik novih ponudb.**
-- **Ko je uvožena vsebina v drugem jeziku:** *Ponudi prevod* (privzeto, en klik), *Prevedi samodejno* (prevede takoj ob uvozu v jezik ponudbe) ali *Ne opozarjaj*.
-- **Prevajalnik:**
-    - *Google Prevajalnik* – brezplačen, deluje brez nastavitev. Priporočen za začetek.
-    - *DeepL* – najbolj naravni prevodi, zlasti v nemščino. Brezplačni paket DeepL API Free omogoča 500.000 znakov na mesec.
-    - *MyMemory* – brezplačna rezerva za krajša besedila.
-- **Preizkusi prevod** pokaže, ali izbrani prevajalnik deluje.
-
-**Nastavitev DeepL (neobvezno):**
-
-1. Na **deepl.com/pro-api** izberi *DeepL API Free* in ustvari račun (ob registraciji običajno zahteva plačilno kartico za preverjanje; brezplačni paket se ne zaračuna).
-2. V *Account → API Keys* kopiraj ključ (konča se s `:fx`).
-3. DeepL deluje samo prek tvojega posrednika – najprej postavi Cloudflare Worker iz poglavja 3 (novi `worker.js` že vsebuje podporo za DeepL; če si Worker postavil prej, vanj znova prilepi novo različico in klikni **Deploy**).
-4. Ključ vpiši v **Nastavitve → Jezik in prevajanje → DeepL API ključ**. Varnejša možnost: v Cloudflare odpri Worker → **Settings → Variables and Secrets → Add**, tip *Secret*, ime `DEEPL_KEY`, vrednost ključ → **Deploy**; polje v programu pusti prazno.
-5. Izberi prevajalnik *DeepL* in klikni **Preizkusi prevod**.
-
-Če DeepL kdaj ne odgovori (npr. porabljena mesečna kvota), program samodejno uporabi Google.
+- **Ko je uvožena vsebina v drugem jeziku:** *Ponudi prevod* (privzeto, en klik), *Prevedi samodejno* ali *Ne opozarjaj*.
+- **Prevajalnik:** Google Prevajalnik – brezplačen, deluje brez nastavitev in ključev.
+- **Preizkusi prevod** pokaže, ali prevajanje deluje.
 
 **Pomembno:** strojni prevod je dober, ni pa brezhiben. Tehnične izraze in nazive izdelkov pred pošiljanjem na hitro preveri. Prevajalniku se pošljejo samo naziv, opis in besedila ponudbe – podatki kupca ne.
 
@@ -863,12 +945,334 @@ Pomembno: **brezplačnega API dostopa do Claude ni**. Obračuna se po porabi, ob
 - Klik na dan v mesecu odpre dnevni pogled, klik na uro v dnevnem ali tedenskem pogledu ustvari dogodek ob tej uri.
 - Datumi v koledarju so zapisani kot **dd/mm/llll**.
 
-## 22. Hitri kontrolni seznam za namestitev
+## 22. Zadnje novosti: plačila, brisanje, e-pošta, navigacija
+
+### Izpiski in plačila
+
+Rubrika **Finance → Izpiski in plačila** ima dve skupini zavihkov.
+
+**Podjetje:**
+
+- **Bančni izpiski – ime tvojega podjetja** (ime se vzame iz rubrike Podjetje): uvoz izpiskov, **Dodaj ročno**, povezovanje z DFA/IFA, opomini.
+- **Plačila s kartico:** izbereš **plačilna kartica** ali **predplačniška kartica** in vpišeš datum, trgovca, znesek, zadnje 4 številke kartice, kategorijo, ali je račun priložen, knjiženo in polnitev predplačniške kartice. Na dnu so vsote po vrsti kartice.
+- **Gotovina:** prejemki, izdatki, pologi na banko in dvigi, z dokumentom in namenom. Na dnu je stanje blagajne.
+
+**Način plačil (stranke):**
+
+- **Plačila s kartico:** plačila strank prek POS terminala ali spletno, z provizijo in datumom nakazila na TRR.
+- **Plačila na obroke:** kupec, ponudnik obrokov, znesek, število obrokov, odobritev, nakazilo ponudnika, provizija, stanje.
+- **Leasingi:** kupec, leasing hiša, predmet, pogodba, vrednost, polog, odobritev, nakazilo leasing hiše, stanje.
+
+Povsod dodaš vnos z gumbom zgoraj desno, s **✕** v vrstici pa ga izbrišeš brez odpiranja. Z **Razveljavi** ga vrneš.
+
+### Brisanje po seznamu
+
+V vseh seznamih je na koncu vrstice **✕**. Z njim izbrišeš vrstico brez odpiranja. To velja za evidence (DFA, IFA, zaloga, sejmi …), naročila, pošiljke, naročila dobaviteljem, reklamacije, stranke, montažne termine, bančne transakcije, datoteke v mapah in follow-up.
+
+Pri večini brisanj se pokaže gumb **Razveljavi** (nekaj sekund), pri pomembnejših (naročila, stranke) program najprej vpraša.
+
+### Logotip na vrhu programa
+
+V **Nastavitve → Začetna stran in plačila** označi **Prikaži logotip podjetja na vrhu programa**. Logotip naložiš v rubriki **Podjetje**.
+
+### Stranke se shranijo same
+
+Kupec, ki ga vpišeš kjerkoli v programu, se samodejno doda v **Stranke**, če ga tam še ni:
+
+- ponudba;
+- montažni termin, B2B kupec, IFA račun;
+- plačila na obroke, leasing, plačila s kartico;
+- tehnično poročilo, follow-up.
+
+### DFA plačila – uvoz iz Excela
+
+Tabela ima stolpce kot izvoz iz računovodskega programa: **Številka, Originalna številka, Dobavitelj, Država stranke, Datum, Opravljeno, Zapadlost, Znesek, DE**, ter stanje plačila.
+
+1. **DFA plačila → Evidenca → Uvoz Excel** in izberi datoteko.
+2. Program stolpce z enakimi imeni poveže sam. Preveri predogled in klikni **Uvozi**.
+
+Datumi in zneski se preberejo neposredno iz celic Excela, zato so pravilni ne glede na obliko zapisa (17.3.2026, 17/03/2026, datum Excela; 1.526,53 ali 1526.53). Široko tabelo lahko pomikaš vodoravno.
+
+### Datumi
+
+Program vse datume izpisuje v obliki **dd/mm/llll**: seznami, dokumenti, koledar, tisk. **Polja za izbiro datuma** (koledarček) pa prikaže brskalnik po jezikovnih nastavitvah računalnika. Če tam vidiš mesec pred dnevom, v Chromu nastavi *Nastavitve → Jeziki* slovenščino na vrh (ali jezik sistema Windows na slovenščino) in brskalnik znova zaženi.
+
+### Pošiljanje e-pošte (Računovodstvo, Tutoriali, opomini …)
+
+Pri vsakem pošiljanju se odpre okno **Pošlji e-pošto**:
+
+- **Za:** naslov lahko spremeniš ali izbereš s seznama (stranke, dobavitelji, računovodja); več naslovov loči z vejico;
+- **Zadeva** in **Besedilo** lahko urediš;
+- izbereš, s čim pošlješ: **Gmail** ali **Outlook** (odpreta se v brskalniku, ni potreben program za e-pošto), **E-poštni program** (npr. Outlook na računalniku) ali **Kopiraj**. Program si zapomni zadnjo izbiro.
+
+Če prej ni delovalo, je bil vzrok, da računalnik nima nastavljenega privzetega programa za e-pošto. Z Gmailom ali Outlookom v brskalniku to ni več potrebno.
+
+Priloge pripneš v odprtem sporočilu:
+
+- **Računovodstvo:** program pred tem prenese ZIP z dokumenti (na telefonu jih pošlje neposredno);
+- **Tutoriali:** najbolje pošlješ povezavo z Google Drive ali YouTube.
+
+E-pošto računovodje spremeniš v Nastavitvah ali neposredno v polju *Za*.
+
+### Nazaj in naprej
+
+Na vrhu menija sta puščici **‹ Nazaj** in **› Naprej**. Delujeta tudi **stranska gumba miške** in gumba brskalnika. Program si zapomni, kje si bil: rubrike, ponudbe, naročila, pošiljke, naročila dobaviteljem, reklamacije in cenik builder.
+
+### Mape pri vnosu
+
+Pri novem vnosu (npr. **Sejmi**) lahko v polju **Mapa** takoj izbereš mapo (npr. *Obiski sejmov* ali *Razstavljanje*). Zapis in njegove datoteke se prikažejo v tej mapi na zavihku *Mape in datoteke*; klik na zapis ga odpre. To velja za vse evidence z mapami.
+
+### Follow-up – ročni vnos
+
+**Marketing → Follow-up → Dodaj stranko ročno**: stranka, telefon, e-pošta, zadeva, zadnji in naslednji stik, stanje in opombe. Naslednji stik se prikaže v koledarju. Pri vnosu lahko pokličeš, pošlješ e-pošto, ga urediš, označiš *Zaključeno* ali izbrišeš.
+
+### Nastavitev AI – korak za korakom
+
+AI nastaviš v **Nastavitve → Opisi izdelkov in AI → Kratek opis ustvari**. Izberi eno možnost:
+
+**A) Claude prek Workerja (priporočeno – ključ ni v brskalniku)**
+
+1. Odpri **console.anthropic.com** in se registriraj.
+2. **Settings → Billing**: dodaj plačilno kartico in dobroimetje (npr. 5 USD).
+3. **Settings → API Keys → Create Key**: vpiši ime (npr. *STIK*) in kopiraj ključ (začne se s `sk-ant-`). Ključ se prikaže samo enkrat.
+4. **dash.cloudflare.com → Workers & Pages →** tvoj Worker **→ Settings → Variables and Secrets → Add**: tip **Secret**, ime `ANTHROPIC_KEY`, vrednost ključ → **Deploy**.
+5. V programu: *Nastavitve → Pobiranje s spletnih strani* mora imeti vpisan naslov Workerja; v *Kratek opis ustvari* izberi **Claude AI prek mojega Workerja**.
+6. Klikni **Preizkusi kratek opis**. Če se izpiše »Deluje (AI)«, je vse nastavljeno.
+
+**B) Claude z API ključem v brskalniku**
+
+- Koraki 1–3 kot zgoraj.
+- V programu izberi **Claude AI z API ključem v tem brskalniku**, prilepi ključ in klikni **Preizkusi kratek opis**.
+- Ključ vpišeš na vsaki napravi posebej.
+
+**C) OpenAI (ChatGPT)**
+
+1. Odpri **platform.openai.com**, se prijavi, v **Settings → Billing** dodaj dobroimetje.
+2. **API keys → Create new secret key** in kopiraj ključ (`sk-…`).
+3. V programu izberi **OpenAI (ChatGPT) z API ključem**, prilepi ključ.
+4. Polje *Model* pusti prazno (privzeti hitri model) ali vpiši drugega, če ga želiš. Nato **Preizkusi kratek opis**.
+
+**D) Google Gemini** (ima brezplačno kvoto z omejitvami)
+
+1. Odpri **aistudio.google.com** in se prijavi z Google računom.
+2. **Get API key → Create API key** in kopiraj ključ (`AIza…`).
+3. V programu izberi **Google Gemini z API ključem**, prilepi ključ, model pusti prazen.
+4. Isti ključ lahko vpišeš še v **AI urejanje slik** (za ✎ Uredi z AI pri slikah).
+5. **Preizkusi kratek opis**.
+
+**Opis dejavnosti podjetja** (isti razdelek) vpiši enkrat, npr. »trgovina in montaža opreme, spletna prodaja«. AI ga uporablja pri vseh besedilih (opisi, objave, oglasi, AI asistent).
+
+**Stroški:**
+
+- Claude in OpenAI se plačata po porabi, običajno nekaj centov na dan.
+- Gemini ima brezplačno kvoto.
+- Naročnine (Claude Pro, ChatGPT Plus, Gemini Advanced) **ne vključujejo** API ključa, to je ločena storitev.
+
+## 23. Označevanje vrstic, izpiski, e-pošta in posodobitve
+
+### Označevanje vrstic (kot v Excelu)
+
+V vseh evidencah (DFA, IFA, zaloga, sejmi …) in pri bančnih transakcijah je na začetku vrstice kljukica:
+
+- **klik** označi vrstico, **Shift + klik** označi vse vrstice do tam, kljukica v glavi tabele označi vse;
+- nad tabelo se pokaže vrstica z dejanji:
+    - **Izbriši izbrane** (ali tipka **Delete**) – z enim gumbom **Razveljavi** vrneš vse;
+    - **Kopiraj (za Excel)** – v Excelu klikni celico in prilepi (Ctrl+V); stolpci se ohranijo;
+    - **Označi plačano** (pri DFA in IFA);
+    - **Počisti izbor**.
+- **Iz Excela v program:** v Excelu označi vrstice skupaj z naslovno vrstico, kopiraj (Ctrl+C), v programu odpri evidenco (zavihek *Evidenca*) in pritisni **Ctrl+V**. Odpre se okno za povezavo stolpcev, klikni **Uvozi**.
+- Posamezno vrstico izbrišeš s **✕** na koncu vrstice. Pri zaporednem brisanju je prikazano le eno obvestilo z gumbom Razveljavi.
+
+### Bančni izpiski – brisanje in usklajevanje
+
+- **Uvoženi izpiski** so nad tabelo prikazani kot oznake z imenom datoteke. **✕** pri oznaki izbriše **celoten izpisek** (vse njegove transakcije); povezani računi se vrnejo med odprte.
+- Posamezno transakcijo izbrišeš z rdečim **✕** na koncu vrstice ali z označevanjem.
+- **Uskladi samodejno** poveže transakcije z odprtimi DFA/IFA računi. Pogoj je **enak znesek**, pri več kandidatih pa odloča:
+    1. sklic, ki se ujema s sklicem računa;
+    2. številka računa v namenu plačila;
+    3. ime partnerja;
+    4. edini račun s tem zneskom.
+- Program pove, koliko transakcij je ostalo nepovezanih. Te poveži ročno v stolpcu *Povezan račun*. Običajno gre za delna plačila, plačila več računov z enim nakazilom ali provizije banke.
+- Popolnoma brez napak samodejno usklajevanje ne more biti, ker banke namen in sklic zapisujejo različno. Program zato raje pusti transakcijo nepovezano, kot da bi jo povezal napačno.
+- Najbolj natančen je uvoz iz **Excel/CSV izvoza spletne banke**, kjer so partner, namen in sklic v ločenih stolpcih. Pri PDF izpisku je z vklopljenim AI branje boljše.
+
+### Način plačil (stranke) – Gotovina
+
+Pod *Način plačil (stranke)* je nov zavihek **Gotovina (pologi)**: plačila strank z gotovino (račun, blagajniški prejemek, EOR) in datum pologa na banko. Na dnu je vsota gotovine, ki je še v blagajni, in že položene.
+
+### E-pošta neposredno prek Gmaila (s prilogami)
+
+Ko je v programu vpisan Google Client ID, ima okno *Pošlji e-pošto* gumb **Pošlji takoj**.
+
+- Sporočilo se pošlje neposredno prek tvojega Gmail računa, **skupaj s prilogami** (npr. dokumenti za računovodjo), brez odpiranja drugih programov.
+- Ob prvi uporabi Google vpraša za dovoljenje »pošiljanje e-pošte v vašem imenu«.
+- Poslano sporočilo je v Gmailu v mapi *Poslano*.
+
+Enkratna nastavitev v Google Cloud (isti projekt kot za Drive):
+
+1. **console.cloud.google.com → APIs & Services → Library** → poišči **Gmail API** → **Enable**.
+2. **Google Auth Platform → Data access → Add or remove scopes** → v filter vpiši **gmail.send** → označi `…/auth/gmail.send` → **Update** → **Save**.
+3. V programu klikni **Pošlji takoj**, izberi Google račun in potrdi.
+
+Brez te nastavitve delujejo gumbi **Gmail (osnutek)** / **Outlook** (osnutek v brskalniku; priloge program prej prenese kot ZIP, pripneš jih sam) in **E-poštni program**. Priloge do skupno 24 MB; za večje (videi) pošlji povezavo z Google Drive.
+
+### Pošiljanje tutorialov in drugih vsebin stranki
+
+V **Tutoriali**, **Montaže (postopki)**, **Tehnična poročila**, **Certifikati**, **Dokumenti**, **Logo in EPP tisk**, **Ideje**, **Sejmi** in **Sestanki** ima vsaka vrstica gumb **✉**:
+
+1. Klikni **✉** pri vnosu (npr. tutorial).
+2. Odpre se okno *Pošlji e-pošto* z besedilom vnosa, povezavami (YouTube, Google Drive) in prilogami (datoteke vnosa).
+3. V polje **Za** vpiši ali izberi stranko, po želji popravi besedilo in klikni **Pošlji takoj** (Gmail) ali **Gmail (osnutek)**.
+
+Za videe je najboljše, da jih naložiš na YouTube (lahko kot *Neobjavljeno*) ali Google Drive (*Deli → Vsak s povezavo*) in povezavo dodaš k tutorialu. Tako jih stranka odpre brez velikih prilog. Tudi datoteke v *Mape in datoteke* imajo gumb **✉**.
+
+### Claude naročnina (20 € na mesec) in API
+
+Naročnina **Claude Pro** (claude.ai) velja samo za pogovor na claude.ai in v aplikacijah Claude. **Ne vključuje API dostopa**, ki ga potrebuje ta program. API je ločena storitev na **console.anthropic.com** z lastnim plačilom po porabi, običajno nekaj centov na dan. Postopek je v poglavju 22 (*Nastavitev AI*). Za **urejanje slik z AI** Claude ni primeren, ker slik ne ustvarja; uporabi Google Gemini ključ (ima brezplačno kvoto).
+
+### Posodobitev, namestitev na naprave in shranjevanje
+
+Glej poglavje **Hitri začetek: namestitev, posodobitev in shranjevanje** na začetku navodil.
+
+## 24. Uvozi, Shopify, uskladitev cen in preverjanje shranjevanja
+
+### Ne vidim strank ali ponudb – preveri filter programa
+
+Če je na vrhu menija izbran program (npr. *PICKUPOPREMA*), program prikazuje samo zapise tega programa in zapise brez programa. Na seznamu ponudb se takrat pokaže moder trak *Prikazan je program …* z gumbom **Pokaži vse programe**.
+
+Podatki se ne izgubijo, so samo skriti. V prejšnji različici so bili pri izbranem programu skriti tudi zapisi brez programa (npr. uvožene stranke), kar je zdaj popravljeno.
+
+### Preverjanje shranjevanja
+
+**Nastavitve → Shranjevanje → Preveri, ali shranjevanje deluje** pokaže:
+
+- ali shramba v brskalniku deluje in koliko ponudb in strank je shranjenih;
+- ali je shramba trajna (brskalnik je ob pomanjkanju prostora ne briše) in koliko prostora je porabljenega;
+- ali je vklopljen filter programa;
+- ali deluje zapis v mapo za samodejno kopijo (preizkusno zapiše in izbriše testno datoteko) in kdaj je bila zadnja kopija;
+- ali je Google Drive povezan in datum zadnje kopije na Drive.
+
+Zelena kljukica pomeni, da je vse v redu. Rdeč klicaj pove, kaj je treba urediti.
+
+### Uvoz ponudb (tudi starih iz PDF in Worda)
+
+**Ponudbe → Uvozi ponudbo** ali **povleci datoteko na seznam ponudb**:
+
+- **STIK datoteka (.json)** se uvozi takšna, kot je bila.
+- **PDF, Word (.docx), Excel, slika:** program prebere besedilo, tabele in slike ter naredi novo ponudbo v obliki STIK Prodaja:
+    - stranka se doda med Stranke;
+    - postavke dobijo naziv, opis, količino in ceno;
+    - slike iz Worda se pripnejo postavkam.
+- Z vklopljenim **AI** je pretvorba najboljša: AI prepozna kupca, postavke, cene brez DDV in pogoje. Brez AI program poišče vrstice s cenami. Po uvozu vedno preveri cene, DDV in slike.
+- Slik iz PDF program ne pobere. Dodaš jih z ✎ ali povezavo.
+- Stari format .doc najprej shrani kot .docx ali PDF.
+
+### Povleci in spusti (drag & drop)
+
+Datoteke lahko povlečeš:
+
+- na **seznam ponudb** (uvoz ponudbe);
+- v **Stranke** (uvoz strank);
+- v **Ceniki – tabele** (uvoz cenika);
+- v **evidence** (zavihek Evidenca – uvoz Excel);
+- v **Bančne izpiske** (uvoz izpiska);
+- v **mape** (nalaganje);
+- na **mapo** (nalaganje v to mapo);
+- v **Tabele za Shopify** (povezave ali slike);
+- v ponudbo v korak *Izdelki* (povezave, slike, besedilo).
+
+Program pokaže modro obrobo z napisom, kaj se bo zgodilo.
+
+### Mape – seznam, premikanje, nazaj in naprej
+
+- Gumb **▦ / ☰** preklaplja med prikazom **ikon** in **seznama** (ime, vrsta, velikost, datum), kot v Raziskovalcu. Izbira velja v vseh mapah programa.
+- Imena map so izpisana v celoti.
+- **Premikanje:** datoteko ali mapo primi z miško in jo spusti na drugo mapo ali na ime mape v poti zgoraj (tudi na koren). Datoteke z računalnika spustiš neposredno na mapo.
+- **↑** odpre nadrejeno mapo.
+- **‹ ›** na vrhu menija ter stranska gumba miške delujejo tudi med mapami (npr. v Tutorialih).
+
+### Stranke – uvoz iz Excela, CSV in PDF
+
+**Stranke → Uvozi (Excel, CSV, PDF)** ali povleci datoteko v Stranke.
+
+- Program poveže stolpce (Naziv, Naslov, Kraj, Telefon, E-pošta, ID za DDV …), ti preveriš v predogledu.
+- Obstoječe stranke z enakim nazivom se dopolnijo, ne podvojijo.
+- Pri PDF je z AI branje najboljše.
+
+### Dobavitelji
+
+Meni **Nabava in logistika → Dobavitelji** ima za vsakega dobavitelja:
+
+- kontakt, telefon, e-pošto za naročila, **spletno stran**;
+- **B2B portal** (povezava za prijavo) in številko stranke pri dobavitelju;
+- naslov, državo, ID za DDV, **TRR / IBAN**;
+- plačilni rok, rabat, minimalno naročilo, dobavni rok, jezik dopisov;
+- skupino izdelkov, program in povezavo do kataloga ali cenika.
+
+Na seznamu sta hitri povezavi **splet** in **portal**.
+
+### Uskladitev cen
+
+Meni **Prodaja → Uskladitev cen**:
+
+1. **Moja trgovina:** naslov tvoje trgovine (npr. `https://pickupoprema.si`) → **Preberi artikle iz trgovine** (pri Shopify trgovinah program sam prebere vse izdelke in cene). Lahko tudi **Iz cenika** ali **Iz tabel za Shopify**. S kljukicami izbereš, katere artikle preveriš.
+2. **Konkurenca:** **Dodaj trgovino** → ime in naslov konkurenčne trgovine.
+    - Pri Shopify trgovinah program uporabi njihovo iskanje izdelkov, pri drugih prebere stran z rezultati iskanja.
+    - **Preišči tudi celoten splet:** AI poišče enak artikel v drugih spletnih trgovinah. Deluje s Claude (prek Workerja ali ključa) ali Google Gemini, ker imata spletno iskanje.
+3. **Dovoljeno odstopanje** (npr. 3 %) in **Največ artiklov** na eno preverjanje (vsak artikel je en klic AI).
+4. **Preveri cene z AI.**
+5. **Rezultat:**
+    - za vsak artikel: tvoja cena, najnižja konkurenčna, razlika v % in viri s povezavami;
+    - **rdeče** so artikli, ki so dražji od konkurence za več kot dovoljeno odstopanje, s **predlogom cene** (1 % pod najnižjo);
+    - zeleno so cenejši;
+    - izvoz v **Excel** in **Natisni**.
+
+AI lahko zamenja podoben artikel ali ceno brez DDV, zato pred spremembo cene vedno odpri vir.
+
+### Tabele za Shopify
+
+Meni **Prodaja → Tabele za Shopify** pripravi izdelke točno v obliki izvoza iz tvoje trgovine.
+
+1. **Uvozi vzorec / izvoz iz Shopify:**
+    - v Shopify **Products → Export → All products → CSV for Excel, Numbers, or other spreadsheet programs**;
+    - datoteko (npr. `products_export_1.csv`) uvozi v program;
+    - program si zapomni vse stolpce (tvoja trgovina jih ima 103, tudi trge *Included / Slovenia / EU / International* in lastnosti izdelkov), najpogostejšega proizvajalca in kategorijo ter vse obstoječe izdelke (Handle, nazivi, SKU), da ne pride do prepisa.
+2. **Dodaj izdelke:**
+    - **povleci povezavo** do izdelka iz brskalnika v okvir ali jo prilepi in pritisni Enter – program pobere naziv, opis, slike (javne povezave), ceno, proizvajalca in SKU;
+    - **Iz cenika** prenese izbrane artikle cenika (s cenami z DDV, težo, zalogo, EAN);
+    - **Ročno**.
+3. **Uredi izdelek** (klik na vrstico):
+    - **rdeče obrobljena polja** so obvezna: naziv, Handle, cena, vsaj ena slika z javno povezavo (https);
+    - pod izdelkom je izpisano, kaj je še **priporočeno** (opis, vrsta, SKU, teža, SEO);
+    - **AI: dopolni opis, SEO, oznake** napiše HTML opis, SEO naslov in opis ter oznake;
+    - **različice:** npr. ime *Montažni pribor:*, vrednosti `Ne=380, Da=420` (cena za vsako vrednost);
+    - **slike:** vsaka povezava v svoji vrstici. Lokalnih slik Shopify ne uvozi; najprej jih naloži v Shopify (*Content → Files*) in prilepi povezavo.
+4. **Seznam:**
+    - iskanje in filtri (*manjkajo podatki*, *pripravljeni*, *že obstajajo v trgovini*);
+    - označevanje vrstic, brisanje s ✕, izvoz izbranih;
+    - oznaka **obstaja v trgovini**: Handle je enak obstoječemu izdelku;
+    - opozorilo, če ima izdelek enak naziv ali SKU kot obstoječi.
+5. **Izvozi CSV za Shopify:**
+    - izdelki z manjkajočimi obveznimi podatki se izpustijo (program prej opozori);
+    - pri izdelkih, ki že obstajajo, izbereš **izpusti** (varno) ali izvozi vse;
+    - datoteka ima **iste stolpce in obliko** kot tvoj izvoz: dodatne slike in različice so v dodatnih vrsticah z istim Handle, vrednosti true/false kot v tvoji trgovini, trgi vključeni.
+6. **Uvoz v Shopify:** **Products → Import → Add file → Upload and preview**.
+    - Možnosti **Overwrite products with matching handles** ne označi, razen če res želiš posodobiti obstoječe izdelke.
+    - Najprej preizkusi z enim ali dvema izdelkoma.
+
+### Oglasi iz izdelkov Shopify
+
+**Marketing → Oglasi → Iz izdelkov Shopify** izbere izdelek iz uvoženega izvoza trgovine ali iz *Tabel za Shopify*.
+
+- Program pripravi oglas s povezavo na stran izdelka (`/products/…`), naslovom, besedilom s ceno in ključnimi besedami.
+- Z **Napiši variante z AI** dobiš več različic besedil za izbrano platformo.
+
+## 25. Hitri kontrolni seznam za namestitev
 
 1. **GitHub Pages:** naloži vse datoteke iz ZIP v repozitorij (poglavje 1). Pri posodobitvi zamenjaj `index.html`, `sw.js` in `worker.js`.
 2. **Cloudflare Worker** (neobvezno, a priporočeno):
     - v Worker prilepi `worker.js` → **Deploy**;
-    - dodaj skrivnosti `ANTHROPIC_KEY` (AI), `BREVO_KEY` (e-pošta) in po želji `DEEPL_KEY`;
+    - dodaj skrivnosti `ANTHROPIC_KEY` (AI) in `BREVO_KEY` (e-pošta);
     - naslov Workerja vpiši v *Nastavitve → Posrednik*.
 3. **Google Cloud:** projekt, Google Drive API in Google Calendar API, zaslon za soglasje s testnim uporabnikom, OAuth Client ID za `https://stiksoft.github.io` (poglavje 14).
 4. **Vsaka naprava:**
@@ -879,7 +1283,21 @@ Pomembno: **brezplačnega API dostopa do Claude ni**. Obračuna se po porabi, ob
 6. **Podjetje:** logotip, podatki, glava in noga dokumentov; *Nastavitve*: DDV, rok dobave, cena ure montaže, garancija, plačilni rok.
 7. **Po posodobitvi:** stran enkrat osveži (Ctrl+F5 na računalniku; na telefonu aplikacijo zapri in znova odpri). Podatki ostanejo.
 
-## 23. Dobro je vedeti
+## 26. Dobro je vedeti
+
+**Google javi »Access blocked … doesn't comply with Google's OAuth 2.0 policy … Error 400: invalid_request«:** program je odprt **z dvoklikom na datoteko `index.html` na disku** (naslov v brskalniku se začne s `file:///`). Google prijave za datoteke z diska ne dovoli.
+
+1. Program odpri prek spletnega naslova, npr. `https://stiksoft.github.io/…/`, ali prek nameščene aplikacije.
+2. Če želiš imeti ikono na namizju, program namesti iz spletnega naslova (Chrome → ikona **Namesti** v naslovni vrstici).
+3. Podatki v datoteki z diska in v spletni različici so **ločeni**. Če si delal v datoteki z diska, tam klikni *Shrani kopijo* in jo v spletni različici uvozi z *Obnovi (zamenjaj vse)*.
+
+Gumb **Preveri, ali shranjevanje deluje** te ne prijavlja v Google, ampak pokaže, ali je naslov programa pravilen.
+
+**Koledar javi »Not Found« ali »koledar ni najden«:**
+
+1. **Nastavitve → Shranjevanje → Google koledar:** polje pusti **prazno** (ali vpiši `primary`) za glavni koledar prijavljenega računa. Tja ne vpisuj Client ID ali drugih kod.
+2. V **Koledar in roki** klikni **Ponastavi povezavo**. To je potrebno po menjavi Google računa ali projekta: dogodki iz programa se znova zapišejo v koledar prijavljenega računa.
+3. Klikni **Sinhroniziraj** in se prijavi z Google računom, katerega koledar želiš uporabljati.
 
 **Program se ne odpre ali ne shranjuje po posodobitvi?** Ob nadgradnji program posodobi shrambo v brskalniku. Če je starejša različica še odprta v drugem zavihku ali v nameščeni aplikaciji, se pokaže okno *Zapri stare zavihke programa*. Zapri vse druge zavihke in okna s programom, nato klikni **Poskusi znova**. Podatki ostanejo. Če se na vrhu pokaže rdeče obvestilo *Shranjevanje v brskalnik ne deluje*, program odpri prek spletnega naslova v Chromu ali Edgeu (ne v zasebnem oknu).
 
