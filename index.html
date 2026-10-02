@@ -391,6 +391,11 @@ body.editing .nav .navs a{justify-content:center;padding:8px 0;min-height:34px}}
 .kvp{width:100%;border-collapse:collapse}.kvp th{width:55mm;text-align:left;font-weight:normal;color:#556;padding:1.5mm 0;border-bottom:.2mm solid #e3e7ed;vertical-align:top}.kvp td{padding:1.5mm 0;border-bottom:.2mm solid #e3e7ed}
 @media (max-width:900px){.nav .navs{flex-direction:row;overflow:visible;margin:0;padding:0;display:contents}.nav .ng{display:none}.tbl.modt .tr,.tbl.modt .th-row{grid-template-columns:minmax(0,1fr) 100px}.tbl.modt .tr>div:not(.c1):not(:last-child),.tbl.modt .th-row span:not(:first-child):not(:last-child){display:none}.recgrid{grid-template-columns:1fr}.kanban{grid-template-columns:repeat(6,160px)}.agrow .d{width:74px}}
 .sh-foot{flex-wrap:wrap;row-gap:8px}
+.syncpill{display:flex;align-items:center;gap:6px;width:100%;border:0;border-radius:8px;padding:6px 10px;margin:0 0 8px;font:inherit;font-size:12.5px;cursor:pointer;background:#26324a;color:#C3CCDC;text-align:left}.syncpill .i{width:16px;height:16px;flex:none}.syncpill span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.syncpill.ok{background:#16452f;color:#B6F0CF}.syncpill.warn{background:#5a4200;color:#FFE08A}.syncpill.err{background:#5c1f1a;color:#FFC9C2}.syncpill.busy{background:#1d3a7a;color:#C9D8FF}
+#syncFloat{display:none}
+.syncbanner{display:flex;align-items:center;gap:10px;background:#FFF6DB;border:1px solid #F2D48A;border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:14px;flex-wrap:wrap}.syncbanner span{flex:1;min-width:200px}.syncbanner .i{width:18px;height:18px}
+@media (max-width:900px){.nav .syncpill{display:none}#syncFloat{display:flex;position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);right:8px;width:auto;max-width:56vw;z-index:60;margin:0;box-shadow:0 2px 8px rgba(0,0,0,.25)}body.editing #syncFloat{display:none}.top{padding-right:120px}}
 .divbanner{display:flex;align-items:center;gap:8px;background:#EEF3FE;border:1px solid #BFD0F5;border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:14px;flex-wrap:wrap}.divbanner .i{width:16px;height:16px}
 .chkrow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line2)}.chkrow>span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:700;flex:none}.chkrow.ok>span{background:#DDF1E6;color:#11663d}.chkrow.bad>span{background:#F8D9D5;color:var(--bad)}.chkrow.na>span{background:#EEF1F6;color:var(--mute)}.chkrow small{display:block;color:var(--ink2)}
 .dropov{position:fixed;inset:12px;z-index:180;border:3px dashed var(--acc);border-radius:18px;background:rgba(30,79,216,.08);display:grid;place-items:center;font-size:20px;font-weight:700;color:var(--acc);pointer-events:none}
@@ -1021,8 +1026,8 @@ const DB={
   tx(store,mode,fn){return new Promise((res,rej)=>{const t=this.db.transaction(store,mode);const req=fn(t.objectStore(store));t.oncomplete=()=>res(req?req.result:undefined);t.onerror=t.onabort=()=>rej(t.error)})},
   get(s,k){return this.tx(s,'readonly',o=>o.get(k))},
   all(s){return this.tx(s,'readonly',o=>o.getAll())},
-  put(s,v,k){const r=this.tx(s,'readwrite',o=>k===undefined?o.put(v):o.put(v,k));if(!this.quiet&&!(s==='kv'&&(k==='fx'||k==='dir'))&&typeof autoBackup==='function')autoBackup();return r},
-  del(s,k){return this.tx(s,'readwrite',o=>o.delete(k))}
+  put(s,v,k){const r=this.tx(s,'readwrite',o=>k===undefined?o.put(v):o.put(v,k));if(!this.quiet&&!(s==='kv'&&(k==='fx'||k==='dir'||k==='preSyncCopy'))){if(typeof autoBackup==='function')autoBackup();if(typeof markDirty==='function')markDirty()}return r},
+  del(s,k){const r=this.tx(s,'readwrite',o=>o.delete(k));if(!this.quiet&&typeof markDirty==='function'){markDirty();if(typeof autoBackup==='function')autoBackup()}return r}
 };
 
 /* ================= state ================= */
@@ -1609,7 +1614,7 @@ function renderList(){
   const f=qs.filter(q=>(listFilter==='vse'||q.status===listFilter)&&(!listQ||[q.number,q.title,q.customer?.name,...q.items.map(i=>i.title)].join(' ').toLowerCase().includes(listQ.toLowerCase())));
   const stat={osnutek:'Osnutek',poslano:'Poslano',sprejeto:'Sprejeto',zavrnjeno:'Zavrnjeno'};
   $('#vList').innerHTML=`<div class="wrap">
-    ${backupBanner()}${divBanner()}
+    ${syncBanner()}${backupBanner()}${divBanner()}
     <div class="list-head"><h1>Ponudbe</h1>
       <label class="search">${ic('search')}<input id="lq" placeholder="Išči po kupcu, številki, izdelku" value="${esc(listQ)}"></label>
       <button class="btn" id="openFile">${ic('upload')}Uvozi ponudbo</button>
@@ -2322,7 +2327,9 @@ function wordHTML(q){
 <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
 <style>@page WordSection1{size:21cm 29.7cm;margin:1.6cm 1.7cm 1.8cm}div.WordSection1{page:WordSection1}body{font-family:'${d.font}',Calibri,Arial,sans-serif;font-size:10pt;color:#1f2633}p{margin:0 0 4pt}ul{margin:0 0 4pt}li{margin:0}a{color:${d.accent}}table{border-collapse:collapse}</style></head><body><div class="WordSection1">${wordDoc(q)}</div></body></html>`;
 }
-async function driveToken(){
+const googleOriginOk=()=>location.protocol==='https:'||location.hostname==='localhost';
+const GOOGLE_ORIGIN_MSG='Google prijava deluje samo, ko program odpreš prek spletnega naslova (https://stiksoft.github.io/…) ali nameščene aplikacije – ne z dvoklikom na datoteko index.html na disku.';
+async function driveToken(){if(!googleOriginOk())throw new Error(GOOGLE_ORIGIN_MSG);
   const cid=(S.settings.driveId||'').trim();
   if(!cid){toast('Najprej v Nastavitvah vpiši Google Client ID (navodila so v datoteki NAVODILA.md).','err',8000);showSettings();return null}
   if(driveToken.tok&&driveToken.exp>Date.now())return driveToken.tok;
@@ -2333,7 +2340,7 @@ async function driveUpload(tok,blob,name,mime){
   const H={Authorization:'Bearer '+tok};
   let fid=S.settings.driveFolder;
   if(fid){const r=await fetch(`https://www.googleapis.com/drive/v3/files/${fid}?fields=id,trashed`,{headers:H});const j=r.ok?await r.json():null;if(!j||j.trashed)fid=null}
-  if(!fid){const r=await fetch('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({name:'STIK Prodaja',mimeType:'application/vnd.google-apps.folder'})});const j=await r.json();if(!r.ok)throw new Error(j.error?.message||'mape ni mogoče ustvariti');fid=j.id;S.settings.driveFolder=fid;saveSettings()}
+  if(!fid){const r=await fetch('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({name:'STIK Prodaja',mimeType:'application/vnd.google-apps.folder'})});const j=await r.json();if(!r.ok)throw new Error(j.error?.message||'mape ni mogoče ustvariti');fid=j.id;S.settings.driveFolder=fid;DB.quiet=true;try{await DB.put('kv',S.settings,'settings')}finally{DB.quiet=false}}
   const fd=new FormData();fd.append('metadata',new Blob([JSON.stringify({name,parents:[fid]})],{type:'application/json'}));fd.append('file',new Blob([blob],{type:mime}));
   const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink',{method:'POST',headers:H,body:fd});const j=await r.json();if(!r.ok)throw new Error(j.error?.message||'nalaganje ni uspelo');return j;
 }
@@ -2436,7 +2443,8 @@ function showSettings(){
     <label class="switch" style="margin-top:6px"><input type="checkbox" data-s="importVat" ${st.importVat?'checked':''}>Cene s spletnih strani vsebujejo DDV</label>
     <p class="help">Spletne trgovine za končne kupce običajno prikazujejo cene z DDV. Pri pobiranju iz B2B cenikov to izklopi.</p>
   </div>
-  <div class="panel"><h2>Shranjevanje in varnostne kopije</h2><button class="btn sig" id="stCheck" style="margin-bottom:10px">${ic('check')}Preveri, ali shranjevanje deluje</button>
+  <div class="panel"><h2>Shranjevanje in varnostne kopije</h2><div class="inline" style="margin-bottom:10px;flex-wrap:wrap"><button class="btn sig" id="stCheck" style="flex:none">${ic('check')}Preveri, ali shranjevanje deluje</button>${st.driveId?`<button class="btn syncnow" style="flex:none">${ic('repeat')}Uskladi z Google Drive zdaj</button>`:''}</div>
+    <p class="help" style="margin-top:0"><b>Google Drive</b> je skupna kopija za vse naprave – program jo usklajuje sam (ob odprtju klikni <i>Uskladi zdaj</i>, nato med delom pošilja samodejno). <b>Mapa na disku</b> je dodatna varnostna kopija samo tega računalnika.</p>
     <p>Vsi podatki (ponudbe, naročila, stranke, ceniki …) se sproti shranjujejo <b>v tej napravi</b>. Zadnja varnostna kopija: <b>${st.lastBackup?dtm(+st.lastBackup):'še nikoli'}</b>.</p>
     <div class="sub">1. Samodejna kopija na disk (računalnik, Chrome/Edge)</div>
     ${window.showDirectoryPicker?`<div class="kv">Mapa: <b>${S.dir?esc(S.dir.name):'ni izbrana'}</b>${S.dir?` · ${bkState==='paused'?'<span class="warnc">zaustavljeno</span>':'aktivno'}`:''}</div>
@@ -2542,10 +2550,13 @@ function renderNav(){
   const col=S.settings.navCol||{};
   const lg=S.settings.navLogo&&S.settings.company.logo;
   $('#nav').innerHTML=`<div class="brandrow"><div class="brand${lg?' haslogo':''}" data-go="dash">${lg?`<img class="navlogo" src="${esc(S.settings.company.logo)}" alt="${esc(S.settings.company.name||'')}">`:`${MARK}<span>STIK Prodaja</span>`}</div><div class="navarr"><button class="btn sm ghost icon" id="navBack" title="Nazaj (tudi stranski gumb miške)" aria-label="Nazaj">‹</button><button class="btn sm ghost icon" id="navFwd" title="Naprej" aria-label="Naprej">›</button></div></div>
+  ${S.settings.driveId?`<button class="syncpill" title="Google Drive">${ic('cloud')}<span></span></button>`:''}
   ${divs().length?`<select class="divsel" id="divSel" aria-label="Program"><option value="">Vsi programi</option>${divs().map(d=>`<option value="${d.id}"${S.settings.divF===d.id?' selected':''}>${esc(d.name)}</option>`).join('')}</select>`:''}<div class="navs">
   ${NAV.map(([k,l,i,grp,sh])=>{const h=grp!==g?(g=grp,grp?`<div class="ng${col[grp]?' col':''}" data-ngc="${grp}">${grp}<span>${col[grp]?'+':'−'}</span></div>`:''):'';if(grp&&col[grp]&&navOn!==k)return h;const cnt=k==='todo'?n:k==='montaze'?S.orders.filter(o=>!o.deleted&&!o.cancelled&&!o.done&&(o.type||'montaza')==='montaza'&&o.planned&&o.planned<=isoAdd(today(),7)).length:k==='list'?S.quotes.filter(q=>q.status==='poslano'&&!orderOf(q)).length:k==='dfa'?(S.recs.dfa||[]).filter(r=>payDue(r)==='zapadlo').length:0;
     return `${h}<a data-go="${k}" data-nav="${k}" class="${navOn===k?'on':''}${MOB_MAIN.includes(k)?' mm':' mx'}" title="${l}">${ic(i)}<span><i class="d">${l}</i><i class="m">${sh||l}</i></span>${cnt?`<em class="${k==='todo'||k==='dfa'?'badge':'cnt2'}">${cnt}</em>`:''}</a>`}).join('')}</div>
   <a class="morebtn${MOB_MAIN.includes(navOn)?'':' on'}" data-morenav>${ic('menu')}<span>Več</span></a>`;
+  let fl=$('#syncFloat');if(S.settings.driveId){if(!fl){fl=document.createElement('button');fl.id='syncFloat';fl.className='syncpill';fl.innerHTML=`${ic('cloud')}<span></span>`;document.body.appendChild(fl)}}else if(fl)fl.remove();
+  setTimeout(renderSyncPill,0);
 }
 function setNav(k,detail){navOn=k;document.body.classList.toggle('editing',k==='edit');document.body.classList.toggle('detail',!!detail);renderNav()}
 function go(k){
@@ -3640,7 +3651,7 @@ function editCampaign(c){
 
 /* ================= mobile "more" menu ================= */
 function openMoreNav(){
-  let g0=null;openModal({title:'Vse rubrike',body:`<div class="morenav">${NAV.filter(([k])=>!MOB_MAIN.includes(k)).map(([k,l,i,grp])=>`${grp!==g0?(g0=grp,`<div class="mng">${grp||'Splošno'}</div>`):''}<button data-go="${k}" data-md="close">${ic(i)}<span>${l}</span></button>`).join('')}${isStandalone()?'':`<button id="mnInst">${ic('install')}<span>Namesti aplikacijo</span></button>`}</div>`,onClick:e=>{if(e.target.closest('#mnInst')){closeModal();installHelp()}}});
+  let g0=null;openModal({title:'Vse rubrike',body:`${divs().length?`<label class="fld" style="margin-bottom:10px"><span>Program</span><select id="divSel2"><option value="">Vsi programi</option>${divs().map(d=>`<option value="${d.id}"${S.settings.divF===d.id?' selected':''}>${esc(d.name)}</option>`).join('')}</select></label>`:''}${S.settings.driveId?`<button class="btn sig syncnow" style="width:100%;margin-bottom:10px" data-md="close">${ic('repeat')}Uskladi z Google Drive</button>`:''}<div class="morenav">${NAV.map(([k,l,i,grp])=>`${grp!==g0?(g0=grp,`<div class="mng">${grp||'Splošno'}</div>`):''}<button data-go="${k}" data-md="close">${ic(i)}<span>${l}</span></button>`).join('')}${isStandalone()?'':`<button id="mnInst">${ic('install')}<span>Namesti aplikacijo</span></button>`}</div>`,onClick:e=>{if(e.target.closest('#mnInst')){closeModal();installHelp()}}});
 }
 
 
@@ -3713,7 +3724,7 @@ async function driveSyncUp(){
   try{const name='STIK-Prodaja-podatki.json',ex=await driveFind(tok,name).catch(()=>null);
     if(ex){const r=await fetch(`https://www.googleapis.com/upload/drive/v3/files/${ex.id}?uploadType=media`,{method:'PATCH',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:await backupBlob()});if(!r.ok)throw new Error('posodobitev ni uspela')}
     else await driveUpload(tok,await backupBlob(),name,'application/json');
-    S.settings.lastBackup=Date.now();S.settings.lastDrive=Date.now();saveSettings();toast('Podatki so shranjeni v Google Drive (mapa »STIK Ponudbe«).');}
+    S.settings.lastBackup=Date.now();S.settings.lastDrive=Date.now();const mm=await driveGetMeta(tok);if(mm)LS.set('remote',mm.modifiedTime);LS.set('syncAt',Date.now()+1000);DB.quiet=true;try{await DB.put('kv',S.settings,'settings')}finally{DB.quiet=false}renderSyncPill();toast('Podatki so shranjeni v Google Drive (mapa »STIK Prodaja«).');}
   catch(e){toast('Drive: '+e.message,'err',8000)}finally{busy(false)}
 }
 async function driveSyncDown(){
@@ -3721,7 +3732,7 @@ async function driveSyncDown(){
   try{const f=await driveFind(tok,'STIK-Prodaja-podatki.json');if(!f){busy(false);toast('V Drive še ni shranjenih podatkov. Najprej jih pošlji z naprave, kjer delaš.','err',8000);return}
     const r=await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`,{headers:{Authorization:'Bearer '+tok}});const j=await r.json();busy(false);
     if(!confirm(`Podatki v Drive so z dne ${dtm(f.modifiedTime)}:\n${j.quotes?.length||0} ponudb, ${j.orders?.length||0} naročil, ${j.customers?.length||0} strank.\n\nZamenjam vse podatke v tej napravi s temi?`))return;
-    await restoreAll(j);toast('Podatki prenešeni iz Google Drive.');showList();}
+    DB.quiet=true;try{await restoreAll(j)}finally{DB.quiet=false}LS.set('remote',f.modifiedTime);LS.set('syncAt',Date.now()+1000);renderSyncPill();toast('Podatki prenešeni iz Google Drive.');showList();}
   catch(e){busy(false);toast('Drive: '+e.message,'err',8000)}
 }
 function backupAgeDays(){const t=+S.settings.lastBackup||0;return t?Math.floor((Date.now()-t)/864e5):null}
@@ -4791,7 +4802,7 @@ function renderDash(){
   const monthRev=S.orders.filter(o=>!o.deleted&&!o.cancelled&&(o.date||'').startsWith(t.slice(0,7))).reduce((a,o)=>a+orderTotals(o).gross,0);
   const K=(go,l,v,s,c='')=>`<button class="kpi ${c}" data-go="${go}"><span>${l}</span><b>${v}</b><small>${s}</small></button>`;
   const alerts=[lateTodo.length&&['todo',`${lateTodo.length} opravil za danes ali zamujenih`],lateP.length&&['buy',`${lateP.length} dobav zamuja`],dfaDue.length&&['dfa',`${dfaDue.length} prejetih računov zapade v 7 dneh (${fmt(dfaDue.reduce((a,r)=>a+(+r.amount||0),0))})`],ifaLate.length&&['ifa',`${ifaLate.length} izdanih računov je zapadlih (${fmt(ifaLate.reduce((a,x)=>a+x.amount,0))})`],low.length&&['zaloga',`${low.length} artiklov pod minimalno zalogo`],exp.length&&['cert',`${exp.length} certifikatov/dokumentov kmalu poteče`],openO.some(o=>o.done===false&&o.avans?.on&&!(o.invoices||[]).some(i=>i.type==='avansni'))&&['orders','Prejet avans brez avansnega računa'],backupAgeDays()===null||backupAgeDays()>=7?['settings','Varnostna kopija ni bila narejena več kot 7 dni']:null].filter(Boolean);
-  $('#vDash').innerHTML=`<div class="wrap wide"><div class="list-head"><h1>Nadzorna plošča</h1><span class="help" style="margin:0">${['nedelja','ponedeljek','torek','sreda','četrtek','petek','sobota'][new Date().getDay()]}, ${dateSl(t)}</span><span class="grow"></span><button class="btn" data-go="assistant">${ic('spark')}AI asistent</button><button class="btn sig" id="dashNewQ">${ic('plus')}Nova ponudba</button></div>
+  $('#vDash').innerHTML=`<div class="wrap wide">${syncBanner()}<div class="list-head"><h1>Nadzorna plošča</h1><span class="help" style="margin:0">${['nedelja','ponedeljek','torek','sreda','četrtek','petek','sobota'][new Date().getDay()]}, ${dateSl(t)}</span><span class="grow"></span><button class="btn" data-go="assistant">${ic('spark')}AI asistent</button><button class="btn sig" id="dashNewQ">${ic('plus')}Nova ponudba</button></div>
     <div class="dash four">${K('list','Odprte ponudbe',openQ.length,fmt(openQ.reduce((a,q)=>a+totals(q).gross,0)))}${K('orders','Naročila v teku',openO.length,fmt(openO.reduce((a,o)=>a+orderTotals(o).gross,0)))}${K('montaze','Montaže ta teden',mont.length,mont[0]?esc(mont[0].customer?.name||'')+' · '+dateSl(mont[0].planned):'—')}${K('reports','Prodaja ta mesec',fmt(monthRev),'vrednost naročil')}</div>
     <div class="rep-grid"><div class="panel"><h2>${ic('cal')}Naslednjih 7 dni</h2>${ag.length?ag.slice(0,14).map(x=>`<div class="agrow"><span class="d">${x.date===t?'Danes':dmy(x.date)}${x.time?' '+esc(x.time):''}</span><i class="dot" style="background:${SRC[x.src][1]}"></i><span>${esc(x.title)}</span></div>`).join(''):'<p class="help">Ni dogodkov ali rokov.</p>'}<div class="inline" style="margin-top:8px"><button class="btn sm" data-go="calendar" style="flex:none">Odpri koledar</button><button class="btn sm" id="dashNewEv" style="flex:none">${ic('plus')}Dogodek</button></div></div>
     <div class="panel"><h2>${ic('alert')}Pozornost</h2>${alerts.length?alerts.map(([g,l])=>`<button class="mrow" data-go="${g}"><span>${l}</span></button>`).join(''):'<p class="okbox">Vse je pod nadzorom.</p>'}</div>
@@ -4940,7 +4951,7 @@ async function printFile(f,u){u=u||URL.createObjectURL(dataURLtoBlob(f.data));
   if(/pdf/.test(f.type)){const fr=document.createElement('iframe');fr.style.cssText='position:fixed;right:0;bottom:0;width:1px;height:1px;border:0';fr.src=u;document.body.appendChild(fr);fr.onload=()=>{try{fr.contentWindow.focus();fr.contentWindow.print()}catch{window.open(u,'_blank')}setTimeout(()=>fr.remove(),60000)};return}
   if(/image/.test(f.type)){printPage(f.name,`<img src="${f.data}" style="max-width:100%;max-height:250mm;display:block;margin:auto">`);return}
   window.open(u,'_blank');}
-document.addEventListener('change',e=>{if(e.target.id==='divSel')setDivF(e.target.value)});
+document.addEventListener('change',e=>{if(e.target.id==='divSel'||e.target.id==='divSel2'){setDivF(e.target.value);if(e.target.id==='divSel2')closeModal()}});
 document.addEventListener('input',e=>{const q=e.target.closest('[data-dq]');if(!q)return;const sp=q.closest('.drive').dataset.space;DRV[sp].q=q.value;const p=q.selectionStart;rerenderDrive(sp);const n=document.querySelector(`.drive[data-space="${sp}"] [data-dq]`);n.focus();n.setSelectionRange(p,p)});
 document.addEventListener('click',async e=>{const dr=e.target.closest('.drive');if(!dr)return;const sp=dr.dataset.space,D=driveSpace(sp),st=DRV[sp],t=e.target;
   const fm=t.closest('[data-dfm]');if(fm){e.stopPropagation();const x=D.folders.find(y=>y.id===fm.dataset.dfm);const n=prompt('Ime mape (prazno = izbriši mapo):',x.name);if(n===null)return;if(!n.trim()){if(D.items.some(i=>i.folder===x.id)||D.folders.some(y=>y.parent===x.id)){toast('Mapa ni prazna – najprej premakni ali izbriši vsebino.','err');return}D.folders=D.folders.filter(y=>y!==x)}else x.name=n.trim();await saveDrive();rerenderDrive(sp);return}
@@ -5317,7 +5328,7 @@ function sumBar(k){const L=R$(k);if(!L.length)return '';const s=f=>L.filter(f).r
 
 /* ================= Gmail API: send with attachments ================= */
 let gmTok=null,gmExp=0;
-function gmailToken(){return new Promise(async(res,rej)=>{if(gmTok&&gmExp>Date.now())return res(gmTok);const cid=(S.settings.driveId||'').trim();if(!cid)return rej(new Error('najprej vpiši Google Client ID (Nastavitve → Shranjevanje)'));
+function gmailToken(){return new Promise(async(res,rej)=>{if(gmTok&&gmExp>Date.now())return res(gmTok);if(!googleOriginOk())return rej(new Error(GOOGLE_ORIGIN_MSG));const cid=(S.settings.driveId||'').trim();if(!cid)return rej(new Error('najprej vpiši Google Client ID (Nastavitve → Shranjevanje)'));
   try{await loadScript(CDN.gis)}catch{return rej(new Error('Google prijava ni na voljo'))}
   const tc=google.accounts.oauth2.initTokenClient({client_id:cid,scope:'https://www.googleapis.com/auth/gmail.send',include_granted_scopes:true,callback:r=>{if(r.error)return rej(new Error(r.error));gmTok=r.access_token;gmExp=Date.now()+(r.expires_in-60)*1000;res(gmTok)}});tc.requestAccessToken()})}
 const b64u=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -5378,7 +5389,9 @@ async function storageCheck(){const R=[];const add=(ok,t,d='')=>R.push([ok,t,d])
   try{const p=navigator.storage&&navigator.storage.persisted?await navigator.storage.persisted():null;add(p!==false,'Trajna shramba',p?'brskalnik podatkov ne bo samodejno brisal':p===false?'brskalnik lahko ob pomanjkanju prostora briše podatke – redno delaj kopije':'ni podatka');const est=navigator.storage&&navigator.storage.estimate?await navigator.storage.estimate():null;if(est)add(true,'Poraba prostora',`${(est.usage/1e6).toFixed(1)} MB od ${(est.quota/1e9).toFixed(1)} GB`)}catch{}
   if(S.settings.divF)add(false,'Filter programa je vklopljen',`prikazan je samo program »${divName(S.settings.divF)}« in zapisi brez programa – na vrhu menija izberi »Vsi programi«`);
   if(S.dir){try{const pm=await S.dir.queryPermission({mode:'readwrite'});if(pm!=='granted')add(false,'Samodejna kopija na disk','dovoljenje ni dano – klikni Nadaljuj na seznamu ponudb');else{const fh=await S.dir.getFileHandle('STIK-Prodaja-test.txt',{create:true});const w=await fh.createWritable();await w.write('test '+new Date().toISOString());await w.close();await S.dir.removeEntry('STIK-Prodaja-test.txt');add(true,'Samodejna kopija na disk',`mapa »${S.dir.name}« – zapis deluje${S.settings.lastBackup?', zadnja kopija '+dtm(+S.settings.lastBackup):''}`)}}catch(e){add(false,'Samodejna kopija na disk',e.message)}}else add(null,'Samodejna kopija na disk','mapa ni izbrana');
-  if(S.settings.driveId){try{const tok=await driveToken();const f=await driveFind(tok,'STIK-Prodaja-podatki.json').catch(()=>null);add(true,'Google Drive',f?`povezano – kopija z dne ${dtm(f.modifiedTime)}`:'povezano – kopija še ni bila poslana (klikni Pošlji podatke v Drive)')}catch(e){add(false,'Google Drive',e.message)}}else add(null,'Google Drive','Client ID ni vpisan');
+  add(location.protocol==='https:'||location.hostname==='localhost','Naslov programa',location.protocol==='file:'?'program je odprt kot datoteka z diska – Google Drive, koledar in Gmail ne bodo delovali. Odpri ga prek https://stiksoft.github.io/… ali nameščene aplikacije.':location.origin);
+  if(S.settings.driveId){if(driveToken.tok&&driveToken.exp>Date.now()){try{const f=await driveFind(driveToken.tok,'STIK-Prodaja-podatki.json').catch(()=>null);add(true,'Google Drive',f?`povezano – kopija z dne ${dtm(f.modifiedTime)}`:'povezano – kopija še ni bila poslana (klikni Pošlji podatke v Drive)')}catch(e){add(false,'Google Drive',e.message)}}
+    else add(null,'Google Drive',`Client ID je vpisan${S.settings.lastDrive?' · zadnje pošiljanje '+dtm(+S.settings.lastDrive):''}. Povezave ne preverjam samodejno (to bi odprlo Google prijavo) – za preizkus klikni »Pošlji podatke v Drive«.`)}else add(null,'Google Drive','Client ID ni vpisan');
   const a=backupAgeDays();add(a!==null&&a<7,'Varnostna kopija',a===null?'še nikoli':`pred ${a} dnevi`);
   openModal({title:'Preverjanje shranjevanja',body:R.map(([ok,t,d])=>`<div class="chkrow ${ok===true?'ok':ok===false?'bad':'na'}"><span>${ok===true?'✓':ok===false?'!':'–'}</span><div><b>${esc(t)}</b><small>${esc(d)}</small></div></div>`).join(''),foot:`<span class="grow"></span><button class="btn pri" data-md="close">V redu</button>`})}
 
@@ -5557,6 +5570,60 @@ let dropOv=null;
 document.addEventListener('dragover',e=>{if(!e.dataTransfer||![...e.dataTransfer.types].includes('Files'))return;if(e.target.closest&&(e.target.closest('.drive,.ddrop,#capBox,.dropzone2,#spDrop,[data-dropf],#sheet')))return;const t=dropTarget();if(!t)return;e.preventDefault();if(!dropOv){dropOv=document.createElement('div');dropOv.className='dropov';document.body.appendChild(dropOv)}dropOv.textContent=t[0]});
 document.addEventListener('dragleave',e=>{if(dropOv&&(e.clientX<=0||e.clientY<=0||e.clientX>=innerWidth||e.clientY>=innerHeight)){dropOv.remove();dropOv=null}});
 document.addEventListener('drop',e=>{if(dropOv){dropOv.remove();dropOv=null}if(!e.dataTransfer||!e.dataTransfer.files.length)return;if(e.target.closest&&(e.target.closest('.drive,.ddrop,#capBox,.dropzone2,#spDrop,[data-dropf],#sheet')))return;const t=dropTarget();if(!t)return;e.preventDefault();[...e.dataTransfer.files].forEach(f=>t[1](f))});
+
+/* ================= smart Google Drive sync ================= */
+const LS={get:k=>{try{return localStorage.getItem('stik_'+k)}catch{return null}},set:(k,v)=>{try{localStorage.setItem('stik_'+k,String(v))}catch{}}};
+const syncDirty=()=>+(LS.get('dirty')||0)>+(LS.get('syncAt')||0);
+let SYNC={busy:false,msg:'',err:''};
+function markDirty(){LS.set('dirty',Date.now());renderSyncPill();syncAutoSoon()}
+const syncAutoSoon=debounce(()=>{if(S.settings.driveId&&driveToken.tok&&driveToken.exp>Date.now()&&syncDirty())syncNow({silent:true})},20000);
+function deviceName(){let n=LS.get('device');if(!n){const p=platform();n=(p==='ios'||p==='android')?(/iPad|Tablet/.test(navigator.userAgent)?'tablica':'telefon'):'računalnik';LS.set('device',n)}return n}
+function syncState(){if(!S.settings.driveId)return['off','Drive ni povezan'];if(SYNC.busy)return['busy','Usklajujem …'];if(SYNC.err)return['err','Napaka – klikni'];
+  const tokOk=driveToken.tok&&driveToken.exp>Date.now(),at=+(LS.get('syncAt')||0);
+  if(syncDirty())return[tokOk?'busy':'warn',tokOk?'Pošiljam kmalu …':'Neposlane spremembe – klikni'];
+  if(!at)return['warn','Uskladi z Drive – klikni'];return[tokOk?'ok':'idle',`Usklajeno ${dtm(at).slice(-5)}${tokOk?'':' – klikni za preverjanje'}`]}
+function renderSyncPill(){const [c,t]=syncState();$$('.syncpill').forEach(el=>{el.className='syncpill '+c;el.title=t+(S.settings.driveId?' (Google Drive)':'');const s=el.querySelector('span');if(s)s.textContent=t})}
+setInterval(renderSyncPill,60000);
+async function driveGetMeta(tok){const f=await driveFind(tok,'STIK-Prodaja-podatki.json').catch(()=>null);return f}
+async function driveDownload(tok,f){const r=await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`,{headers:{Authorization:'Bearer '+tok}});if(!r.ok)throw new Error('prenos ni uspel');return r.json()}
+async function driveUploadData(tok,f){const blob=await backupBlob();let r;
+  if(f)r=await fetch(`https://www.googleapis.com/upload/drive/v3/files/${f.id}?uploadType=media&fields=id,modifiedTime`,{method:'PATCH',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:blob});
+  else{await driveUpload(tok,blob,'STIK-Prodaja-podatki.json','application/json');const m=await driveGetMeta(tok);return m}
+  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error?.message||'pošiljanje ni uspelo');return j}
+function newer(a,b){return (a.updated||a.created||0)>(b.updated||b.created||0)}
+async function mergeSync(j){const mergeArr=(L,R)=>{(R||[]).forEach(x=>{if(!x||!x.id)return;const i=L.findIndex(y=>y.id===x.id);if(i<0)L.push(x);else if(newer(x,L[i]))L[i]=x})};
+  for(const q of j.quotes||[]){const i=S.quotes.findIndex(x=>x.id===q.id);if(i<0){S.quotes.push(q);await DB.put('quotes',q)}else if(newer(q,S.quotes[i])){S.quotes[i]=q;await DB.put('quotes',q)}}
+  (j.customers||[]).forEach(c=>{const i=S.customers.findIndex(x=>(c.id&&x.id===c.id)||x.name===c.name);if(i<0)S.customers.push(c);else if(newer(c,S.customers[i]))S.customers[i]={...S.customers[i],...c}});await saveCustomers();
+  mergeArr(S.prices,j.prices);await savePrices();mergeArr(S.todos,j.todos);await saveTodos();mergeArr(S.orders,j.orders);await saveOrders();mergeArr(S.ships,j.ships);await saveShips();mergeArr(S.campaigns,j.campaigns);await saveCampaigns();
+  mergeArr(S.suppliers,j.suppliers);await saveSup();mergeArr(S.pos,j.pos);await savePO();mergeArr(S.claims,j.claims);await saveClaims();
+  if(j.mk){for(const k of ['posts','ads','assets'])mergeArr(S.mk[k],j.mk[k]);(j.mk.stats||[]).forEach(x=>{if(!S.mk.stats.some(y=>y.month===x.month&&y.channel===x.channel))S.mk.stats.push(x)});await saveMk()}
+  for(const [k,L] of Object.entries(j.recs||{}))mergeArr(R$(k),L);await saveRecsNow();
+  for(const [sp,D] of Object.entries(j.drive||{})){const L=driveSpace(sp);(D.folders||[]).forEach(f=>{if(!L.folders.some(y=>y.id===f.id))L.folders.push(f)});mergeArr(L.items,D.items)}await saveDrive();
+  mergeArr(S.events,j.events);await saveEvents();for(const f of j.files||[]){if(!(await DB.get('files',f.id)))await DB.put('files',f)}}
+async function syncNow(o={}){if(SYNC.busy)return;if(!S.settings.driveId){if(!o.silent){toast('Najprej vpiši Google Client ID (Nastavitve → Shranjevanje).','err');showSettings()}return}
+  if(o.silent&&!(driveToken.tok&&driveToken.exp>Date.now()))return;
+  SYNC.busy=true;SYNC.err='';renderSyncPill();
+  try{const tok=await driveToken();if(!tok)throw new Error('ni prijave');const f=await driveGetMeta(tok);const seen=LS.get('remote')||'',dirty=syncDirty();
+    const hasLocal=S.quotes.length+S.customers.length+S.orders.length>0;
+    let action='none';
+    if(!f)action=hasLocal?'up':'none';
+    else{const remoteNew=f.modifiedTime!==seen;if(!seen&&!hasLocal)action='down';else if(!seen)action='merge';else if(remoteNew&&dirty)action='merge';else if(remoteNew)action='down';else if(dirty)action='up'}
+    let res=f;
+    if(action==='down'){const j=await driveDownload(tok,f);DB.quiet=true;try{await restoreAll(j)}finally{DB.quiet=false}LS.set('remote',f.modifiedTime)}
+    else if(action==='merge'){const j=await driveDownload(tok,f);try{await DB.put('kv',backupData(),'preSyncCopy')}catch{}DB.quiet=true;try{await mergeSync(j)}finally{DB.quiet=false}res=await driveUploadData(tok,f);LS.set('remote',res.modifiedTime||f.modifiedTime)}
+    else if(action==='up'){res=await driveUploadData(tok,f);LS.set('remote',res?.modifiedTime||'')}
+    else if(f)LS.set('remote',f.modifiedTime);
+    LS.set('syncAt',Date.now());S.settings.lastDrive=Date.now();if(action!=='none')S.settings.lastBackup=Date.now();DB.quiet=true;try{await DB.put('kv',S.settings,'settings')}finally{DB.quiet=false}
+    const M={down:'Preneseni novejši podatki z Google Drive.',up:'Spremembe poslane v Google Drive.',merge:'Podatki te naprave in Google Drive so združeni in poslani.',none:'Vse je usklajeno z Google Drive.'};
+    if(!o.silent||action==='down'||action==='merge')toast(M[action],'',action==='merge'?9000:4000);
+    if(action==='down'||action==='merge'){renderNav();const on=$('.view.on');if(on&&on.id==='vList')renderList();else if(on&&on.id==='vDash')renderDash();else if(on&&on.id==='vCust')renderCustomers();else showList()}
+  }catch(e){SYNC.err=e.message;if(!o.silent)toast('Google Drive: '+e.message,'err',9000)}finally{SYNC.busy=false;renderSyncPill()}}
+document.addEventListener('click',e=>{if(e.target.closest('.syncpill,.syncnow')){e.preventDefault();syncNow()}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&syncDirty())syncNow({silent:true});if(document.visibilityState==='visible'&&S.settings&&S.settings.driveId&&driveToken.tok&&driveToken.exp>Date.now())syncNow({silent:true})});
+window.addEventListener('beforeunload',e=>{if(S.settings&&S.settings.driveId&&syncDirty()&&!window.__noUnloadWarn){e.preventDefault();e.returnValue=''}});
+function syncBanner(){if(!S.settings.driveId)return '';const at=+(LS.get('syncAt')||0),tokOk=driveToken.tok&&driveToken.exp>Date.now();if(tokOk&&!syncDirty())return '';
+  return `<div class="syncbanner">${ic('cloud')}<span>${syncDirty()?'Spremembe na tej napravi še niso poslane v Google Drive.':at?`Zadnja uskladitev z Google Drive: ${dtm(at)}. Preveri, ali so na Drive novejši podatki z drugih naprav.`:'Ta naprava še ni usklajena z Google Drive.'}</span><button class="btn sm sig syncnow">${ic('repeat')}<span>Uskladi zdaj</span></button></div>`}
+
 /* ================= toast ================= */
 function toast(msg,type='',ms=3500,action){
   const el=document.createElement('div');el.className='tst'+(type==='err'?' err':'');el.innerHTML=`<span>${esc(msg)}</span>`;
