@@ -391,6 +391,13 @@ body.editing .nav .navs a{justify-content:center;padding:8px 0;min-height:34px}}
 .kvp{width:100%;border-collapse:collapse}.kvp th{width:55mm;text-align:left;font-weight:normal;color:#556;padding:1.5mm 0;border-bottom:.2mm solid #e3e7ed;vertical-align:top}.kvp td{padding:1.5mm 0;border-bottom:.2mm solid #e3e7ed}
 @media (max-width:900px){.nav .navs{flex-direction:row;overflow:visible;margin:0;padding:0;display:contents}.nav .ng{display:none}.tbl.modt .tr,.tbl.modt .th-row{grid-template-columns:minmax(0,1fr) 100px}.tbl.modt .tr>div:not(.c1):not(:last-child),.tbl.modt .th-row span:not(:first-child):not(:last-child){display:none}.recgrid{grid-template-columns:1fr}.kanban{grid-template-columns:repeat(6,160px)}.agrow .d{width:74px}}
 .sh-foot{flex-wrap:wrap;row-gap:8px}
+.fmtbar{display:flex;gap:4px;margin:2px 0 4px}.fmtbar button{width:30px;height:28px;border:1px solid var(--line);background:var(--surf);border-radius:6px;cursor:pointer;font:inherit;font-size:14px}.fmtbar button:hover{background:var(--soft)}
+.montbox{border:1px dashed var(--line);border-radius:10px;padding:8px 10px;margin-top:10px}.montbox .chk .i{width:15px;height:15px;margin-right:2px}
+.nav .gsearch{display:flex;align-items:center;gap:6px;width:100%;border:1px solid #33415a;background:#1f2a3d;color:#C3CCDC;border-radius:8px;padding:6px 10px;margin:0 0 8px;font:inherit;font-size:13px;cursor:pointer}.nav .gsearch span{flex:1;text-align:left}.nav .gsearch kbd{font-size:10px;opacity:.6;font-family:inherit}.nav .gsearch .i{width:15px;height:15px}
+#gsFloat{display:none}
+.srg{font-size:11.5px;text-transform:uppercase;color:var(--mute);font-weight:600;margin:12px 0 4px}.srr{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:8px;cursor:pointer;font:inherit}.srr:hover{background:var(--soft)}.srr small{color:var(--ink2);white-space:nowrap}.gsr{max-height:60vh;overflow:auto;margin-top:8px}
+.annual h2{font-size:17px;margin:14px 0 6px}.annual h3{font-size:14px;margin:12px 0 4px}
+@media (max-width:900px){.nav .gsearch{display:none}#gsFloat{display:grid;place-items:center;position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);right:calc(8px + min(56vw,190px));width:36px;height:34px;border-radius:8px;border:0;background:#26324a;color:#fff;z-index:60;box-shadow:0 2px 8px rgba(0,0,0,.25)}#gsFloat .i{width:18px;height:18px}body.editing #gsFloat{display:none}#syncFloat{max-width:min(56vw,190px)}}
 .syncpill{display:flex;align-items:center;gap:6px;width:100%;border:0;border-radius:8px;padding:6px 10px;margin:0 0 8px;font:inherit;font-size:12.5px;cursor:pointer;background:#26324a;color:#C3CCDC;text-align:left}.syncpill .i{width:16px;height:16px;flex:none}.syncpill span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .syncpill.ok{background:#16452f;color:#B6F0CF}.syncpill.warn{background:#5a4200;color:#FFE08A}.syncpill.err{background:#5c1f1a;color:#FFC9C2}.syncpill.busy{background:#1d3a7a;color:#C9D8FF}
 #syncFloat{display:none}
@@ -1035,7 +1042,7 @@ const DEF_TERMS=`Plačilo: {avans_pct} avansa ({avans_eur}) ob naročilu, preost
 Naročilo prične veljati s plačilom avansa po ponudbi.
 Rok dobave (cca.): {rok_dobave}
 Ponudba velja do {veljavnost}.`;
-const DEF_DESIGN={coverStyle:'eco',fxNote:false,template:'moderno',accent:'#1E4FD8',font:'Onest',cover:false,coverTitle:'Ponudba',coverBg:'',coverShade:70,imgMode:'velike',perPage:false,priceMode:'neto',summary:true,qr:true,sign:true,pageBg:'',pageBgOp:6};
+const DEF_DESIGN={coverStyle:'eco',fxNote:false,template:'moderno',accent:'#1E4FD8',font:'Onest',cover:false,coverTitle:'Ponudba',coverBg:'',coverShade:70,imgMode:'velike',perPage:false,priceMode:'neto',summary:true,qr:true,sign:false,pageBg:'',pageBgOp:6};
 const DEF_SETTINGS={company:{name:'STIK trgovina d.o.o.',address:'',post:'',city:'',country:'Slovenija',taxId:'',iban:'',phone:'',email:'stikdoo@gmail.com',web:'pickupoprema.si',logo:'',logoScale:120,logoLight:false,regNo:'',swift:'',bank:'',mobile:'',contact:''},
   currency:'EUR',vat:22,avans:30,avansType:'%',rok:'4 tedne',validDays:30,terms:DEF_TERMS,intro:'',nextNumber:218,importVat:true,proxy:'',driveId:'',design:{...DEF_DESIGN},lastQuote:null,lang:'sl',trAuto:'ask',trProvider:'google',deeplKey:'',fxSrc:'bs',fxOtpKind:'prodajni',warrantyMonths:12,montRate:0,nextOrder:1,orderYear:'',aiMode:'local',aiKey:'',aiModel:'claude-haiku-4-5-20251001',descDefault:'full',followDays:3,defCarrier:'Pošta Slovenije',nextShip:1,shipYear:'',defOrderType:'montaza'};
 
@@ -1299,12 +1306,12 @@ function fillTerms(t,q,T){
 }
 
 /* ================= rich text ================= */
-function inlineMd(s){return esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')}
+function inlineMd(s){return esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/__(.+?)__/g,'<u>$1</u>').replace(/(^|[^*\w])\*(?!\s)([^*]+?)(?<!\s)\*(?!\*)/g,'$1<i>$2</i>')}
 function richText(t){
   const lines=String(t||'').replace(/\r/g,'').split('\n');let out='',list=[],para=[];
   const flushP=()=>{if(para.length){out+=`<p>${para.map(inlineMd).join('<br>')}</p>`;para=[]}};
   const flushL=()=>{if(list.length){out+=`<ul>${list.map(l=>`<li>${inlineMd(l)}</li>`).join('')}</ul>`;list=[]}};
-  for(const raw of lines){const l=raw.trim();const m=l.match(/^[•\-\*–✓✔]\s*(.+)/);
+  for(const raw of lines){const l=raw.trim();const m=l.match(/^(?:[•\-–✓✔]\s*|\*\s+)(.+)/);
     if(m){flushP();list.push(m[1])}else if(!l){flushP();flushL()}else{flushL();para.push(l)}}
   flushP();flushL();return out;
 }
@@ -1610,11 +1617,11 @@ function showList(){
   cur=null;setNav('list');topSimple('Ponudbe');show('#vList');renderList();
 }
 function renderList(){
-  const qs=[...S.quotes].filter(divOk).sort((a,b)=>(b.updated||0)-(a.updated||0));
+  const qs=[...S.quotes].filter(divOk).filter(q=>yearOk(q.date)).sort((a,b)=>(b.updated||0)-(a.updated||0));
   const f=qs.filter(q=>(listFilter==='vse'||q.status===listFilter)&&(!listQ||[q.number,q.title,q.customer?.name,...q.items.map(i=>i.title)].join(' ').toLowerCase().includes(listQ.toLowerCase())));
   const stat={osnutek:'Osnutek',poslano:'Poslano',sprejeto:'Sprejeto',zavrnjeno:'Zavrnjeno'};
   $('#vList').innerHTML=`<div class="wrap">
-    ${syncBanner()}${backupBanner()}${divBanner()}
+    ${syncBanner()}${backupBanner()}${divBanner()}${yearBanner()}
     <div class="list-head"><h1>Ponudbe</h1>
       <label class="search">${ic('search')}<input id="lq" placeholder="Išči po kupcu, številki, izdelku" value="${esc(listQ)}"></label>
       <button class="btn" id="openFile">${ic('upload')}Uvozi ponudbo</button>
@@ -2057,7 +2064,7 @@ function openSheet(data){
 }
 function editItem(i){
   const it=cur.items[i],vat=itemVat(it,cur),hv=!!S.settings.importVat;
-  openSheet({mode:'edit',itemId:it.id,images:[...(it.images||[])],sel:(it.images||[]).map((_,k)=>k),videos:it.video?[it.video.src]:[],video:it.video?0:-1,title:it.title,desc:it.desc,lang:it.lang||'',orig:it.orig||null,fullDesc:it.fullDesc||'',shortDesc:it.shortDesc||'',dmode:it.dmode||'full',...(it.fx&&it.fx.cur&&it.fx.cur!=='EUR'?{cur:it.fx.cur,fx:{rate:it.fx.rate,date:it.fx.date,src:it.fx.src,kind:it.fx.kind},fxSrc:it.fx.src==='rocno'?(S.settings.fxSrc||'bs'):it.fx.src,price:fmtP(it.fx.price),hasVat:!!it.fx.hasVat}:{price:fmtP(hv?r2(it.net*(1+vat/100)):r2(it.net)),hasVat:hv}),vat,disc:it.disc,qty:it.qty,unit:it.unit,src:it.source||''});
+  openSheet({mode:'edit',mont:it.mont?clone(it.mont):null,itemId:it.id,images:[...(it.images||[])],sel:(it.images||[]).map((_,k)=>k),videos:it.video?[it.video.src]:[],video:it.video?0:-1,title:it.title,desc:it.desc,lang:it.lang||'',orig:it.orig||null,fullDesc:it.fullDesc||'',shortDesc:it.shortDesc||'',dmode:it.dmode||'full',...(it.fx&&it.fx.cur&&it.fx.cur!=='EUR'?{cur:it.fx.cur,fx:{rate:it.fx.rate,date:it.fx.date,src:it.fx.src,kind:it.fx.kind},fxSrc:it.fx.src==='rocno'?(S.settings.fxSrc||'bs'):it.fx.src,price:fmtP(it.fx.price),hasVat:!!it.fx.hasVat}:{price:fmtP(hv?r2(it.net*(1+vat/100)):r2(it.net)),hasVat:hv}),vat,disc:it.disc,qty:it.qty,unit:it.unit,src:it.source||''});
 }
 function closeSheet(){$('#sheet').hidden=true;document.body.classList.remove('noscroll');SH=null}
 function renderSheet(){
@@ -2095,6 +2102,9 @@ function renderSheet(){
         <div class="row" style="--c:3"><label class="fld"><span>Popust %</span><input data-f="disc" inputmode="decimal" value="${esc(fmtN(s.disc))}"></label><label class="fld"><span>Količina</span><input data-f="qty" inputmode="decimal" value="${esc(fmtN(s.qty,3))}"></label><label class="fld"><span>Enota</span><input data-f="unit" value="${esc(s.unit)}" list="units"></label></div>
         <datalist id="units"><option>kos</option><option>kpl</option><option>set</option><option>m</option><option>m²</option><option>ura</option><option>storitev</option></datalist>
         <div class="row keep"><label class="fld"><span>DDV %</span><input data-f="vat" inputmode="decimal" value="${esc(fmtN(s.vat))}"></label><div></div></div>
+        <div class="montbox"><label class="chk"><input type="checkbox" id="shMontOn" ${s.mont&&s.mont.on?'checked':''}>${ic('wrench')}Montaža za ta artikel</label>
+          <div class="row keep" id="shMontRow" ${s.mont&&s.mont.on?'':'hidden'}><label class="fld"><span>Cena montaže brez DDV (€)</span><input id="shMontNet" data-num inputmode="decimal" value="${s.mont&&+s.mont.net?esc(fmtP(s.mont.net)):''}" placeholder="0,00"></label><label class="chk" style="align-self:end"><input type="checkbox" id="shMontQty" ${s.mont&&s.mont.perQty?'checked':''}>× količina</label></div>
+          <p class="help" style="margin:4px 0 0">Montaže vseh artiklov se na koncu ponudbe seštejejo v eno postavko »Montaža«.</p></div>
         <div class="calc" id="shCalc"></div>
       </div>
     </div>
@@ -2250,6 +2260,7 @@ async function commitSheet(){
   const it={id:s.itemId||uid(),title:s.title.trim(),desc:s.desc.trim(),images:conv,video:s.video>=0&&s.videos[s.video]?{src:s.videos[s.video]}:null,
     qty:n.qty||1,unit:(s.unit||'kos').trim(),net:Math.round(n.net*10000)/10000,disc:n.disc,vat:n.vat===+cur.vat?null:n.vat,source:s.src||'',lang:s.lang||detectLang(s.title+'\n'+s.desc),orig:s.orig||null,
     fullDesc:s.fullDesc||'',shortDesc:s.shortDesc||'',dmode:s.dmode||'full',
+    mont:$('#shMontOn')&&$('#shMontOn').checked?{on:true,net:num($('#shMontNet').value),perQty:$('#shMontQty').checked}:null,
     fx:s.cur&&s.cur!=='EUR'&&s.fx&&s.fx.rate?{cur:s.cur,price:num(s.price),hasVat:!!s.hasVat,rate:s.fx.rate,date:s.fx.date,src:s.fx.src,kind:s.fx.kind||''}:null};
   if(s.mode==='edit'){const i=cur.items.findIndex(x=>x.id===s.itemId);if(i>=0)cur.items[i]=it}else cur.items.push(it);
   if(cur.items.length===1&&s.mode!=='edit'&&cur.design.cover&&!cur.design.coverBg&&it.images[0])cur.design.coverBg=it.images[0];
@@ -2333,8 +2344,9 @@ async function driveToken(){if(!googleOriginOk())throw new Error(GOOGLE_ORIGIN_M
   const cid=(S.settings.driveId||'').trim();
   if(!cid){toast('Najprej v Nastavitvah vpiši Google Client ID (navodila so v datoteki NAVODILA.md).','err',8000);showSettings();return null}
   if(driveToken.tok&&driveToken.exp>Date.now())return driveToken.tok;
-  await loadScript(CDN.gis);
-  return new Promise((res,rej)=>{const tc=google.accounts.oauth2.initTokenClient({client_id:cid,scope:'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar.events',callback:r=>{if(r.error)return rej(new Error(r.error));driveToken.tok=r.access_token;driveToken.exp=Date.now()+(r.expires_in-60)*1000;res(r.access_token)},error_callback:e=>rej(new Error(e.message||e.type||'prijava prekinjena'))});tc.requestAccessToken()});
+  if(useRedirectAuth()){startRedirectAuth(driveToken.after||'sync');return new Promise(()=>{})}
+  await withTimeout(loadScript(CDN.gis),20000,'Google prijava se ni naložila – preveri internet');
+  return withTimeout(new Promise((res,rej)=>{const tc=google.accounts.oauth2.initTokenClient({client_id:cid,scope:'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar.events',callback:r=>{if(r.error)return rej(new Error(r.error));driveToken.tok=r.access_token;driveToken.exp=Date.now()+(r.expires_in-60)*1000;res(r.access_token)},error_callback:e=>rej(new Error(e.message||e.type||'prijava prekinjena'))});tc.requestAccessToken()}),120000,'Google prijava ni bila zaključena (okno za prijavo se je zaprlo ali je bilo blokirano). Na telefonu v Nastavitvah izberi način prijave »Preusmeritev«.');
 }
 async function driveUpload(tok,blob,name,mime){
   const H={Authorization:'Bearer '+tok};
@@ -2444,6 +2456,8 @@ function showSettings(){
     <p class="help">Spletne trgovine za končne kupce običajno prikazujejo cene z DDV. Pri pobiranju iz B2B cenikov to izklopi.</p>
   </div>
   <div class="panel"><h2>Shranjevanje in varnostne kopije</h2><div class="inline" style="margin-bottom:10px;flex-wrap:wrap"><button class="btn sig" id="stCheck" style="flex:none">${ic('check')}Preveri, ali shranjevanje deluje</button>${st.driveId?`<button class="btn syncnow" style="flex:none">${ic('repeat')}Uskladi z Google Drive zdaj</button>`:''}</div>
+    <div class="row"><label class="fld"><span>Način Google prijave</span><select data-s="authMode">${[['','Samodejno (telefon: preusmeritev, računalnik: okno)'],['popup','Okno (popup)'],['redirect','Preusmeritev (za telefon in tablico)']].map(([v,l])=>`<option value="${v}"${(st.authMode||'')===v?' selected':''}>${l}</option>`).join('')}</select></label><label class="fld"><span>Naslov za Google (Authorized redirect URI)</span><input readonly value="${esc(appRedirectUri())}" onclick="this.select()"></label></div>
+    <p class="help">Za prijavo s <b>preusmeritvijo</b> (telefon, tablica) mora biti zgornji naslov vpisan v Google Cloud → Clients → tvoj klient → <b>Authorized redirect URIs</b>.</p>
     <p class="help" style="margin-top:0"><b>Google Drive</b> je skupna kopija za vse naprave – program jo usklajuje sam (ob odprtju klikni <i>Uskladi zdaj</i>, nato med delom pošilja samodejno). <b>Mapa na disku</b> je dodatna varnostna kopija samo tega računalnika.</p>
     <p>Vsi podatki (ponudbe, naročila, stranke, ceniki …) se sproti shranjujejo <b>v tej napravi</b>. Zadnja varnostna kopija: <b>${st.lastBackup?dtm(+st.lastBackup):'še nikoli'}</b>.</p>
     <div class="sub">1. Samodejna kopija na disk (računalnik, Chrome/Edge)</div>
@@ -2461,6 +2475,7 @@ function showSettings(){
     <p class="help">Na telefonu se kopija shrani v Prenose/Datoteke – od tam jo lahko deliš v Drive, e-pošto ali računalnik.</p>
   </div>
   <div class="panel"><h2>Začetna stran in plačila</h2><label class="chk" style="margin-bottom:8px"><input type="checkbox" data-s="navLogo" ${st.navLogo?'checked':''}>Prikaži logotip podjetja na vrhu programa (logotip naložiš v rubriki Podjetje)</label><div class="row"><label class="fld"><span>Začetna stran</span><select data-s="startView">${[['dash','Nadzorna plošča'],['calendar','Koledar in roki'],['list','Ponudbe'],['orders','Naročila']].map(([k,l])=>`<option value="${k}"${(st.startView||'dash')===k?' selected':''}>${l}</option>`).join('')}</select></label>${sf('Plačilni rok za kupce (dni)','payDays',{num:1,ph:'8'})}</div><div class="row">${sf('Kilometrina za osebno vozilo (€/km)','kmRate',{num:1,ph:'preveri veljavni znesek'})}${sf('E-pošta računovodje (več loči z vejico)','accEmails',{type:'email'})}</div></div>
+  ${archivesHTML()}
   <div class="panel"><h2>Namestitev aplikacije</h2><p>${isStandalone()?'Program teče kot nameščena aplikacija.':'Program lahko namestiš kot aplikacijo na računalnik, Android ali iPhone – z ikono, brez naslovne vrstice in z delovanjem brez interneta.'}</p><button class="btn" id="instHelp">${ic('install')}Kako namestim</button></div>
   <div class="panel"><h2>Pobiranje s spletnih strani</h2><p>Aplikacija prebere stran prek posrednika. Brez nastavitve uporablja javne posrednike, ki so včasih počasni. Z lastnim (brezplačnim) Cloudflare Workerjem je hitreje in zanesljiveje.</p>
     ${sf('Naslov lastnega posrednika','proxy',{ph:'https://stik-proxy.tvoj-racun.workers.dev'})}
@@ -2551,10 +2566,12 @@ function renderNav(){
   const lg=S.settings.navLogo&&S.settings.company.logo;
   $('#nav').innerHTML=`<div class="brandrow"><div class="brand${lg?' haslogo':''}" data-go="dash">${lg?`<img class="navlogo" src="${esc(S.settings.company.logo)}" alt="${esc(S.settings.company.name||'')}">`:`${MARK}<span>STIK Prodaja</span>`}</div><div class="navarr"><button class="btn sm ghost icon" id="navBack" title="Nazaj (tudi stranski gumb miške)" aria-label="Nazaj">‹</button><button class="btn sm ghost icon" id="navFwd" title="Naprej" aria-label="Naprej">›</button></div></div>
   ${S.settings.driveId?`<button class="syncpill" title="Google Drive">${ic('cloud')}<span></span></button>`:''}
+  <button class="gsearch" id="gSearch" title="Iskanje (Ctrl+K)">${ic('search')}<span>Išči …</span><kbd>Ctrl K</kbd></button>${yearSelect('yearSel')}
   ${divs().length?`<select class="divsel" id="divSel" aria-label="Program"><option value="">Vsi programi</option>${divs().map(d=>`<option value="${d.id}"${S.settings.divF===d.id?' selected':''}>${esc(d.name)}</option>`).join('')}</select>`:''}<div class="navs">
   ${NAV.map(([k,l,i,grp,sh])=>{const h=grp!==g?(g=grp,grp?`<div class="ng${col[grp]?' col':''}" data-ngc="${grp}">${grp}<span>${col[grp]?'+':'−'}</span></div>`:''):'';if(grp&&col[grp]&&navOn!==k)return h;const cnt=k==='todo'?n:k==='montaze'?S.orders.filter(o=>!o.deleted&&!o.cancelled&&!o.done&&(o.type||'montaza')==='montaza'&&o.planned&&o.planned<=isoAdd(today(),7)).length:k==='list'?S.quotes.filter(q=>q.status==='poslano'&&!orderOf(q)).length:k==='dfa'?(S.recs.dfa||[]).filter(r=>payDue(r)==='zapadlo').length:0;
     return `${h}<a data-go="${k}" data-nav="${k}" class="${navOn===k?'on':''}${MOB_MAIN.includes(k)?' mm':' mx'}" title="${l}">${ic(i)}<span><i class="d">${l}</i><i class="m">${sh||l}</i></span>${cnt?`<em class="${k==='todo'||k==='dfa'?'badge':'cnt2'}">${cnt}</em>`:''}</a>`}).join('')}</div>
   <a class="morebtn${MOB_MAIN.includes(navOn)?'':' on'}" data-morenav>${ic('menu')}<span>Več</span></a>`;
+  if(!$('#gsFloat')){const g=document.createElement('button');g.id='gsFloat';g.className='gsearch';g.setAttribute('aria-label','Iskanje');g.innerHTML=ic('search');document.body.appendChild(g)}
   let fl=$('#syncFloat');if(S.settings.driveId){if(!fl){fl=document.createElement('button');fl.id='syncFloat';fl.className='syncpill';fl.innerHTML=`${ic('cloud')}<span></span>`;document.body.appendChild(fl)}}else if(fl)fl.remove();
   setTimeout(renderSyncPill,0);
 }
@@ -2990,7 +3007,7 @@ $('#vComp').addEventListener('click',async e=>{
   const hm=t.closest('[data-hm]');if(hm){c.head.custom=hm.dataset.hm==='custom';if(c.head.custom&&!c.head.text.trim())c.head.text=headLines({...c,head:{...c.head,custom:false}},I18N.sl).join('\n');saveSettings();renderCompany();return}
   if(t.closest('#hdReset')){c.head.text=headLines({...c,head:{...c.head,custom:false}},I18N.sl).join('\n');saveSettings();renderCompany();return}
   if(t.closest('#ftReset')){c.foot={...DEF_FOOT};saveSettings();renderCompany();return}
-  const ph=t.closest('[data-ph]');if(ph){const el=lastFootEl||$('[data-s="company.foot.left"]');const s=el.selectionStart??el.value.length;el.value=el.value.slice(0,s)+ph.dataset.ph+el.value.slice(el.selectionEnd??s);el.focus();el.setSelectionRange(s+ph.dataset.ph.length,s+ph.dataset.ph.length);el.dispatchEvent(new Event('input',{bubbles:true}));return}
+  const ph=t.closest('[data-ph]');if(ph){const el=lastFootEl||$('[data-s="company.foot.left"]');const s=el.selectionStart??el.value.length,e2=el.selectionEnd??s;const pre=el.value.slice(0,s),post=el.value.slice(e2);const ins=(pre&&!/\s$/.test(pre)?' ':'')+ph.dataset.ph+(post&&!/^\s/.test(post)?' ':(post?'':' '));el.value=pre+ins+post;el.focus();el.setSelectionRange(s+ins.length,s+ins.length);el.dispatchEvent(new Event('input',{bubbles:true}));return}
   if(t.closest('#setLogo'))pickFile('image/*',async f=>{try{busy(true,'Pripravljam logotip …');const r=await processLogo(await fileToDataURL(f));Object.assign(c,{logo:r.logo,logoLight:r.light,logoProc:1});saveSettings();renderCompany();toast(r.light?'Logotip je svetel – na ponudbi bo na temni podlagi.':'Logotip naložen, prazni robovi so obrezani.')}catch(err){toast('Logotipa ni mogoče prebrati: '+err.message,'err')}finally{busy(false)}});
   if(t.closest('#delLogo')){c.logo='';saveSettings();renderCompany()}
 });
@@ -3042,6 +3059,7 @@ function montNet(m){if(!m)return 0;if(!Array.isArray(m.work)&&(m.hours||m.rate))
 function extraLines(q){
   const e=q.extras||{},W=I18N[q.lang]||I18N.sl,L=[];
   const t=e.transport;if(t&&t.on&&+t.net)L.push({id:'x-tr',x:'tr',title:t.title||W.xTransport,desc:t.desc||'',qty:1,unit:'storitev',net:+t.net||0,disc:0,vat:t.vat,images:[]});
+  const IM=(q.items||[]).filter(i=>i.mont&&i.mont.on&&+i.mont.net);if(IM.length){const amt=i=>r2((+i.mont.net||0)*(i.mont.perQty?(+i.qty||1):1));L.push({id:'x-mi',x:'mi',title:({sl:'Montaža',en:'Installation',de:'Montage',hr:'Montaža'})[q.lang]||'Montaža',desc:IM.map(i=>`- ${i.title}${i.mont.perQty&&+i.qty>1?` (${fmtN(+i.qty,3)} × ${fmt(+i.mont.net)})`:''}: ${fmt(amt(i))}`).join('\n'),qty:1,unit:'kpl',net:r2(IM.reduce((a,i)=>a+amt(i),0)),disc:0,vat:null,images:[]})}
   const m=e.mont;if(m&&m.on){const net=montNet(m);if(net)L.push({id:'x-mo',x:'mo',title:m.title||W.xMont,desc:m.desc||'',qty:1,unit:'kpl',net,disc:0,vat:m.vat,images:[]})}
   return L;
 }
@@ -3155,7 +3173,7 @@ function ordRow(o){
     <span class="status ${sk}">${sl}</span><button class="btn sm ghost icon px rx" data-odel="${o.id}" title="Izbriši" aria-label="Izbriši">✕</button></div>`;
 }
 function renderOrders(){
-  const t=today(),wk=isoAdd(t,7),all=S.orders.filter(o=>!o.deleted&&divOk(o));
+  const t=today(),wk=isoAdd(t,7),all=S.orders.filter(o=>!o.deleted&&divOk(o)&&(yearOk(o.date)||(!o.done&&!o.cancelled)));
   const open=all.filter(o=>!o.done&&!o.cancelled),done=all.filter(o=>o.done&&!o.cancelled),canc=all.filter(o=>o.cancelled);
   const toOrder=[];open.forEach(o=>o.lines.forEach(l=>{if(!l.x&&l.st==='za')toOrder.push([o,l])}));
   const warr=[];all.forEach(o=>o.lines.forEach(l=>{if(!l.x&&(l.serials||'').trim())warr.push([o,l])}));
@@ -3450,7 +3468,7 @@ function printLabel(sh){
 
 /* ================= reports ================= */
 let repP='12m';
-function repRange(){const t=today(),y=+t.slice(0,4),m=+t.slice(5,7);const iso=(Y,M,D)=>`${Y}-${String(M).padStart(2,'0')}-${String(D).padStart(2,'0')}`;
+function repRange(){if(S.settings.yearF){const y=S.settings.yearF;return[`${y}-01-01`,`${y}-12-31`,'Leto '+y]}const t=today(),y=+t.slice(0,4),m=+t.slice(5,7);const iso=(Y,M,D)=>`${Y}-${String(M).padStart(2,'0')}-${String(D).padStart(2,'0')}`;
   switch(repP){case 'mesec':return[iso(y,m,1),t,'Ta mesec'];case 'prej':{const pm=m===1?12:m-1,py=m===1?y-1:y;return[iso(py,pm,1),iso(py,pm,new Date(py,pm,0).getDate()),'Prejšnji mesec']}
     case 'leto':return[iso(y,1,1),t,'Letos'];case 'lani':return[iso(y-1,1,1),iso(y-1,12,31),'Lani'];case 'vse':return['0000-00-00','9999-99-99','Vse'];default:return[isoAdd(t,-365),t,'Zadnjih 12 mesecev']}}
 function showReports(){cur=null;setNav('reports');topSimple('Poročila');show('#vRep');renderReports()}
@@ -3482,7 +3500,7 @@ function renderReports(){
   const stat={};qs.forEach(q=>{stat[q.status]=(stat[q.status]||0)+1});
   const K=(l,v,s,c='')=>`<div class="kpi ${c}"><span>${l}</span><b>${v}</b><small>${s}</small></div>`;
   const tbl=(h,rows)=>rows.length?`<div class="tbl rep"><div class="th-row">${h.map((x,i)=>`<span class="${i?'r':''}">${x}</span>`).join('')}</div>${rows.map(r=>`<div class="tr">${r.map((x,i)=>`<span class="${i?'r':''}">${x}</span>`).join('')}</div>`).join('')}</div>`:'<p class="help">Ni podatkov za to obdobje.</p>';
-  $('#vRep').innerHTML=`<div class="wrap"><div class="list-head"><h1>Poročila</h1><select id="repP" class="inp" style="width:auto">${[['mesec','Ta mesec'],['prej','Prejšnji mesec'],['leto','Letos'],['lani','Lani'],['12m','Zadnjih 12 mesecev'],['vse','Vse']].map(([k,l])=>`<option value="${k}"${repP===k?' selected':''}>${l}</option>`).join('')}</select>${printBtn('repPrint')}<button class="btn" id="repCsv">${ic('download')}Izvozi CSV</button></div>
+  $('#vRep').innerHTML=`<div class="wrap"><div class="list-head"><h1>Poročila ${S.settings.yearF?`<small>Leto ${S.settings.yearF}</small>`:''}</h1><button class="btn sig" data-annual="${S.settings.yearF||today().slice(0,4)}">${ic('chart')}Letno poročilo</button><select id="repP" class="inp" style="width:auto">${[['mesec','Ta mesec'],['prej','Prejšnji mesec'],['leto','Letos'],['lani','Lani'],['12m','Zadnjih 12 mesecev'],['vse','Vse']].map(([k,l])=>`<option value="${k}"${repP===k?' selected':''}>${l}</option>`).join('')}</select>${printBtn('repPrint')}<button class="btn" id="repCsv">${ic('download')}Izvozi CSV</button></div>
     <h3 class="rh3">Ponudbe · ${lbl}</h3>
     <div class="dash four">${K('Ponudbe',qs.length,fmt(sum(qs,V)))}${K('Sprejete',acc.length,fmt(sum(acc,V)),'hl')}${K('Uspešnost',Math.round(conv)+' %',`${acc.length} sprejetih / ${rej.length} zavrnjenih`)}${K('Povprečna ponudba',fmt(qs.length?sum(qs,V)/qs.length:0),`${sent.length} poslanih`)}</div>
     <h3 class="rh3">Naročila in plačila</h3>
@@ -3651,7 +3669,7 @@ function editCampaign(c){
 
 /* ================= mobile "more" menu ================= */
 function openMoreNav(){
-  let g0=null;openModal({title:'Vse rubrike',body:`${divs().length?`<label class="fld" style="margin-bottom:10px"><span>Program</span><select id="divSel2"><option value="">Vsi programi</option>${divs().map(d=>`<option value="${d.id}"${S.settings.divF===d.id?' selected':''}>${esc(d.name)}</option>`).join('')}</select></label>`:''}${S.settings.driveId?`<button class="btn sig syncnow" style="width:100%;margin-bottom:10px" data-md="close">${ic('repeat')}Uskladi z Google Drive</button>`:''}<div class="morenav">${NAV.map(([k,l,i,grp])=>`${grp!==g0?(g0=grp,`<div class="mng">${grp||'Splošno'}</div>`):''}<button data-go="${k}" data-md="close">${ic(i)}<span>${l}</span></button>`).join('')}${isStandalone()?'':`<button id="mnInst">${ic('install')}<span>Namesti aplikacijo</span></button>`}</div>`,onClick:e=>{if(e.target.closest('#mnInst')){closeModal();installHelp()}}});
+  let g0=null;openModal({title:'Vse rubrike',body:`${divs().length?`<label class="fld" style="margin-bottom:10px"><span>Program</span><select id="divSel2"><option value="">Vsi programi</option>${divs().map(d=>`<option value="${d.id}"${S.settings.divF===d.id?' selected':''}>${esc(d.name)}</option>`).join('')}</select></label>`:''}<button class="btn gsearch" style="width:100%;margin-bottom:10px">${ic('search')}Išči po programu</button><label class="fld" style="margin-bottom:10px"><span>Leto</span>${yearSelect('yearSel2').replace('class="divsel"','')}</label>${S.settings.driveId?`<button class="btn sig syncnow" style="width:100%;margin-bottom:10px" data-md="close">${ic('repeat')}Uskladi z Google Drive</button>`:''}<div class="morenav">${NAV.map(([k,l,i,grp])=>`${grp!==g0?(g0=grp,`<div class="mng">${grp||'Splošno'}</div>`):''}<button data-go="${k}" data-md="close">${ic(i)}<span>${l}</span></button>`).join('')}${isStandalone()?'':`<button id="mnInst">${ic('install')}<span>Namesti aplikacijo</span></button>`}</div>`,onClick:e=>{if(e.target.closest('#mnInst')){closeModal();installHelp()}}});
 }
 
 
@@ -4546,7 +4564,7 @@ function showMod(k){if(DRV[k])DRV[k].f='';cur=null;curOrder=null;setNav(k);topSi
 function renderMod(k){
   const m=MODS[k],L=R$(k),q=(MOD_Q[k]||'').toLowerCase(),fl=MOD_F[k]||'';
   const cols=m.cols.map(c=>m.f.find(f=>f[0]===c));const stOpts=m.stf?Object.entries(m.stl):m.st?(m.f.find(f=>f[0]===m.st)[3]||[]).map(x=>[x,x]):[];
-  const F=L.filter(r=>(!q||m.f.some(([fk])=>String(r[fk]??'').toLowerCase().includes(q)))&&(!fl||(modStatus(m,r)||[])[0]===fl));
+  const ydk=(m.cal||[])[0]?.[0]||m.f.find(f=>f[2]==='date')?.[0];const F=L.filter(r=>(!q||m.f.some(([fk])=>String(r[fk]??'').toLowerCase().includes(q)))&&(!fl||(modStatus(m,r)||[])[0]===fl)&&(!ydk||!S.settings.yearF||!r[ydk]||yearOk(r[ydk])));
   const dk=(m.cal||[])[0]?.[0]||m.f.find(f=>f[2]==='date')?.[0];
   F.sort((a,b)=>dk?String(b[dk]||'').localeCompare(String(a[dk]||'')):(b.created||0)-(a.created||0));
   const tab=MOD_T[k]||(DRIVE_FIRST.includes(k)?'drive':'recs'),D=driveSpace(k),tabs=`<div class="chips mtabs"><button class="chip${tab==='drive'?' on':''}" data-mtab="drive">${ic('folder')}Mape in datoteke (${D.items.length})</button><button class="chip${tab==='recs'?' on':''}" data-mtab="recs">${ic('menu')}Evidenca (${L.length})</button></div>`;
@@ -5003,9 +5021,9 @@ MODS.montman={t:'Montažni termini',one:'Montažni termin',ic:'wrench',hidden:1,
   f:[['customer','Stranka','customer',1],['vehicle','Vozilo','text'],['quoteNo','Št. ponudbe','text'],['date','Datum montaže','date'],['time','Ura','time'],['installer','Montažer','text'],['status','Status','sel',['Čaka na blago','Pripravljeno','Termin potrjen','Opravljeno','Odpovedano']],['avans','Avans plačan','check'],['goods','Blago je prispelo','check'],['phone','Telefon','tel'],['address','Kraj montaže','text'],['div','Program','div'],['note','Opombe','area'],['files','Priloge','files']],cols:['customer','vehicle','date','installer','status'],st:'status',cal:[['date','Montaža']]};
 let mtV='list',mtQ='',mtS='',mtI='',mtSort='date';
 function mtRows(){const t=today();
-  const fromOrders=S.orders.filter(o=>!o.deleted&&!o.cancelled&&(o.type||'montaza')==='montaza'&&divOk(o)).map(o=>{const mon=o.lines.filter(l=>!l.x),goods=mon.length&&mon.every(l=>['pri','mon'].includes(l.st));
+  const fromOrders=S.orders.filter(o=>!o.deleted&&!o.cancelled&&(o.type||'montaza')==='montaza'&&divOk(o)&&(!o.planned||yearOk(o.planned))).map(o=>{const mon=o.lines.filter(l=>!l.x),goods=mon.length&&mon.every(l=>['pri','mon'].includes(l.st));
     return{src:'o',id:o.id,customer:o.customer?.name||'',vehicle:o.vehicle||'',quoteNo:o.quoteNumber||'',date:o.planned||'',time:o.plannedTime||'',installer:o.installer||'',status:o.done?'Opravljeno':goods?(o.planned?'Termin potrjen':'Pripravljeno'):'Čaka na blago',avans:!!o.avans?.on,goods,phone:o.customer?.phone||'',items:mon.map(l=>l.title).join(', '),div:o.div}});
-  const man=R$('montman').filter(divOk).map(r=>({src:'m',...r,status:r.status||'Čaka na blago'}));
+  const man=R$('montman').filter(divOk).filter(r=>!r.date||yearOk(r.date)).map(r=>({src:'m',...r,status:r.status||'Čaka na blago'}));
   return[...fromOrders,...man];}
 function renderMontaze(){
   const all=mtRows(),q=mtQ.toLowerCase(),inst=[...new Set(all.map(r=>r.installer).filter(Boolean))].sort();
@@ -5168,6 +5186,7 @@ async function openImageEditor(src,cb){
     const down=e=>{if(st.square)return;o=pos(e);e.preventDefault()},move=e=>{if(!o)return;const p=pos(e);st.sel={x:Math.min(o[0],p[0]),y:Math.min(o[1],p[1]),w:Math.abs(p[0]-o[0]),h:Math.abs(p[1]-o[1])};Object.assign(sel.style,{left:c.offsetLeft+st.sel.x+'px',top:c.offsetTop+st.sel.y+'px',width:st.sel.w+'px',height:st.sel.h+'px'});sel.hidden=st.sel.w<6},up=()=>{o=null};
     c.addEventListener('mousedown',down);c.addEventListener('touchstart',down,{passive:false});window.addEventListener('mousemove',move);c.addEventListener('touchmove',move,{passive:true});window.addEventListener('mouseup',up);c.addEventListener('touchend',up)}
 }
+document.addEventListener('change',e=>{if(e.target.id==='shMontOn'){const r=$('#shMontRow');if(r)r.hidden=!e.target.checked;if(e.target.checked)setTimeout(()=>$('#shMontNet')?.focus(),30)}});
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-ied]');if(!b)return;e.preventDefault();e.stopPropagation();const i=+b.dataset.ied;const src=SH&&SH.images[i];if(!src)return;
   openImageEditor(src,u=>{SH.images[i]=u;renderSheet()})},true);
 
@@ -5207,7 +5226,7 @@ let bankF='';
 function bankTabsHTML(cur){return `<div class="chips mtabs">${BANK_TABS.map(([k,l])=>`<button class="chip${cur===k?' on':''}" data-go="${k}">${l}</button>`).join('')}</div>`}
 const txSign=t=>t.dir==='in'?1:-1;
 function showBank(){cur=null;setNav('izpiski');topSimple('Izpiski in plačila');show('#vBank');renderBank()}
-function renderBank(){const L=R$('banktx').sort((a,b)=>(b.date||'').localeCompare(a.date||'')),F=L.filter(t=>!bankF||(bankF==='in'&&t.dir==='in')||(bankF==='out'&&t.dir==='out')||(bankF==='un'&&!t.match));
+function renderBank(){const L=R$('banktx').filter(t=>yearOk(t.date)).sort((a,b)=>(b.date||'').localeCompare(a.date||'')),F=L.filter(t=>!bankF||(bankF==='in'&&t.dir==='in')||(bankF==='out'&&t.dir==='out')||(bankF==='un'&&!t.match));
   const dfa=R$('dfa'),ifa=R$('ifaman'),open=r=>payStatus(r)!=='placano';
   const sum=(A,f)=>A.filter(f).reduce((a,x)=>a+(+x.amount||0),0),t=today();
   $('#vBank').innerHTML=`<div class="wrap wide">${payTabsHTML('izpiski')}<div class="list-head"><div><h1 style="margin:0">Bančni izpiski – ${esc(S.settings.company.name||'podjetje')}</h1><p class="help" style="margin:2px 0 0">Uvozi izpisek (PDF, Excel ali CSV iz spletne banke). Program razvrsti prilive in odlive ter jih poveže z DFA in IFA računi – plačani se obarvajo zeleno.</p></div><span class="grow"></span>
@@ -5328,7 +5347,8 @@ function sumBar(k){const L=R$(k);if(!L.length)return '';const s=f=>L.filter(f).r
 
 /* ================= Gmail API: send with attachments ================= */
 let gmTok=null,gmExp=0;
-function gmailToken(){return new Promise(async(res,rej)=>{if(gmTok&&gmExp>Date.now())return res(gmTok);if(!googleOriginOk())return rej(new Error(GOOGLE_ORIGIN_MSG));const cid=(S.settings.driveId||'').trim();if(!cid)return rej(new Error('najprej vpiši Google Client ID (Nastavitve → Shranjevanje)'));
+function gmailToken(){return withTimeout(gmailToken0(),120000,'Gmail prijava ni bila zaključena')}
+function gmailToken0(){return new Promise(async(res,rej)=>{if(gmTok&&gmExp>Date.now())return res(gmTok);if(!googleOriginOk())return rej(new Error(GOOGLE_ORIGIN_MSG));const cid=(S.settings.driveId||'').trim();if(!cid)return rej(new Error('najprej vpiši Google Client ID (Nastavitve → Shranjevanje)'));
   try{await loadScript(CDN.gis)}catch{return rej(new Error('Google prijava ni na voljo'))}
   const tc=google.accounts.oauth2.initTokenClient({client_id:cid,scope:'https://www.googleapis.com/auth/gmail.send',include_granted_scopes:true,callback:r=>{if(r.error)return rej(new Error(r.error));gmTok=r.access_token;gmExp=Date.now()+(r.expires_in-60)*1000;res(gmTok)}});tc.requestAccessToken()})}
 const b64u=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -5585,9 +5605,9 @@ function syncState(){if(!S.settings.driveId)return['off','Drive ni povezan'];if(
 function renderSyncPill(){const [c,t]=syncState();$$('.syncpill').forEach(el=>{el.className='syncpill '+c;el.title=t+(S.settings.driveId?' (Google Drive)':'');const s=el.querySelector('span');if(s)s.textContent=t})}
 setInterval(renderSyncPill,60000);
 async function driveGetMeta(tok){const f=await driveFind(tok,'STIK-Prodaja-podatki.json').catch(()=>null);return f}
-async function driveDownload(tok,f){const r=await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`,{headers:{Authorization:'Bearer '+tok}});if(!r.ok)throw new Error('prenos ni uspel');return r.json()}
+async function driveDownload(tok,f){const r=await withTimeout(fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`,{headers:{Authorization:'Bearer '+tok}}),90000);if(!r.ok)throw new Error('prenos ni uspel');return r.json()}
 async function driveUploadData(tok,f){const blob=await backupBlob();let r;
-  if(f)r=await fetch(`https://www.googleapis.com/upload/drive/v3/files/${f.id}?uploadType=media&fields=id,modifiedTime`,{method:'PATCH',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:blob});
+  if(f)r=await withTimeout(fetch(`https://www.googleapis.com/upload/drive/v3/files/${f.id}?uploadType=media&fields=id,modifiedTime`,{method:'PATCH',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:blob}),120000);
   else{await driveUpload(tok,blob,'STIK-Prodaja-podatki.json','application/json');const m=await driveGetMeta(tok);return m}
   const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error?.message||'pošiljanje ni uspelo');return j}
 function newer(a,b){return (a.updated||a.created||0)>(b.updated||b.created||0)}
@@ -5603,7 +5623,7 @@ async function mergeSync(j){const mergeArr=(L,R)=>{(R||[]).forEach(x=>{if(!x||!x
 async function syncNow(o={}){if(SYNC.busy)return;if(!S.settings.driveId){if(!o.silent){toast('Najprej vpiši Google Client ID (Nastavitve → Shranjevanje).','err');showSettings()}return}
   if(o.silent&&!(driveToken.tok&&driveToken.exp>Date.now()))return;
   SYNC.busy=true;SYNC.err='';renderSyncPill();
-  try{const tok=await driveToken();if(!tok)throw new Error('ni prijave');const f=await driveGetMeta(tok);const seen=LS.get('remote')||'',dirty=syncDirty();
+  try{driveToken.after='sync';const tok=await driveToken();if(!tok)throw new Error('ni prijave');const f=await withTimeout(driveGetMeta(tok),45000);const seen=LS.get('remote')||'',dirty=syncDirty();
     const hasLocal=S.quotes.length+S.customers.length+S.orders.length>0;
     let action='none';
     if(!f)action=hasLocal?'up':'none';
@@ -5624,6 +5644,115 @@ window.addEventListener('beforeunload',e=>{if(S.settings&&S.settings.driveId&&sy
 function syncBanner(){if(!S.settings.driveId)return '';const at=+(LS.get('syncAt')||0),tokOk=driveToken.tok&&driveToken.exp>Date.now();if(tokOk&&!syncDirty())return '';
   return `<div class="syncbanner">${ic('cloud')}<span>${syncDirty()?'Spremembe na tej napravi še niso poslane v Google Drive.':at?`Zadnja uskladitev z Google Drive: ${dtm(at)}. Preveri, ali so na Drive novejši podatki z drugih naprav.`:'Ta naprava še ni usklajena z Google Drive.'}</span><button class="btn sm sig syncnow">${ic('repeat')}<span>Uskladi zdaj</span></button></div>`}
 
+
+/* ================= OAuth redirect flow (phones / tablets / installed app) + timeouts ================= */
+const withTimeout=(p,ms,msg)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error(msg||'časovna omejitev – preveri internet')),ms))]);
+const appRedirectUri=()=>location.origin+location.pathname.replace(/index\.html$/,'');
+const useRedirectAuth=()=>{const p=platform();return S.settings.authMode==='redirect'||(S.settings.authMode!=='popup'&&(p==='ios'||p==='android'))};
+function startRedirectAuth(after){const cid=(S.settings.driveId||'').trim();try{sessionStorage.setItem('stik_after',after||'sync')}catch{}
+  window.__noUnloadWarn=true;
+  location.href=`https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(cid)}&redirect_uri=${encodeURIComponent(appRedirectUri())}&response_type=token&include_granted_scopes=true&prompt=select_account&scope=${encodeURIComponent('https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/calendar.events')}`}
+function takeRedirectToken(){const h=location.hash||'';if(!/access_token=/.test(h)&&!/error=/.test(h))return null;const P=new URLSearchParams(h.slice(1));history.replaceState(null,'',location.pathname+location.search);
+  if(P.get('error'))return{error:P.get('error')};driveToken.tok=P.get('access_token');driveToken.exp=Date.now()+((+P.get('expires_in')||3600)-60)*1000;let after='';try{after=sessionStorage.getItem('stik_after')||'';sessionStorage.removeItem('stik_after')}catch{}return{after}}
+
+/* ================= global search ================= */
+function openSearch(){let q='';const run=()=>{const s=q.trim().toLowerCase();if(s.length<2)return '<p class="help">Vpiši vsaj 2 znaka. Iščem po ponudbah, naročilih, strankah, cenikih, dobaviteljih, evidencah, mapah, koledarju in opravilih.</p>';
+  const R=[];const hit=t=>String(t||'').toLowerCase().includes(s);const add=(g,t,sub,act)=>{if(R.length<120)R.push([g,t,sub,act])};
+  S.quotes.forEach(x=>{if(hit(x.number)||hit(x.customer?.name)||hit(x.title)||x.items.some(i=>hit(i.title)))add('Ponudbe',`${x.number} · ${x.customer?.name||''}`,dateSl(x.date),`q|${x.id}`)});
+  S.orders.filter(o=>!o.deleted).forEach(o=>{if(hit(o.number)||hit(o.customer?.name)||o.lines.some(l=>hit(l.title)))add('Naročila',`${o.number} · ${o.customer?.name||''}`,dateSl(o.date),`o|${o.id}`)});
+  S.customers.forEach(c=>{if(hit(c.name)||hit(c.email)||hit(c.phone)||hit(c.city))add('Stranke',c.name,[c.city,c.phone].filter(Boolean).join(' · '),`c|${c.id}`)});
+  S.prices.forEach(p=>{if(hit(p.name)||hit(p.sku))add('Ceniki',p.name,[p.sku,fmt(p.net)].filter(Boolean).join(' · '),`p|${p.id}`)});
+  S.suppliers.forEach(x=>{if(hit(x.name)||hit(x.email))add('Dobavitelji',x.name,x.email||'',`s|${x.id}`)});
+  S.pos.forEach(x=>{if(hit(x.number)||hit(x.supplierName)||(x.lines||[]).some(l=>hit(l.title)))add('Nabava',`${x.number} · ${x.supplierName}`,dateSl(x.date),`po|${x.id}`)});
+  S.todos.forEach(x=>{if(hit(x.text))add('Opravila',x.text,x.due?dateSl(x.due):'','go|todo')});
+  S.events.filter(e=>!e.deleted).forEach(e=>{if(hit(e.title)||hit(e.location))add('Koledar',e.title,dateSl(e.date),'go|calendar')});
+  Object.entries(MODS).forEach(([k,m])=>R$(k).forEach(r=>{if(m.f.some(f=>f[2]!=='files'&&hit(r[f[0]])))add(m.t,String(r[m.f[0][0]]||m.one),m.f.filter(f=>f[2]==='date').map(f=>dateSl(r[f[0]])).filter(Boolean)[0]||'',`r|${k}|${r.id}`)}));
+  Object.entries(S.drive||{}).forEach(([sp,D])=>(D.items||[]).forEach(x=>{if(hit(x.name)||hit(x.text))add('Datoteke',x.name,(D.folders.find(f=>f.id===x.folder)||{}).name||sp,`d|${sp}|${x.folder||''}`)}));
+  R$('shopItems').forEach(p=>{if(hit(p.title)||hit(p.sku))add('Tabele za Shopify',p.title,p.sku||'',`sh|${p.id}`)});
+  if(!R.length)return '<p class="help">Ni zadetkov.</p>';let g0=null;return R.map(([g,t,sub,a])=>`${g!==g0?(g0=g,`<div class="srg">${esc(g)}</div>`):''}<button class="srr" data-sr="${esc(a)}"><b>${esc(t)}</b><small>${esc(sub)}</small></button>`).join('')};
+  openModal({title:'Iskanje po programu',wide:1,body:`<input class="inp" id="gsQ" placeholder="Išči: stranka, številka, izdelek, šifra, datoteka …" autocomplete="off"><div id="gsR" class="gsr">${run()}</div>`,onOpen:()=>setTimeout(()=>$('#gsQ').focus(),50),
+    onInput:e=>{if(e.target.id==='gsQ'){q=e.target.value;$('#gsR').innerHTML=run()}},
+    onClick:e=>{const b=e.target.closest('[data-sr]');if(!b)return;const p=b.dataset.sr.split('|');closeModal();
+      if(p[0]==='q')openQuote(p[1]);else if(p[0]==='o')openOrder(p[1]);else if(p[0]==='c'){go('customers');setTimeout(()=>editCustomer(S.customers.find(x=>x.id===p[1])),50)}else if(p[0]==='p'){go('prices');setTimeout(()=>editPrice(S.prices.find(x=>x.id===p[1])),50)}
+      else if(p[0]==='s'){go('dobavitelji');setTimeout(()=>editSupplier(S.suppliers.find(x=>x.id===p[1])),50)}else if(p[0]==='po')openPO(p[1]);else if(p[0]==='go')go(p[1]);else if(p[0]==='r'){const r=R$(p[1]).find(x=>x.id===p[2]);if(MODS[p[1]].hidden)editRec(p[1],r);else{go(p[1]);MOD_T[p[1]]='recs';renderMod(p[1]);setTimeout(()=>editRec(p[1],r),50)}}
+      else if(p[0]==='d'){if(p[1]==='katalogi')go('katalogi');else if(p[1]==='ceniki'){go('prices');priceTab='drive';renderPrices()}else{go(p[1]);MOD_T[p[1]]='drive';renderMod(p[1])}setTimeout(()=>driveNav(p[1],p[2]),50)}else if(p[0]==='sh'){go('shopify');setTimeout(()=>editShopItem(R$('shopItems').find(x=>x.id===p[1])),50)}}})}
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openSearch()}});
+document.addEventListener('click',e=>{if(e.target.closest('#gSearch,.gsearch')){e.preventDefault();openSearch()}});
+
+/* ================= year filter ================= */
+const yearOk=d=>!S.settings.yearF||String(d||'').startsWith(S.settings.yearF);
+function yearsAvail(){const Y=new Set([today().slice(0,4)]);S.quotes.forEach(q=>q.date&&Y.add(q.date.slice(0,4)));S.orders.forEach(o=>o.date&&Y.add(o.date.slice(0,4)));R$('dfa').forEach(r=>r.date&&Y.add(String(r.date).slice(0,4)));R$('ifaman').forEach(r=>r.date&&Y.add(String(r.date).slice(0,4)));return [...Y].filter(y=>/^\d{4}$/.test(y)).sort().reverse()}
+function setYearF(v){S.settings.yearF=v;saveSettings();renderNav();const on=$('.view.on');if(!on)return;({vList:renderList,vOrd:renderOrders,vRep:renderReports,vMontaze:renderMontaze,vDash:renderDash,vBank:renderBank})[on.id]?.();if(on.id==='vMod')renderMod($('#vMod').dataset.mod)}
+const yearSelect=id=>`<select class="divsel" id="${id}" aria-label="Leto"><option value="">Vsa leta</option>${yearsAvail().map(y=>`<option${S.settings.yearF===y?' selected':''}>${y}</option>`).join('')}</select>`;
+document.addEventListener('change',e=>{if(e.target.id==='yearSel'||e.target.id==='yearSel2'){setYearF(e.target.value);if(e.target.id==='yearSel2')closeModal()}});
+const yearBanner=()=>S.settings.yearF?`<div class="divbanner">${ic('cal')}Prikazano je leto <b>${S.settings.yearF}</b>. <button class="btn sm" data-yearall>Pokaži vsa leta</button></div>`:'';
+document.addEventListener('click',e=>{if(e.target.closest('[data-yearall]'))setYearF('')});
+
+/* ================= annual report ================= */
+function annualData(y){const inY=d=>String(d||'').startsWith(y),sum=(L,f)=>L.reduce((a,x)=>a+(+f(x)||0),0);
+  const qs=S.quotes.filter(q=>inY(q.date)),ords=S.orders.filter(o=>!o.deleted&&!o.cancelled&&inY(o.date)),acc=qs.filter(q=>q.status==='sprejeto'||orderOf(q)),rej=qs.filter(q=>q.status==='zavrnjeno');
+  const byM=[...Array(12)].map((_,i)=>{const m=`${y}-${String(i+1).padStart(2,'0')}`;return[monthName(m),qs.filter(q=>q.date.startsWith(m)).length,sum(qs.filter(q=>q.date.startsWith(m)),q=>totals(q).gross),ords.filter(o=>o.date.startsWith(m)).length,sum(ords.filter(o=>o.date.startsWith(m)),o=>orderTotals(o).gross)]});
+  const cust={};ords.forEach(o=>{const n=o.customer?.name||'—';cust[n]=(cust[n]||0)+orderTotals(o).gross});
+  const prod={};ords.forEach(o=>o.lines.filter(l=>!l.x).forEach(l=>{const k=l.title;prod[k]=prod[k]||[0,0];prod[k][0]+=+l.qty||1;prod[k][1]+=(+l.net||0)*(+l.qty||1)}));
+  const div={};ords.forEach(o=>{const n=divName(o.div)||'brez programa';div[n]=(div[n]||0)+orderTotals(o).gross});
+  const src={};qs.forEach(q=>{const n=q.source||'neznano';src[n]=src[n]||[0,0];src[n][0]++;if(acc.includes(q))src[n][1]++});
+  const dfa=R$('dfa').filter(r=>inY(r.date)),ifa=R$('ifaman').filter(r=>inY(r.date)),tx=R$('banktx').filter(r=>inY(r.date));
+  const cash=R$('gotovina').filter(r=>inY(r.date)),cards=R$('kartice').filter(r=>inY(r.date)),trips=R$('potovanja').filter(r=>inY(r.from)),ads=S.mk.ads.filter(a=>inY(a.start)),claims=S.claims.filter(c=>inY(c.date)),pos=S.pos.filter(p=>inY(p.date));
+  return{y,qs,ords,acc,rej,byM,cust:Object.entries(cust).sort((a,b)=>b[1]-a[1]).slice(0,15),prod:Object.entries(prod).sort((a,b)=>b[1][1]-a[1][1]).slice(0,20),div:Object.entries(div),src:Object.entries(src),
+    k:{qN:qs.length,qV:sum(qs,q=>totals(q).gross),conv:acc.length+rej.length?acc.length/(acc.length+rej.length)*100:0,oN:ords.length,oV:sum(ords,o=>orderTotals(o).gross),oOpen:sum(ords.filter(o=>!o.done),o=>orderTotals(o).rest),
+      dfaV:sum(dfa,r=>r.amount),dfaOpen:sum(dfa.filter(r=>payStatus(r)!=='placano'),r=>r.amount),ifaV:sum(ifa,r=>r.amount),ifaOpen:sum(ifa.filter(r=>payStatus(r)!=='placano'),r=>r.amount),
+      inV:sum(tx.filter(t=>t.dir==='in'),t=>t.amount),outV:sum(tx.filter(t=>t.dir==='out'),t=>t.amount),cashIn:sum(cash.filter(r=>r.dir==='prejemek'),r=>r.amount),cards:sum(cards,r=>r.amount),
+      poN:pos.length,claims:claims.length,trips:sum(trips,r=>(/osebno/.test(r.vtype||'')?(+r.km||0)*(+r.kmRate||+S.settings.kmRate||0):0)+(+r.fuel||0)+(+r.perDiem||0)+(+r.lodging||0)+(+r.other||0)),ads:sum(ads,a=>a.results?.spend||0),
+      subs:sum(R$('narocnine').filter(r=>r.active!==false),r=>{const a=+r.amount||0;return r.period==='mesečno'?a*12:r.period==='četrtletno'?a*4:r.period==='letno'?a:0}),stock:sum(R$('zaloga'),r=>(+r.qty||0)*(+r.cost||0))}}}
+function annualHTML(y){const D=annualData(y),k=D.k,T=(h,rows)=>ptable(h,rows);
+  return `<h2>Prodaja</h2>${T(['Kazalnik','Vrednost'],[['Ponudbe',`${k.qN} · ${fmt(k.qV)}`],['Uspešnost ponudb',fmtN(k.conv,0)+' %'],['Naročila',`${k.oN} · ${fmt(k.oV)}`],['Še odprto po naročilih',fmt(k.oOpen)]])}
+  <h3>Po mesecih</h3>${T(['Mesec','Ponudbe','Vrednost ponudb','Naročila','Vrednost naročil'],D.byM.map(r=>[esc(r[0]),r[1],fmt(r[2]),r[3],fmt(r[4])]))}
+  ${D.div.length>1?`<h3>Po programih</h3>${T(['Program','Naročila'],D.div.map(([n,v])=>[esc(n),fmt(v)]))}`:''}
+  <h3>Najboljši kupci</h3>${T(['Kupec','Vrednost naročil'],D.cust.map(([n,v])=>[esc(n),fmt(v)]))}
+  <h3>Najbolj prodajani izdelki</h3>${T(['Izdelek','Količina','Vrednost brez DDV'],D.prod.map(([n,[q,v]])=>[esc(n),fmtN(q,2),fmt(v)]))}
+  <h3>Viri strank</h3>${T(['Vir','Ponudbe','Uspešne'],D.src.map(([n,[a,b]])=>[esc(n),a,b]))}
+  <h2>Finance</h2>${T(['Kazalnik','Vrednost'],[['Izdani računi (IFA)',fmt(k.ifaV)],['– od tega neplačano',fmt(k.ifaOpen)],['Prejeti računi (DFA)',fmt(k.dfaV)],['– od tega neplačano',fmt(k.dfaOpen)],['Prilivi na banko',fmt(k.inV)],['Odlivi z banke',fmt(k.outV)],['Gotovinski prejemki',fmt(k.cashIn)],['Plačila s kartico (podjetje)',fmt(k.cards)],['Naročnine (letno)',fmt(k.subs)],['Službena potovanja',fmt(k.trips)],['Oglaševanje (poraba)',fmt(k.ads)]])}
+  <h2>Nabava in poslovanje</h2>${T(['Kazalnik','Vrednost'],[['Naročila dobaviteljem',k.poN],['Reklamacije',k.claims],['Vrednost zaloge (nabavna, trenutno)',fmt(k.stock)]])}`}
+function annualRows(y){const D=annualData(y),k=D.k;return[[`LETNO POROČILO ${y}`],[],['Ponudbe',k.qN,k.qV],['Uspešnost %',r2(k.conv)],['Naročila',k.oN,k.oV],['Odprto po naročilih',k.oOpen],[],['Mesec','Ponudbe','Vrednost ponudb','Naročila','Vrednost naročil'],...D.byM,[],['Kupec','Vrednost'],...D.cust,[],['Izdelek','Količina','Vrednost brez DDV'],...D.prod.map(([n,[q,v]])=>[n,q,v]),[],['IFA',k.ifaV,'neplačano',k.ifaOpen],['DFA',k.dfaV,'neplačano',k.dfaOpen],['Prilivi',k.inV],['Odlivi',k.outV],['Gotovina',k.cashIn],['Kartice',k.cards],['Naročnine',k.subs],['Potovanja',k.trips],['Oglaševanje',k.ads],['Naročila dobaviteljem',k.poN],['Reklamacije',k.claims],['Zaloga (vrednost)',k.stock]]}
+function openAnnual(y){y=y||S.settings.yearF||today().slice(0,4);
+  openModal({title:`Letno poročilo ${y}`,wide:2,body:`<div class="inline" style="margin-bottom:10px"><select class="inp" id="anY" style="max-width:140px">${yearsAvail().map(x=>`<option${x===y?' selected':''}>${x}</option>`).join('')}</select><span class="grow"></span><button class="btn" data-an="xls">${ic('download')}Excel</button><button class="btn" data-an="print">${ic('print')}Natisni / PDF</button><button class="btn sig" data-an="close">${ic('check')}Zaključek leta …</button></div><div class="annual">${annualHTML(y)}</div>`,
+    onInput:e=>{if(e.target.id==='anY'){closeModal();openAnnual(e.target.value)}},
+    onClick:e=>{const a=e.target.closest('[data-an]')?.dataset.an;if(a==='xls')exportXlsx(`STIK-letno-porocilo-${y}`,annualRows(y));if(a==='print')printPage(`Letno poročilo ${y} – ${S.settings.company.name||''}`,annualHTML(y));if(a==='close'){closeModal();yearClose(y)}}})}
+
+/* ================= year close & archives ================= */
+async function yearClose(y){const D=annualData(y);const openIfa=R$('ifaman').filter(r=>String(r.date||'').startsWith(y)&&payStatus(r)!=='placano'),openDfa=R$('dfa').filter(r=>String(r.date||'').startsWith(y)&&payStatus(r)!=='placano'),openO=S.orders.filter(o=>!o.deleted&&!o.cancelled&&!o.done&&String(o.date||'').startsWith(y));
+  const closed=(S.settings.closedYears||[]).includes(y);
+  openModal({title:`Zaključek leta ${y}`,wide:1,body:`${closed?`<div class="okbox">Leto ${y} je že zaključeno. Arhiv lahko narediš znova.</div>`:''}
+    <p>Zaključek leta naredi <b>arhiv vseh podatkov leta ${y}</b> (datoteka JSON na disk in v Google Drive), letno poročilo in seznam odprtih postavk, ki se prenesejo v novo leto. Podatki v programu ostanejo – starejša leta skriješ z izbiro leta na vrhu menija.</p>
+    <div class="sub">Pred zaključkom preveri</div>
+    <div class="chkrow ${openIfa.length?'bad':'ok'}"><span>${openIfa.length?'!':'✓'}</span><div><b>Neplačani izdani računi: ${openIfa.length}</b><small>${fmt(openIfa.reduce((a,r)=>a+(+r.amount||0),0))} – ostanejo odprti v novem letu</small></div></div>
+    <div class="chkrow ${openDfa.length?'bad':'ok'}"><span>${openDfa.length?'!':'✓'}</span><div><b>Neplačani prejeti računi: ${openDfa.length}</b><small>${fmt(openDfa.reduce((a,r)=>a+(+r.amount||0),0))}</small></div></div>
+    <div class="chkrow ${openO.length?'bad':'ok'}"><span>${openO.length?'!':'✓'}</span><div><b>Odprta naročila: ${openO.length}</b><small>preneseta se v novo leto</small></div></div>
+    <div class="chkrow na"><span>–</span><div><b>Inventura zaloge</b><small>${R$('zaloga').length} artiklov, vrednost ${fmt(D.k.stock)} – natisni seznam in preveri stanje na polici</small></div></div>`,
+    foot:`<button class="btn" data-yc="inv">${ic('print')}Inventurni seznam</button><span class="grow"></span><button class="btn pri" data-yc="go">${ic('check')}Ustvari arhiv in zaključi leto</button>`,
+    onClick:async e=>{const a=e.target.closest('[data-yc]')?.dataset.yc;
+      if(a==='inv'){printPage(`Inventurni seznam ${y}-12-31`,ptable(['Šifra','Artikel','Lokacija','Stanje v programu','Dejansko stanje','Nabavna cena'],R$('zaloga').map(r=>[esc(r.sku||''),esc(r.name),esc(r.loc||''),fmtN(+r.qty||0,2),'',r.cost?fmt(+r.cost):''])),{landscape:1});return}
+      if(a!=='go')return;busy(true,'Pripravljam arhiv …');try{const inY=d=>String(d||'').startsWith(y);const B=backupData();
+        const arch={app:'stik-prodaja-arhiv',year:y,created:new Date().toISOString(),company:S.settings.company.name,report:annualRows(y),quotes:B.quotes.filter(q=>inY(q.date)),orders:(B.orders||[]).filter(o=>inY(o.date)),customers:B.customers,prices:B.prices,recs:Object.fromEntries(Object.entries(B.recs||{}).map(([k,L])=>{const df=(MODS[k]?.f||[]).find(f=>f[2]==='date');return[k,df?(L||[]).filter(r=>inY(r[df[0]])):L]})),pos:(B.pos||[]).filter(p=>inY(p.date)),claims:(B.claims||[]).filter(c=>inY(c.date)),ships:(B.ships||[]).filter(s=>inY(s.date))};
+        const blob=new Blob([JSON.stringify(arch)],{type:'application/json'}),name=`STIK-Prodaja-arhiv-${y}.json`;download(blob,name);
+        if(S.dir){try{const fh=await S.dir.getFileHandle(name,{create:true});const w=await fh.createWritable();await w.write(blob);await w.close()}catch{}}
+        if(S.settings.driveId&&driveToken.tok&&driveToken.exp>Date.now()){try{await driveUpload(driveToken.tok,blob,name,'application/json')}catch{}}
+        S.settings.archives=[...(S.settings.archives||[]).filter(x=>x.y!==y),{y,at:Date.now(),q:arch.quotes.length,o:arch.orders.length}];S.settings.closedYears=[...new Set([...(S.settings.closedYears||[]),y])];await saveSettings();
+        closeModal();toast(`Leto ${y} zaključeno. Arhiv ${name} je shranjen${S.dir?' v mapo na disku':''}${S.settings.driveId&&driveToken.tok?' in v Google Drive':''} ter prenesen.`,'',10000)}catch(err){toast('Arhiv: '+err.message,'err')}finally{busy(false)}}})}
+function archivesHTML(){const A=S.settings.archives||[];return `<div class="panel"><h2>${ic('folder')}Arhivi po letih</h2><p class="help">Zaključek leta naredi arhiv podatkov leta (Poročila → Letno poročilo → Zaključek leta). Arhiv odpreš z Uvozi (dodaj) samo za pregled starih podatkov.</p>${A.length?A.sort((a,b)=>b.y.localeCompare(a.y)).map(a=>`<div class="opprow"><div class="grow"><b>Leto ${a.y}</b><span>arhiv ${dtm(a.at)} · ${a.q} ponudb, ${a.o} naročil</span></div><div class="acts"><button class="btn sm" data-annual="${a.y}">Letno poročilo</button></div></div>`).join(''):'<p class="help">Še ni arhivov.</p>'}<div class="inline" style="margin-top:8px"><button class="btn sm" data-annual="${today().slice(0,4)}" style="flex:none">${ic('chart')}Letno poročilo in zaključek leta</button></div></div>`}
+document.addEventListener('click',e=>{const a=e.target.closest('[data-annual]');if(a)openAnnual(a.dataset.annual)});
+
+/* ================= number fields: type over existing value ================= */
+document.addEventListener('focusin',e=>{const el=e.target;if(!(el instanceof HTMLInputElement))return;if(el.type==='number'||el.hasAttribute('data-num')||/decimal|numeric/.test(el.inputMode||'')||/^-?[\d.,\s]*\d[\d.,\s]*$/.test(el.value)&&/price|net|amount|qty|disc|vat|rate|znesek|cena/i.test((el.dataset.f||el.dataset.m||el.dataset.r||el.dataset.s||el.dataset.o||el.id||'')))setTimeout(()=>{try{el.select()}catch{}},0)});
+document.addEventListener('mouseup',e=>{const el=e.target;if(el instanceof HTMLInputElement&&document.activeElement===el&&el.dataset.selOnce!=='1'&&el.selectionStart===el.selectionEnd&&(el.hasAttribute('data-num')||/decimal|numeric/.test(el.inputMode||''))){el.dataset.selOnce='1';e.preventDefault();el.select()}},true);
+document.addEventListener('focusout',e=>{if(e.target&&e.target.dataset)delete e.target.dataset.selOnce});
+/* ================= bold / italic / underline toolbar for quote texts ================= */
+const FMT_SEL='#vEdit textarea, #sheet textarea';
+function fmtWrap(el,m){const a=el.selectionStart,b=el.selectionEnd,v=el.value;if(a===b){const ins=m+'besedilo'+m;el.value=v.slice(0,a)+ins+v.slice(b);el.setSelectionRange(a+m.length,a+m.length+8)}else{const sel=v.slice(a,b);const on=sel.startsWith(m)&&sel.endsWith(m)&&sel.length>=2*m.length;const rep=on?sel.slice(m.length,sel.length-m.length):m+sel+m;el.value=v.slice(0,a)+rep+v.slice(b);el.setSelectionRange(a,a+rep.length)}el.dispatchEvent(new Event('input',{bubbles:true}));el.focus()}
+let fmtBar=null,fmtEl=null;
+document.addEventListener('focusin',e=>{const el=e.target;if(!(el instanceof HTMLTextAreaElement)||!el.matches(FMT_SEL))return;fmtEl=el;if(!fmtBar){fmtBar=document.createElement('div');fmtBar.className='fmtbar';fmtBar.innerHTML='<button type="button" data-fmt="**" title="Krepko (Ctrl+B)"><b>B</b></button><button type="button" data-fmt="*" title="Ležeče (Ctrl+I)"><i>I</i></button><button type="button" data-fmt="__" title="Podčrtano (Ctrl+U)"><u>U</u></button>';fmtBar.addEventListener('mousedown',ev=>ev.preventDefault());fmtBar.addEventListener('click',ev=>{ev.stopPropagation();const b=ev.target.closest('[data-fmt]');if(b&&fmtEl)fmtWrap(fmtEl,b.dataset.fmt)})}el.parentElement.insertBefore(fmtBar,el);fmtBar.hidden=false});
+document.addEventListener('focusout',e=>{if(e.target===fmtEl)setTimeout(()=>{if(fmtBar&&document.activeElement!==fmtEl)fmtBar.hidden=true},150)});
+document.addEventListener('keydown',e=>{const el=e.target;if(!(e.ctrlKey||e.metaKey)||!(el instanceof HTMLTextAreaElement)||!el.matches(FMT_SEL))return;const k=e.key.toLowerCase();const m=k==='b'?'**':k==='i'?'*':k==='u'?'__':null;if(m){e.preventDefault();fmtWrap(el,m)}});
 /* ================= toast ================= */
 function toast(msg,type='',ms=3500,action){
   const el=document.createElement('div');el.className='tst'+(type==='err'?' err':'');el.innerHTML=`<span>${esc(msg)}</span>`;
@@ -5656,7 +5785,7 @@ addEventListener('visibilitychange',()=>{if(document.hidden&&cur)saveQuoteNow()}
     const arr=async k=>{try{const v=await DB.get('kv',k);return Array.isArray(v)?v:[]}catch{return[]}};
     S.prices=await arr('prices');S.todos=await arr('todos');S.orders=await arr('orders');S.ships=await arr('ships');S.campaigns=await arr('campaigns');S.suppliers=await arr('suppliers');S.pos=await arr('pos');S.claims=await arr('claims');
     try{S.mk=mergeDeep(DEF_MK,(await DB.get('kv','mk'))||{})}catch{S.mk=clone(DEF_MK)}
-    try{const r=await DB.get('kv','recs');S.recs=r&&typeof r==='object'?r:{}}catch{S.recs={}}S.events=await arr('events');try{navigator.storage&&navigator.storage.persist&&navigator.storage.persisted().then(p=>{if(!p)navigator.storage.persist()})}catch{}setTimeout(()=>{try{fixSerialDates()}catch{}},500);try{const d=await DB.get('kv','drive');S.drive=d&&typeof d==='object'?d:{}}catch{S.drive={}}
+    try{const r=await DB.get('kv','recs');S.recs=r&&typeof r==='object'?r:{}}catch{S.recs={}}S.events=await arr('events');if(!S.settings.migSign2){S.settings.migSign2=1;if(S.settings.design)S.settings.design.sign=false;S.quotes.forEach(q=>{if(q.design&&q.status==='osnutek'&&q.design.sign){q.design.sign=false;DB.put('quotes',clone(q))}});saveSettings()}try{navigator.storage&&navigator.storage.persist&&navigator.storage.persisted().then(p=>{if(!p)navigator.storage.persist()})}catch{}setTimeout(()=>{try{fixSerialDates()}catch{}},500);try{const d=await DB.get('kv','drive');S.drive=d&&typeof d==='object'?d:{}}catch{S.drive={}}
     try{S.comp=(await DB.get('kv','comp'))||{sites:[],items:[]}}catch{S.comp={sites:[],items:[]}}try{S.shopMeta=(await DB.get('kv','shopMeta'))||null}catch{}
     if(!S.settings.mig4)try{
       const fix=t=>typeof t==='string'&&!t.includes('{preostanek}')?t.replace('preostanek ob prevzemu','preostanek ({preostanek}) ob prevzemu').replace('balance on collection','balance ({preostanek}) on collection').replace('Restbetrag bei Abholung','Restbetrag ({preostanek}) bei Abholung'):t;
@@ -5689,6 +5818,7 @@ addEventListener('visibilitychange',()=>{if(document.hidden&&cur)saveQuoteNow()}
   renderNav();
   if(P.get('new')){history.replaceState(null,'',location.pathname);const q=newQuote();S.quotes.push(q);cur=q;await saveQuoteNow();openQuote(q.id,true);return}
   ['go','openQuote','openOrder','openShip','openPO','openClaim'].forEach(navWrap);
+  const rt=takeRedirectToken();if(rt){if(rt.error)setTimeout(()=>toast('Google prijava: '+rt.error+(rt.error==='redirect_uri_mismatch'?' – v Google Cloud dodaj naslov programa med Authorized redirect URIs (glej Nastavitve).':''),'err',12000),800);else setTimeout(()=>{if(rt.after==='cal')showCal();else syncNow()},600)}
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persisted().then(p=>{if(!p)navigator.storage.persist()})}catch{}
   const v0=P.get('view');if(v0&&(NAV.some(n=>n[0]===v0)||v0==='list')){go(v0);return}
   go(S.settings.startView||'dash');try{history.replaceState({nr:['go',[S.settings.startView||'dash']]},'',location.search)}catch{}
