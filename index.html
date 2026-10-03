@@ -391,6 +391,9 @@ body.editing .nav .navs a{justify-content:center;padding:8px 0;min-height:34px}}
 .kvp{width:100%;border-collapse:collapse}.kvp th{width:55mm;text-align:left;font-weight:normal;color:#556;padding:1.5mm 0;border-bottom:.2mm solid #e3e7ed;vertical-align:top}.kvp td{padding:1.5mm 0;border-bottom:.2mm solid #e3e7ed}
 @media (max-width:900px){.nav .navs{flex-direction:row;overflow:visible;margin:0;padding:0;display:contents}.nav .ng{display:none}.tbl.modt .tr,.tbl.modt .th-row{grid-template-columns:minmax(0,1fr) 100px}.tbl.modt .tr>div:not(.c1):not(:last-child),.tbl.modt .th-row span:not(:first-child):not(:last-child){display:none}.recgrid{grid-template-columns:1fr}.kanban{grid-template-columns:repeat(6,160px)}.agrow .d{width:74px}}
 .sh-foot{flex-wrap:wrap;row-gap:8px}
+.navtools{display:grid;grid-template-columns:32px minmax(0,1fr) minmax(0,1.3fr);gap:4px;margin:0 0 8px}.navtools.two{grid-template-columns:32px minmax(0,1fr)}
+.navtools .divsel{margin:0;padding:5px 6px;font-size:12px;min-width:0}.nav .navtools .gsearch{width:32px;height:30px;padding:0;margin:0;justify-content:center}.nav .navtools .gsearch .i{width:15px;height:15px}
+.syncpill.mini{width:30px;height:30px;padding:0;margin:0;justify-content:center;border-radius:8px;flex:none}.syncpill.mini span{display:none}.syncpill.mini .i{width:16px;height:16px}
 .fmtbar{display:flex;gap:4px;margin:2px 0 4px}.fmtbar button{width:30px;height:28px;border:1px solid var(--line);background:var(--surf);border-radius:6px;cursor:pointer;font:inherit;font-size:14px}.fmtbar button:hover{background:var(--soft)}
 .montbox{border:1px dashed var(--line);border-radius:10px;padding:8px 10px;margin-top:10px}.montbox .chk .i{width:15px;height:15px;margin-right:2px}
 .nav .gsearch{display:flex;align-items:center;gap:6px;width:100%;border:1px solid #33415a;background:#1f2a3d;color:#C3CCDC;border-radius:8px;padding:6px 10px;margin:0 0 8px;font:inherit;font-size:13px;cursor:pointer}.nav .gsearch span{flex:1;text-align:left}.nav .gsearch kbd{font-size:10px;opacity:.6;font-family:inherit}.nav .gsearch .i{width:15px;height:15px}
@@ -1033,7 +1036,7 @@ const DB={
   tx(store,mode,fn){return new Promise((res,rej)=>{const t=this.db.transaction(store,mode);const req=fn(t.objectStore(store));t.oncomplete=()=>res(req?req.result:undefined);t.onerror=t.onabort=()=>rej(t.error)})},
   get(s,k){return this.tx(s,'readonly',o=>o.get(k))},
   all(s){return this.tx(s,'readonly',o=>o.getAll())},
-  put(s,v,k){const r=this.tx(s,'readwrite',o=>k===undefined?o.put(v):o.put(v,k));if(!this.quiet&&!(s==='kv'&&(k==='fx'||k==='dir'||k==='preSyncCopy'))){if(typeof autoBackup==='function')autoBackup();if(typeof markDirty==='function')markDirty()}return r},
+  put(s,v,k){const r=this.tx(s,'readwrite',o=>k===undefined?o.put(v):o.put(v,k));if(!this.quiet&&!(s==='kv'&&(k==='fx'||k==='dir'||k==='preSyncCopy'))){if(typeof autoBackup==='function')autoBackup();if(typeof dirtyCheck==='function')dirtyCheck(s,v,k)}else if(this.quiet&&s!=='files'&&typeof SIGS!=='undefined'&&S.__loaded){try{SIGS.set(s+':'+(k!==undefined?k:(v&&v.id)),sigOf(s,v,k))}catch{}}return r},
   del(s,k){const r=this.tx(s,'readwrite',o=>o.delete(k));if(!this.quiet&&typeof markDirty==='function'){markDirty();if(typeof autoBackup==='function')autoBackup()}return r}
 };
 
@@ -2542,9 +2545,9 @@ $('#vSet').addEventListener('click',async e=>{
   if(t.closest('#bkOut')){const data={app:'stik-ponudbe-backup',v:1,date:new Date().toISOString(),settings:S.settings,customers:S.customers,quotes:S.quotes,prices:S.prices,todos:S.todos,orders:S.orders,ships:S.ships,campaigns:S.campaigns};await saveOut(`STIK-Prodaja-kopija-${today()}.json`,'application/json',async()=>backupBlob());S.settings.lastBackup=Date.now();saveSettings()}
   if(t.closest('#bkIn'))pickFile('.json,application/json',f=>importProjectFile(f));
   if(t.closest('#bkRestore'))pickFile('.json,application/json',async f=>{try{const j=JSON.parse(await f.text());if(j.app!=='stik-ponudbe-backup')throw new Error('to ni varnostna kopija');if(!confirm(`Kopija z dne ${j.date?dtm(j.date):'?'}: ${j.quotes?.length||0} ponudb, ${j.orders?.length||0} naročil, ${j.customers?.length||0} strank.\n\nZamenjam VSE podatke v tej napravi?`))return;await restoreAll(j);toast('Podatki obnovljeni.');showList()}catch(err){toast('Obnova ni uspela: '+err.message,'err')}});
-  if(t.closest('#drvUp')){driveSyncUp();return}
+  if(t.closest('#drvUp')){syncNow({force:'up'});return}
   if(t.closest('#stCheck')){storageCheck();return}
-  if(t.closest('#drvDown')){driveSyncDown();return}
+  if(t.closest('#drvDown')){if(confirm('Prenesem podatke iz Google Drive? Podatki na tej napravi bodo zamenjani s tistimi na Drive (pred tem se shrani kopija).')){DB.quiet=true;DB.put('kv',backupData(),'preSyncCopy').finally(()=>{DB.quiet=false;syncNow({force:'down'})})}return}
   if(t.closest('#instHelp')){installHelp();return}
 });
 
@@ -2564,10 +2567,8 @@ function renderNav(){
   const n=todoDueCount();let g=null;
   const col=S.settings.navCol||{};
   const lg=S.settings.navLogo&&S.settings.company.logo;
-  $('#nav').innerHTML=`<div class="brandrow"><div class="brand${lg?' haslogo':''}" data-go="dash">${lg?`<img class="navlogo" src="${esc(S.settings.company.logo)}" alt="${esc(S.settings.company.name||'')}">`:`${MARK}<span>STIK Prodaja</span>`}</div><div class="navarr"><button class="btn sm ghost icon" id="navBack" title="Nazaj (tudi stranski gumb miške)" aria-label="Nazaj">‹</button><button class="btn sm ghost icon" id="navFwd" title="Naprej" aria-label="Naprej">›</button></div></div>
-  ${S.settings.driveId?`<button class="syncpill" title="Google Drive">${ic('cloud')}<span></span></button>`:''}
-  <button class="gsearch" id="gSearch" title="Iskanje (Ctrl+K)">${ic('search')}<span>Išči …</span><kbd>Ctrl K</kbd></button>${yearSelect('yearSel')}
-  ${divs().length?`<select class="divsel" id="divSel" aria-label="Program"><option value="">Vsi programi</option>${divs().map(d=>`<option value="${d.id}"${S.settings.divF===d.id?' selected':''}>${esc(d.name)}</option>`).join('')}</select>`:''}<div class="navs">
+  $('#nav').innerHTML=`<div class="brandrow"><div class="brand${lg?' haslogo':''}" data-go="dash">${lg?`<img class="navlogo" src="${esc(S.settings.company.logo)}" alt="${esc(S.settings.company.name||'')}">`:`${MARK}<span>STIK Prodaja</span>`}</div><div class="navarr">${S.settings.driveId?`<button class="syncpill mini" title="Google Drive">${ic('cloud')}<span></span></button>`:''}<button class="btn sm ghost icon" id="navBack" title="Nazaj (tudi stranski gumb miške)" aria-label="Nazaj">‹</button><button class="btn sm ghost icon" id="navFwd" title="Naprej" aria-label="Naprej">›</button></div></div>
+  <div class="navtools${divs().length?'':' two'}"><button class="gsearch" id="gSearch" title="Iskanje po programu (Ctrl+K)" aria-label="Iskanje">${ic('search')}</button>${yearSelect('yearSel')}${divs().length?`<select class="divsel" id="divSel" aria-label="Program"><option value="">Vsi programi</option>${divs().map(d=>`<option value="${d.id}"${S.settings.divF===d.id?' selected':''}>${esc(d.name)}</option>`).join('')}</select>`:''}</div><div class="navs">
   ${NAV.map(([k,l,i,grp,sh])=>{const h=grp!==g?(g=grp,grp?`<div class="ng${col[grp]?' col':''}" data-ngc="${grp}">${grp}<span>${col[grp]?'+':'−'}</span></div>`:''):'';if(grp&&col[grp]&&navOn!==k)return h;const cnt=k==='todo'?n:k==='montaze'?S.orders.filter(o=>!o.deleted&&!o.cancelled&&!o.done&&(o.type||'montaza')==='montaza'&&o.planned&&o.planned<=isoAdd(today(),7)).length:k==='list'?S.quotes.filter(q=>q.status==='poslano'&&!orderOf(q)).length:k==='dfa'?(S.recs.dfa||[]).filter(r=>payDue(r)==='zapadlo').length:0;
     return `${h}<a data-go="${k}" data-nav="${k}" class="${navOn===k?'on':''}${MOB_MAIN.includes(k)?' mm':' mx'}" title="${l}">${ic(i)}<span><i class="d">${l}</i><i class="m">${sh||l}</i></span>${cnt?`<em class="${k==='todo'||k==='dfa'?'badge':'cnt2'}">${cnt}</em>`:''}</a>`}).join('')}</div>
   <a class="morebtn${MOB_MAIN.includes(navOn)?'':' on'}" data-morenav>${ic('menu')}<span>Več</span></a>`;
@@ -5595,18 +5596,18 @@ document.addEventListener('drop',e=>{if(dropOv){dropOv.remove();dropOv=null}if(!
 const LS={get:k=>{try{return localStorage.getItem('stik_'+k)}catch{return null}},set:(k,v)=>{try{localStorage.setItem('stik_'+k,String(v))}catch{}}};
 const syncDirty=()=>+(LS.get('dirty')||0)>+(LS.get('syncAt')||0);
 let SYNC={busy:false,msg:'',err:''};
-function markDirty(){LS.set('dirty',Date.now());renderSyncPill();syncAutoSoon()}
+function markDirty(){LS.set('dirty',Date.now());renderSyncPill();syncAutoSoon();if(S.settings&&S.settings.driveId&&!document.querySelector('.syncbanner')){const on=$('.view.on');if(on&&on.id==='vList')setTimeout(()=>{if($('#vList').classList.contains('on')&&!document.querySelector('.syncbanner'))renderList()},300)}}
 const syncAutoSoon=debounce(()=>{if(S.settings.driveId&&driveToken.tok&&driveToken.exp>Date.now()&&syncDirty())syncNow({silent:true})},20000);
 function deviceName(){let n=LS.get('device');if(!n){const p=platform();n=(p==='ios'||p==='android')?(/iPad|Tablet/.test(navigator.userAgent)?'tablica':'telefon'):'računalnik';LS.set('device',n)}return n}
-function syncState(){if(!S.settings.driveId)return['off','Drive ni povezan'];if(SYNC.busy)return['busy','Usklajujem …'];if(SYNC.err)return['err','Napaka – klikni'];
+function syncState(){if(!S.settings.driveId)return['off','Drive ni povezan'];if(SYNC.fmsg)return['busy',SYNC.fmsg];if(SYNC.busy)return['busy','Usklajujem …'];if(SYNC.err)return['err','Napaka – klikni'];
   const tokOk=driveToken.tok&&driveToken.exp>Date.now(),at=+(LS.get('syncAt')||0);
-  if(syncDirty())return[tokOk?'busy':'warn',tokOk?'Pošiljam kmalu …':'Neposlane spremembe – klikni'];
+  if(syncDirty())return[tokOk?'idle':'warn',tokOk?'Spremembe bodo poslane samodejno':'Neposlane spremembe – klikni'];
   if(!at)return['warn','Uskladi z Drive – klikni'];return[tokOk?'ok':'idle',`Usklajeno ${dtm(at).slice(-5)}${tokOk?'':' – klikni za preverjanje'}`]}
-function renderSyncPill(){const [c,t]=syncState();$$('.syncpill').forEach(el=>{el.className='syncpill '+c;el.title=t+(S.settings.driveId?' (Google Drive)':'');const s=el.querySelector('span');if(s)s.textContent=t})}
+function renderSyncPill(){const bn=document.querySelector('.syncbanner');if(bn&&typeof syncBanner==='function'){const n=syncBanner();if(!n)bn.remove();else if(bn.outerHTML!==n)bn.outerHTML=n}const [c,t]=syncState();$$('.syncpill').forEach(el=>{el.className='syncpill'+(el.classList.contains('mini')?' mini':'')+' '+c;el.title=t+(S.settings.driveId?' (Google Drive)':'');const s=el.querySelector('span');if(s)s.textContent=t})}
 setInterval(renderSyncPill,60000);
 async function driveGetMeta(tok){const f=await driveFind(tok,'STIK-Prodaja-podatki.json').catch(()=>null);return f}
 async function driveDownload(tok,f){const r=await withTimeout(fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`,{headers:{Authorization:'Bearer '+tok}}),90000);if(!r.ok)throw new Error('prenos ni uspel');return r.json()}
-async function driveUploadData(tok,f){const blob=await backupBlob();let r;
+async function driveUploadData(tok,f){const blob=await backupBlobSync();let r;
   if(f)r=await withTimeout(fetch(`https://www.googleapis.com/upload/drive/v3/files/${f.id}?uploadType=media&fields=id,modifiedTime`,{method:'PATCH',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:blob}),120000);
   else{await driveUpload(tok,blob,'STIK-Prodaja-podatki.json','application/json');const m=await driveGetMeta(tok);return m}
   const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error?.message||'pošiljanje ni uspelo');return j}
@@ -5627,11 +5628,15 @@ async function syncNow(o={}){if(SYNC.busy)return;if(!S.settings.driveId){if(!o.s
     const hasLocal=S.quotes.length+S.customers.length+S.orders.length>0;
     let action='none';
     if(!f)action=hasLocal?'up':'none';
+    else if(o.force)action=o.force;
     else{const remoteNew=f.modifiedTime!==seen;if(!seen&&!hasLocal)action='down';else if(!seen)action='merge';else if(remoteNew&&dirty)action='merge';else if(remoteNew)action='down';else if(dirty)action='up'}
     let res=f;
-    if(action==='down'){const j=await driveDownload(tok,f);DB.quiet=true;try{await restoreAll(j)}finally{DB.quiet=false}LS.set('remote',f.modifiedTime)}
-    else if(action==='merge'){const j=await driveDownload(tok,f);try{await DB.put('kv',backupData(),'preSyncCopy')}catch{}DB.quiet=true;try{await mergeSync(j)}finally{DB.quiet=false}res=await driveUploadData(tok,f);LS.set('remote',res.modifiedTime||f.modifiedTime)}
+    let rmap=null;
+    if(action==='down'){const j=await driveDownload(tok,f);rmap=j.fileMap;DB.quiet=true;try{await restoreAll(j)}finally{DB.quiet=false}LS.set('remote',f.modifiedTime)}
+    else if(action==='merge'){const j=await driveDownload(tok,f);rmap=j.fileMap;try{DB.quiet=true;await DB.put('kv',backupData(),'preSyncCopy')}catch{}finally{DB.quiet=false}DB.quiet=true;try{await mergeSync(j)}finally{DB.quiet=false}res=await driveUploadData(tok,f);LS.set('remote',res.modifiedTime||f.modifiedTime)}
     else if(action==='up'){res=await driveUploadData(tok,f);LS.set('remote',res?.modifiedTime||'')}
+    if(action==='up'||action==='merge'){const nf=await syncFilesUp(tok);if(nf){const f2=await driveGetMeta(tok);res=await driveUploadData(tok,f2);if(res?.modifiedTime)LS.set('remote',res.modifiedTime)}}
+    if(rmap&&Object.keys(rmap).length)setTimeout(()=>syncFilesDown(tok,rmap).catch(()=>{}),100);
     else if(f)LS.set('remote',f.modifiedTime);
     LS.set('syncAt',Date.now());S.settings.lastDrive=Date.now();if(action!=='none')S.settings.lastBackup=Date.now();DB.quiet=true;try{await DB.put('kv',S.settings,'settings')}finally{DB.quiet=false}
     const M={down:'Preneseni novejši podatki z Google Drive.',up:'Spremembe poslane v Google Drive.',merge:'Podatki te naprave in Google Drive so združeni in poslani.',none:'Vse je usklajeno z Google Drive.'};
@@ -5753,6 +5758,30 @@ let fmtBar=null,fmtEl=null;
 document.addEventListener('focusin',e=>{const el=e.target;if(!(el instanceof HTMLTextAreaElement)||!el.matches(FMT_SEL))return;fmtEl=el;if(!fmtBar){fmtBar=document.createElement('div');fmtBar.className='fmtbar';fmtBar.innerHTML='<button type="button" data-fmt="**" title="Krepko (Ctrl+B)"><b>B</b></button><button type="button" data-fmt="*" title="Ležeče (Ctrl+I)"><i>I</i></button><button type="button" data-fmt="__" title="Podčrtano (Ctrl+U)"><u>U</u></button>';fmtBar.addEventListener('mousedown',ev=>ev.preventDefault());fmtBar.addEventListener('click',ev=>{ev.stopPropagation();const b=ev.target.closest('[data-fmt]');if(b&&fmtEl)fmtWrap(fmtEl,b.dataset.fmt)})}el.parentElement.insertBefore(fmtBar,el);fmtBar.hidden=false});
 document.addEventListener('focusout',e=>{if(e.target===fmtEl)setTimeout(()=>{if(fmtBar&&document.activeElement!==fmtEl)fmtBar.hidden=true},150)});
 document.addEventListener('keydown',e=>{const el=e.target;if(!(e.ctrlKey||e.metaKey)||!(el instanceof HTMLTextAreaElement)||!el.matches(FMT_SEL))return;const k=e.key.toLowerCase();const m=k==='b'?'**':k==='i'?'*':k==='u'?'__':null;if(m){e.preventDefault();fmtWrap(el,m)}});
+
+/* ================= real-change detection (no sync for UI-only writes) ================= */
+const SIGS=new Map();
+const UI_KEYS=new Set(['lastQuote','navCol','driveView','divF','yearF','calSrc','mailVia','lastDrive','lastBackup','gcalLast','migSign2','prImg','authMode','lastBackupWarn','startView']);
+function sigOf(store,v,k){try{if(store==='quotes'&&v&&typeof ensureExtras==='function'){try{ensureExtras(v)}catch{}}if(store==='kv'&&k==='settings'){const o={};Object.keys(v||{}).forEach(x=>{if(!UI_KEYS.has(x))o[x]=v[x]});v=o}
+  let n=0;const s=JSON.stringify(v,(kk,vv)=>{if(kk==='updated')return undefined;if(typeof vv==='string'&&vv.length>300){n+=vv.length;return vv.length+':'+vv.slice(0,24)+vv.slice(-24)}return vv});return s.length+'|'+n+'|'+hashStr(s)}catch{return Math.random()+''}}
+function hashStr(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return h}
+function initSigs(){SIGS.clear();S.quotes.forEach(q=>SIGS.set('quotes:'+q.id,sigOf('quotes',q)));SIGS.set('kv:settings',sigOf('kv',S.settings,'settings'))}
+function dirtyCheck(store,v,k){if(store==='files')return markDirty();const key=store+':'+(k!==undefined?k:(v&&v.id));const sg=sigOf(store,v,k);if(SIGS.get(key)===sg)return;const had=SIGS.has(key);SIGS.set(key,sg);if(!had&&store==='kv'&&k!=='settings'&&!S.__loaded)return;markDirty()}
+
+/* ================= Google Drive: data without attachments + attachments incrementally ================= */
+async function backupBlobSync(){const d=backupData();d.fileMap=(await DB.get('kv','fileMap').catch(()=>null))||{};return new Blob([JSON.stringify(d)],{type:'application/json'})}
+async function fileMapGet(){return (await DB.get('kv','fileMap').catch(()=>null))||{}}
+async function fileMapSet(m){DB.quiet=true;try{await DB.put('kv',m,'fileMap')}finally{DB.quiet=false}}
+async function syncFilesUp(tok){const map=await fileMapGet();const all=(await DB.all('files')).filter(f=>!/^video/.test(f.type)&&!map[f.id]);if(!all.length||!S.settings.driveFolder)return 0;let n=0;
+  for(const f of all){SYNC.fmsg=`Pošiljam priloge ${++n}/${all.length}`;renderSyncPill();
+    const meta={name:`stik-priloga-${f.id}.json`,parents:[S.settings.driveFolder]};const fd=new FormData();fd.append('metadata',new Blob([JSON.stringify(meta)],{type:'application/json'}));fd.append('file',new Blob([JSON.stringify(f)],{type:'application/json'}));
+    try{const r=await withTimeout(fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{Authorization:'Bearer '+tok},body:fd}),120000);const j=await r.json();if(r.ok&&j.id){map[f.id]=j.id;await fileMapSet(map)}}catch{}}
+  SYNC.fmsg='';return n}
+async function syncFilesDown(tok,remoteMap){const local=await fileMapGet();const ids=Object.keys(remoteMap||{});const need=[];for(const id of ids){if(!(await DB.get('files',id)))need.push(id)}
+  Object.assign(local,remoteMap||{});await fileMapSet(local);if(!need.length)return 0;let n=0;
+  for(const id of need){SYNC.fmsg=`Prenašam priloge ${++n}/${need.length}`;renderSyncPill();try{const r=await withTimeout(fetch(`https://www.googleapis.com/drive/v3/files/${remoteMap[id]}?alt=media`,{headers:{Authorization:'Bearer '+tok}}),120000);if(r.ok){const rec=await r.json();DB.quiet=true;try{await DB.put('files',rec)}finally{DB.quiet=false}}}catch{}}
+  SYNC.fmsg='';renderSyncPill();return n}
+
 /* ================= toast ================= */
 function toast(msg,type='',ms=3500,action){
   const el=document.createElement('div');el.className='tst'+(type==='err'?' err':'');el.innerHTML=`<span>${esc(msg)}</span>`;
@@ -5820,7 +5849,9 @@ addEventListener('visibilitychange',()=>{if(document.hidden&&cur)saveQuoteNow()}
   ['go','openQuote','openOrder','openShip','openPO','openClaim'].forEach(navWrap);
   const rt=takeRedirectToken();if(rt){if(rt.error)setTimeout(()=>toast('Google prijava: '+rt.error+(rt.error==='redirect_uri_mismatch'?' – v Google Cloud dodaj naslov programa med Authorized redirect URIs (glej Nastavitve).':''),'err',12000),800);else setTimeout(()=>{if(rt.after==='cal')showCal();else syncNow()},600)}
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persisted().then(p=>{if(!p)navigator.storage.persist()})}catch{}
+  try{S.quotes.forEach(q=>{try{ensureExtras(q)}catch{}});initSigs();[['customers',S.customers],['prices',S.prices],['todos',S.todos],['orders',S.orders],['ships',S.ships],['campaigns',S.campaigns],['suppliers',S.suppliers],['pos',S.pos],['claims',S.claims],['mk',S.mk],['recs',S.recs],['events',S.events],['drive',S.drive],['comp',S.comp]].forEach(([k,v])=>SIGS.set('kv:'+k,sigOf('kv',v,k)))}catch{}S.__loaded=true;
   const v0=P.get('view');if(v0&&(NAV.some(n=>n[0]===v0)||v0==='list')){go(v0);return}
+
   go(S.settings.startView||'dash');try{history.replaceState({nr:['go',[S.settings.startView||'dash']]},'',location.search)}catch{}
   setTimeout(()=>{if(S.settings.driveId&&S.settings.gcalAuto!==false&&S.events.some(e=>e.dirty))gcalSync(true)},3000);
 })();
