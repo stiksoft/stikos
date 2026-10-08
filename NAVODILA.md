@@ -57,8 +57,13 @@ Pravila:
     - **Android:** Chrome → **⋮ → Namesti aplikacijo** (ali *Dodaj na začetni zaslon*);
     - **iPhone / iPad:** Safari → **Deli → Dodaj na začetni zaslon**.
 2. Odpri program z ikono → **Več → Nastavitve → Shranjevanje → Google Client ID** (kodo si pošlji po e-pošti in jo kopiraj).
-3. **Uskladi z Google Drive zdaj** – prenesejo se vsi podatki.
-4. Mape ne izbiraš.
+3. **Enkratna nastavitev v Google Cloud** (samo prvič, za vse telefone in tablice): na telefonu in tablici se Google prijava odpre v istem oknu (preusmeritev), ne v ločenem oknu.
+    - V *Nastavitve → Shranjevanje* je polje **Naslov za Google (Authorized redirect URI)**, npr. `https://stiksoft.github.io/stikos/`.
+    - V Google Cloud: **Clients →** tvoj klient → **Authorized redirect URIs → Add URI** → prilepi ta naslov → **Save**. Počakaj nekaj minut.
+4. **Uskladi z Google Drive zdaj** – odpre se Google prijava, po potrditvi se vrneš v program in prenesejo se vsi podatki.
+5. Mape ne izbiraš.
+
+Če se na telefonu pokaže napaka **redirect_uri_mismatch**, naslov iz koraka 3 ni vpisan v Google Cloud (ali se razlikuje – preveri poševnico na koncu). Če usklajevanje ne konča v 2 minutah, se prekine in izpiše vzrok.
 
 ### Vsakodnevno delo – samodejno usklajevanje
 
@@ -74,6 +79,10 @@ Pravila:
     - rdeče – napaka.
 - Če zapiraš program z neposlanimi spremembami, brskalnik opozori. Takrat klikni **Uskladi zdaj**.
 - Gumba *Pošlji podatke v Drive* in *Prenesi iz Drive* ostaneta za izjeme: na silo pošlji ali na silo prenesi (zamenjaj vse).
+- Program pošilja **samo, ko res spremeniš podatke**. Odpiranje ponudb, premikanje po meniju in podobno ne sproži usklajevanja.
+- **Priloge** (PDF-ji, slike in dokumenti v mapah) se pošljejo **ločeno in samo enkrat**. Pri vsakem usklajevanju gre v Drive le majhna datoteka s podatki, zato je hitro.
+- Druge naprave priloge prenesejo v ozadju; med tem gumb kaže *Prenašam priloge 3/20*.
+- Stanje na računalniku kaže ikona oblačka zgoraj, desno od imena programa (zelena, rumena, rdeča); podrobnosti vidiš, ko se z miško ustaviš na ikoni.
 
 Pri združevanju se zapis, ki si ga izbrisal na eni napravi, lahko vrne z druge naprave. Izbriši ga znova in uskladi. Pred vsakim združevanjem program shrani kopijo stanja te naprave.
 
@@ -88,7 +97,7 @@ Ikone ni treba ponovno nameščati. Podatki niso v datotekah programa, zato jih 
 
 ### Če se kaj zalomi
 
-- **Manjkajo stranke ali ponudbe:** preveri izbiro programa na vrhu menija (*Vsi programi*).
+- **Manjkajo stranke ali ponudbe:** preveri izbiro dejavnosti na vrhu menija (izbrano mora biti *Dejavnost*, kar pomeni vse dejavnosti).
 - **Napačni podatki po uskladitvi:** *Nastavitve → Shranjevanje → Obnovi (zamenjaj vse)* in izberi dnevno kopijo iz mape *Arhiv* na računalniku. Na Google Drive je pri datoteki tudi *Upravljanje različic*.
 - **Google javi napako pri prijavi:** glej poglavje *Dobro je vedeti* (napačen Client ID, program odprt z diska).
 
@@ -194,11 +203,17 @@ Enako deluje v **Ceniki → S povezave** (artikel v cenik) in pri gumbu **Slike 
 
 **Posrednik (priporočeno):** brskalniki iz varnostnih razlogov ne dovolijo, da stran bere druge strani, zato program uporablja posrednika. Brez nastavitve uporabi javne brezplačne posrednike, ki pa so včasih počasni. Lasten posrednik je brezplačen in zanesljiv:
 
-1. Registracija na **dash.cloudflare.com**.
-2. **Workers & Pages → Create → Create Worker**, ime npr. `stik-proxy`, **Deploy**.
-3. **Edit code**, izbriši vsebino, prilepi celoten `worker.js` iz paketa, **Deploy**.
-4. Kopiraj naslov Workerja (npr. `https://stik-proxy.tvoj-racun.workers.dev`).
-5. V programu **Nastavitve → Pobiranje s spletnih strani** → prilepi naslov → **Preizkusi** (mora pisati »Deluje.«).
+1. Registracija na **dash.cloudflare.com** (brezplačno; e-pošta in geslo, potrdi e-pošto).
+2. V meniju levo **Compute (Workers) → Workers & Pages** → modri gumb **Create application** (ali *Create*).
+3. Izberi **Start with Hello World!** → **Get started**.
+4. Pri *Worker name* vpiši ime, npr. `stik-proxy` → **Deploy**. Nastane Worker s preizkusnim besedilom *Hello World*.
+5. Klikni **Edit code** (zgoraj desno). Levo je datoteka `worker.js`: klikni v besedilo, **Ctrl+A** (Mac: Cmd+A) in **Delete**.
+6. Odpri `worker.js` iz paketa STIK Prodaja (z Beležnico / TextEdit), **Ctrl+A, Ctrl+C**, nato v Cloudflaru **Ctrl+V**.
+7. Zgoraj desno klikni **Deploy** → še enkrat **Deploy** (potrditev).
+8. Kopiraj naslov Workerja, ki je izpisan nad urejevalnikom ali na strani Workerja pri *Domains & Routes* (npr. `https://stik-proxy.tvoj-racun.workers.dev`).
+9. V programu **Nastavitve → Pobiranje s spletnih strani** → prilepi naslov → **Preizkusi** (mora pisati »Deluje.«).
+
+Skrivnosti (AI ključ `ANTHROPIC_KEY`, `BREVO_KEY`) dodaš na strani Workerja: **Settings → Variables and Secrets → Add** → *Type:* **Secret** → ime in vrednost → **Deploy**.
 
 V `worker.js` je seznam `ALLOWED` z dovoljenimi naslovi programa (že vsebuje `https://stiksoft.github.io`). Če program objaviš na drugem naslovu, ga dodaj v ta seznam.
 
@@ -714,7 +729,7 @@ Vse rubrike spodaj imajo enak način dela:
 - **Uvozi** – uvozne pošiljke: stanje, datumi, špediter, carinska deklaracija (MRN), vrednost, prevoz, carina, uvozni DDV. Program izračuna skupni strošek blaga.
 - **Transport izvajalci** – kurirji, špediterji, prevozniki s kontakti, pogodbami in ceniki.
 - **Certifikati** – homologacije, ECE, CE, TÜV … s številko, izdajateljem in datumom veljavnosti (opozorilo 60 dni prej).
-- **Montaže (postopki)** – navodila za montažo po izdelkih in vozilih: koraki, orodje, material, čas, opozorila, video in priloge.
+- **Montaže (postopki)** – od različice 24 so del **Tutorialov** (kategorija *montaža*, mapa *Montaža*). Obstoječi postopki so se prenesli sami.
 
 **Finance**
 
@@ -763,7 +778,7 @@ Klik na ime skupine jo **skrije ali prikaže** (»−« / »+«). Tako imaš na 
 
 **Ločeno vodenje po programih:**
 
-- Na vrhu menija je izbira **Vsi programi / PICKUPOPREMA / …**. Ko izbereš program, ponudbe, naročila, stranke, ceniki, montažni termini, poročila in statistika prikazujejo samo ta program.
+- Na vrhu menija je izbira **Dejavnost / PICKUPOPREMA / …** (*Dejavnost* = vse dejavnosti). Ko izbereš program, ponudbe, naročila, stranke, ceniki, montažni termini, poročila in statistika prikazujejo samo ta program.
 - Program nastaviš pri **stranki**, **ponudbi** (*Podatki ponudbe → Program*), **naročilu** (prenese se iz ponudbe), **artiklu v ceniku** ali za cel cenik (*Mape cenikov*) in pri **spletni strani**.
 - Nova ponudba in stranka dobita izbrani program samodejno. Na seznamih je program prikazan kot barvna oznaka.
 
@@ -919,7 +934,7 @@ Rubrika **Finance → Izpiski in plačila** ima zavihke **Bančni izpiski, Plač
 - **✉ Pošlji po e-pošti** pri vsaki datoteki ali povezavi pošlje povezavo ali opis stranki, npr. tutorial.
     - Na telefonu pošlje datoteko neposredno.
     - Na računalniku datoteko pripneš sam, zato je za velike videe najboljša povezava z Drive.
-- **Montaže (postopki)** in ostale evidence: slike, videe in dokumente povlečeš v okvir **Povleci … sem**. Povezave (Drive, YouTube) dodaš z **Dodaj povezavo** in jih pogledaš ali pošlješ po e-pošti.
+- **Tutoriali** (tudi montažni postopki) in ostale evidence: slike, videe in dokumente povlečeš v okvir **Povleci … sem**. Povezave (Drive, YouTube) dodaš z **Dodaj povezavo** in jih pogledaš ali pošlješ po e-pošti.
 - **Pregled Word in Excel datotek** je v programu (tehnična poročila, ceniki, dokumenti). **Uredi v Google Docs / Sheets** naloži datoteko v tvoj Google Drive kot Google dokument in ga odpre za urejanje. Ko končaš, klikni **Prenesi spremembe iz Google**, da se posodobljena različica shrani v program. Potrebuješ nastavljen Google Client ID (poglavje 14).
 
 ### AI – možnosti in stroški
@@ -1118,7 +1133,7 @@ Brez te nastavitve delujejo gumbi **Gmail (osnutek)** / **Outlook** (osnutek v b
 
 ### Pošiljanje tutorialov in drugih vsebin stranki
 
-V **Tutoriali**, **Montaže (postopki)**, **Tehnična poročila**, **Certifikati**, **Dokumenti**, **Logo in EPP tisk**, **Ideje**, **Sejmi** in **Sestanki** ima vsaka vrstica gumb **✉**:
+V **Tutoriali**, **Tehnična poročila**, **Certifikati**, **Dokumenti**, **Logo in EPP tisk**, **Ideje**, **Sejmi** in **Sestanki** ima vsaka vrstica gumb **✉**:
 
 1. Klikni **✉** pri vnosu (npr. tutorial).
 2. Odpre se okno *Pošlji e-pošto* z besedilom vnosa, povezavami (YouTube, Google Drive) in prilogami (datoteke vnosa).
@@ -1138,7 +1153,7 @@ Glej poglavje **Hitri začetek: namestitev, posodobitev in shranjevanje** na za�
 
 ### Ne vidim strank ali ponudb – preveri filter programa
 
-Če je na vrhu menija izbran program (npr. *PICKUPOPREMA*), program prikazuje samo zapise tega programa in zapise brez programa. Na seznamu ponudb se takrat pokaže moder trak *Prikazan je program …* z gumbom **Pokaži vse programe**.
+Če je na vrhu menija izbrana dejavnost (npr. *PICKUPOPREMA*), program prikazuje samo zapise te dejavnosti in zapise brez dejavnosti. Na seznamu ponudb se takrat pokaže moder trak *Prikazana je dejavnost …* z gumbom **Pokaži vse dejavnosti**. Vse dejavnosti vidiš, ko je izbrano **Dejavnost**.
 
 Podatki se ne izgubijo, so samo skriti. V prejšnji različici so bili pri izbranem programu skriti tudi zapisi brez programa (npr. uvožene stranke), kar je zdaj popravljeno.
 
@@ -1163,9 +1178,10 @@ Zelena kljukica pomeni, da je vse v redu. Rdeč klicaj pove, kaj je treba uredit
     - stranka se doda med Stranke;
     - postavke dobijo naziv, opis, količino in ceno;
     - slike iz Worda se pripnejo postavkam.
-- Z vklopljenim **AI** je pretvorba najboljša: AI prepozna kupca, postavke, cene brez DDV in pogoje. Brez AI program poišče vrstice s cenami. Po uvozu vedno preveri cene, DDV in slike.
-- Slik iz PDF program ne pobere. Dodaš jih z ✎ ali povezavo.
-- Stari format .doc najprej shrani kot .docx ali PDF.
+- Ponudbe iz STIK Prodaja (PDF, Word, HTML – različica 24 ali novejša) imajo v datoteki skrite podatke ponudbe, zato se uvozijo **v celoti** (izdelki, slike, cene, kupec, pogoji, izgled).
+- Druge PDF ponudbe (tudi *Natisni → Shrani kot PDF*) program prebere brez AI: kupca, številko, datum, postavke (naziv, opis, količino, ceno, popust) in **slike iz PDF** – vsako sliko pripne pravi postavki.
+- Z vklopljenim **AI** je pretvorba tujih oblik najboljša. Skenirane PDF (brez besedila) prebere samo AI; brez AI se strani dodajo kot slike. Po uvozu vedno preveri cene, DDV in slike.
+- Stari binarni format .doc najprej shrani kot .docx ali PDF.
 
 ### Povleci in spusti (drag & drop)
 
@@ -1267,13 +1283,228 @@ Meni **Prodaja → Tabele za Shopify** pripravi izdelke točno v obliki izvoza i
 - Program pripravi oglas s povezavo na stran izdelka (`/products/…`), naslovom, besedilom s ceno in ključnimi besedami.
 - Z **Napiši variante z AI** dobiš več različic besedil za izbrano platformo.
 
-## 25. Hitri kontrolni seznam za namestitev
+### Ponudbe – montaža pri artiklih, oblikovanje besedila
+
+**Montaža pri posameznem artiklu:**
+
+1. V oknu artikla (dodajanje ali urejanje) označi **Montaža za ta artikel**.
+2. Vpiši **ceno montaže brez DDV**. Označi **× količina**, če se montaža obračuna za vsak kos (npr. 2 kosa × 60 € = 120 €).
+3. Na koncu ponudbe se montaže vseh artiklov **seštejejo v eno postavko »Montaža«**, v opisu so zneski po artiklih.
+4. Če montaže pri artiklih ne želiš, jo dodaš kot doslej samo na koncu (*Montaža z materialom*). Obe možnosti lahko uporabiš tudi hkrati.
+
+**Krepko, ležeče, podčrtano:** v besedilih ponudbe (opis artikla, uvod, pogoji, opombe) se ob kliku v polje pokažejo gumbi **B**, *I* in U. Označi besedilo in klikni gumb, ali uporabi **Ctrl+B**, **Ctrl+I**, **Ctrl+U**. V polju se oblika prikaže z znaki (`**krepko**`, `*ležeče*`, `__podčrtano__`), v ponudbi in PDF pa kot pravo oblikovanje.
+
+**Vpis zneskov:** ko klikneš v polje za znesek ali količino, se vsebina označi in začneš kar tipkati, brez brisanja (npr. `0,00`).
+
+**Podpis** pod ponudbo je privzeto izklopljen. Vklopiš ga v *Izgled ponudbe → Podpis*, če ga želiš.
+
+**Noga ponudbe:** oznake, ki jih vstaviš s klikom (npr. `{podjetje}`, `{telefon}`), se vstavijo s presledkom pred in za oznako. Oznake, napisane ena za drugo, program v ponudbi loči s piko (·), več zaporednih presledkov pa ohrani.
+
+### Iskanje po celotnem programu
+
+- **Računalnik:** polje **Išči …** na vrhu menija ali tipki **Ctrl + K**.
+- **Telefon:** ikona lupe zgoraj desno ali **Več → Išči po programu**.
+
+Iščeš lahko po ponudbah (številka, kupec, izdelek), naročilih, strankah, cenikih (naziv, šifra), dobaviteljih, naročilih dobaviteljem, vseh evidencah (DFA, IFA, sejmi, certifikati …), datotekah v mapah, koledarju, opravilih in tabelah za Shopify. Klik na zadetek odpre zapis.
+
+### Pregled po letih, letno poročilo, zaključek leta in arhivi
+
+**Izbira leta** je na vrhu menija v isti vrstici kot iskanje (lupa) in izbira programa (na telefonu v **Več**): *Vsa leta / 2026 / 2025 …*
+
+- Ponudbe, naročila, evidence (DFA, IFA, potovanja, sejmi …), bančni izpiski, montažni termini in poročila prikazujejo samo izbrano leto.
+- Odprta naročila iz prejšnjih let ostanejo vidna, dokler niso zaključena.
+- Moder trak z gumbom **Pokaži vsa leta** opozarja, da je izbrano leto.
+- Stranke, ceniki, dobavitelji in zaloga niso vezani na leto in so vedno vidni.
+
+**Letno poročilo** (*Poročila → Letno poročilo* ali *Nastavitve → Arhivi po letih*):
+
+- **prodaja:** ponudbe, uspešnost, naročila, odprti zneski, po mesecih, po programih, najboljši kupci, najbolj prodajani izdelki, viri strank;
+- **finance:** izdani in prejeti računi (s neplačanim delom), prilivi in odlivi banke, gotovina, kartice, naročnine, službena potovanja, oglaševanje;
+- **poslovanje:** naročila dobaviteljem, reklamacije, vrednost zaloge;
+- **Excel** ali **Natisni / PDF**.
+
+**Zaključek leta** (gumb v letnem poročilu) je priporočljiv ob koncu leta, npr. v januarju:
+
+1. pokaže neplačane izdane in prejete račune ter odprta naročila, ki se prenesejo v novo leto;
+2. **Inventurni seznam** – natisni zalogo s praznim stolpcem za dejansko stanje;
+3. **Ustvari arhiv in zaključi leto** – arhiv vseh podatkov leta (`STIK-Prodaja-arhiv-2025.json`) se prenese na računalnik, shrani v mapo na disku in v Google Drive, če je prijava veljavna.
+
+Podatki v programu ostanejo. Stara leta skriješ z izbiro leta. Seznam arhivov je v **Nastavitve → Arhivi po letih**.
+
+## 25. Novosti v različici 24
+
+### Kako dobiti novo različico (podatki ostanejo)
+
+1. Na računalniku, kjer delaš, klikni **Uskladi zdaj** (oblaček nad menijem mora biti zelen).
+2. Odpri **github.com** → repozitorij `stikos` → **Add file → Upload files**.
+3. Iz ZIP paketa povleci v okno datoteke **`index.html`**, **`sw.js`**, **`NAVODILA.md`** in **`NAVODILA.pdf`** → spodaj **Commit changes**. `worker.js`, ikon in `manifest.webmanifest` ni treba nalagati (niso spremenjeni).
+4. Počakaj 1–2 minuti. Na **vsaki napravi** zapri program in ga odpri z ikono (na računalniku še **Ctrl + F5**, na Macu **Cmd + Shift + R**).
+5. Preveri, da je naložena nova različica: v meniju **Marketing → Spletne strani** mora biti zavihek **Povezave in raziskave**, izbira na vrhu menija pa se imenuje **Dejavnost**.
+6. Klikni **Uskladi zdaj**.
+
+Ob prvem zagonu program sam: združi podvojene mape (npr. v Tutorialih in Dokumentih), prestavi *Montaže – postopki* v *Tutoriale* in nastavi novi AI model za slike. Nič ni treba narediti ročno.
+
+### Ponudbe – cene, avans, DDV
+
+**Prikaz zneskov brez ali z DDV.** Na seznamu ponudb in pri izdelkih v ponudbi so zneski privzeto **brez DDV**. Z gumboma **Brez DDV / Z DDV** (zgoraj na seznamu in pod poljem za izdelke) preklopiš. Izbira se zapomni.
+
+**Cena ostane prazna (ne izpiše 0,00).** *6 Izgled ponudbe → Cene na ponudbi*:
+
+- **Prikaži vse** – kot doslej;
+- **Skrij 0,00** – izdelki brez cene nimajo zneska (namesto »0,00 €«);
+- **Skrij vse cene** – informativna ponudba brez zneskov in brez skupnega zneska.
+
+Ko je izbrano skrivanje, se pokažeta polji **Besedilo namesto cene** (npr. *Po dogovoru*) in **Besedilo na koncu ponudbe** (npr. *Cena bo določena po ogledu vozila.*). Besedilo na koncu se izpiše namesto skupnega zneska.
+
+Ceno lahko skriješ tudi **pri enem izdelku**: v oknu izdelka označi **Ne izpiši cene tega izdelka** in po želji vpiši **Besedilo namesto cene**.
+
+**Avans izklopljen.** *5 Plačilo in pogoji →* **Brez avansa**. Avans se ne izpiše, vrstice o avansu v pogojih pa se same zamenjajo z *Plačilo: celoten znesek (…) ob prevzemu oz. po dogovoru*. Za vse nove ponudbe: *Nastavitve → Privzete vrednosti → Nove ponudbe brez avansa*.
+
+### Ponudbe – uvoz PDF in povleci in spusti
+
+- **Ponudbe → Uvozi ponudbo** ali povleci PDF na seznam ponudb. Program prebere kupca, številko, datum, postavke (naziv, opis, količino, ceno, popust) in **slike** iz PDF.
+- Vsak PDF, Word in HTML, ki ga ustvari STIK Prodaja 24, vsebuje skrite podatke ponudbe – uvoz je **natančna kopija** (tudi slike, izgled in pogoji). Če ponudba s to številko že obstaja, program vpraša, ali jo odpre ali uvozi kot kopijo.
+- **PDF ali Word povlečeš v odprto ponudbo** (v korak *2 Izdelki*) – postavke se **dodajo** v to ponudbo.
+- **Slike WebP**, AVIF, PNG, JPG, GIF se prepoznajo vedno (tudi če jih brskalnik ne označi pravilno). Slike s telefona v obliki HEIC Chrome ne zna odpreti – na iPhonu jih pošlji kot *Najbolj združljivo* (JPG).
+- **Najprej slika, nato besedilo:** povleci sliko v *Izdelki* → odpre se okno izdelka. Nato v to okno povleci (ali prilepi) besedilo: prva vrstica postane naziv (če je prazen), ostalo gre v opis. Povlečeš lahko tudi povezavo do izdelka – program doda naziv, opis, ceno in slike, ki še manjkajo.
+- Sliko lahko povlečeš naravnost **s spletne strani** (iz drugega zavihka) – vzame se slika, ne stran.
+
+### Glava in noga po dejavnostih
+
+**Podjetje → 5 Glava in noga po dejavnostih.** Za vsako dejavnost (npr. PICKUP OPREMA, ELEKTROMATERIAL, MULTIMEDIA) označi **Ta dejavnost ima svojo glavo in nogo ponudbe** in vpiši, kar je drugače kot pri podjetju:
+
+- prikazno ime, **spletna stran**, e-pošta, telefon, kontaktna oseba;
+- **logotip dejavnosti**;
+- dodatna vrstica v glavi ali lastno besedilo glave;
+- **noga levo / desno** (prazno = noga podjetja).
+
+Ponudba dobi glavo in nogo dejavnosti, ki je izbrana v *4 Podatki ponudbe → Dejavnost*. Z gumbom **Pokaži v predogledu** vidiš rezultat desno. Enako velja za **Cenik builder** (izbira *Dejavnost (glava cenika)*).
+
+**Noga – presledki:** oznake, napisane ena za drugo (`{podjetje}{splet}`), program v ponudbi loči s piko: *STIK trgovina d.o.o. · pickupoprema.si*. Med oznakami lahko vstaviš tudi ločilo **·** ali **|** (gumba med oznakami). Več presledkov zaporedoma se ohrani.
+
+### Meni »Dejavnost« in krajši meni
+
+- Izbira na vrhu menija se zdaj imenuje **Dejavnost** (prej *Vsi programi*). *Dejavnost* = vse dejavnosti; izberi eno, da vidiš samo njo.
+- Meni je nižji (manjši razmiki), zato je na prenosniku viden skoraj v celoti brez drsenja.
+- **Montaže – postopki** ni več v meniju: postopki so v **Dokumenti → Tutoriali** (kategorija *montaža*, mapa *Montaža*).
+
+### Ikona »i« – pojasnila
+
+Ob zahtevnejših možnostih je majhna ikona **i**. Na računalniku se pojasnilo pokaže, ko se z miško ustaviš na njej, na telefonu se dotakneš ikone. Pojasnilo zapreš s klikom drugam ali tipko Esc. Pojasnila so npr. pri: Izgled in cene ponudbe, Avans, Transport in montaža, Mape in datoteke / Evidenca, Marketing (kako začeti), Uskladitev cen, Tabele za Shopify, Bančni izpiski, Nastavitve (shranjevanje, AI, posrednik), Glava in noga, Dobavitelji (geslo, akcije).
+
+### Spletne strani – povezave in raziskave
+
+**Marketing → Spletne strani** ima tri zavihke:
+
+- **Povezave in raziskave** (nov, privzet) – shranjene spletne strani z opombami, razvrščene po **temah**;
+- **Mape in datoteke**;
+- **Lastna spletna mesta** (prej *Evidenca*) – tvoje domene, gostovanje, roki podaljšanj.
+
+Kako uporabljati *Povezave in raziskave*:
+
+1. Povezavo **povleci** iz naslovne vrstice brskalnika (ali zavihek) na seznam ali jo **prilepi** v polje zgoraj → **Shrani povezavo**. Program sam prebere naslov strani.
+2. Povezavo povleci na **temo** levo (npr. *Konkurenca*, *Dobavitelji in proizvajalci*, *Ideje za izdelke*, *Zakonodaja in predpisi*), da jo razvrstiš. **Nova tema** doda svojo (npr. *Strešni kovčki 2027*).
+3. **✎** – naslov, tema, **oznake** (npr. `akcija, LED`) in **opombe** (cene, kontakti, ugotovitve).
+4. Klik na naslov odpre stran v novem zavihku. **☆** označi priljubljene, **⧉** kopira povezavo, **✕** izbriše (z razveljavitvijo).
+5. Pri izbrani temi je rumeno polje za **cilj in ugotovitve raziskave**, gumb **Odpri vse** pa odpre vse strani teme.
+6. **Iskanje** išče po naslovu, opombah in oznakah; razvrstiš po datumu, abecedi ali največkrat odprtih.
+7. **Uvozi** prebere zaznamke iz brskalnika (Chrome: *Zaznamki → Upravitelj zaznamkov → ⋮ → Izvozi zaznamke* → datoteka .html; mape zaznamkov postanejo teme) ali Excel/CSV s stolpcem povezav. **Excel** izvozi vse povezave.
+
+Če povlečeš samo besedilo (brez povezave), ga program shrani kot beležko.
+
+### Povleci povezave in opombe – povsod
+
+- **Mape in datoteke** (vse rubrike): povezava → nova povezava v mapi; besedilo → nova beležka. Spustiš lahko tudi na ime mape.
+- **Okno zapisa** (DFA, naročnine, sejmi, tutoriali …): povezava → med *povezave* zapisa (ali v polje *Povezava*); besedilo → v opombe.
+- **Dobavitelj:** povezava → nova vrstica v *Povezave in akcije*.
+- **Opravila:** povezava ali besedilo, spuščeno v *Opravila*, ustvari novo opravilo za danes.
+- **Uskladitev cen:** povezave do artiklov ali kategorij (glej spodaj).
+- **Ponudba:** slike, besedilo, povezave, PDF in Word.
+
+Vsa polja *Povezava* imajo gumb za odpiranje, v tabelah pa je povezava klikljiva (izpiše se domena).
+
+### Opravila s povezavo
+
+Pri opravilu vpiši povezavo (klikni opravilo → **Povezava**) ali jo napiši kar v besedilo novega opravila (npr. *Preveri ponudbo https://…*) – program jo loči od besedila. Na seznamu je povezava klikljiva.
+
+### Naročnine s povezavami
+
+Naročnine imajo polji **Povezava (stran / prijava)** in **Uporabniško ime**, pri priponkah pa še **Dodaj povezavo** (npr. račun, pogodba). Povezava je v tabeli klikljiva.
+
+### Dobavitelji – prijava v portal, povezave in akcije
+
+**Nabava → Dobavitelji →** dobavitelj:
+
+- **Uporabniško ime** in **Geslo** za B2B portal ali spletno trgovino dobavitelja. Gumb **👁** pokaže geslo, **⧉** ga kopira.
+    - Geslo je shranjeno v programu na tej napravi in v varnostni kopiji (Google Drive, mapa na disku). Za zelo pomembne račune (banka) raje uporabi upravitelja gesel.
+- **Povezave in akcije:** opis (npr. *Akcija LED do 30.11.*), povezava in datum **velja do**. Na seznamu dobaviteljev je oznaka s številom veljavnih povezav in akcij.
+
+### Garancije in reklamacije – brisanje
+
+Na seznamu reklamacij je v vsaki vrstici **✕** (z razveljavitvijo), v odprti reklamaciji pa gumb **🗑** zgoraj desno.
+
+### Dokumenti – arhiv podjetja in izbira mape
+
+**Dokumenti** (Dokumentacijski sistem) je arhiv dokumentov podjetja: dokumenti, poslani računovodji, ročno dodani in uvoženi.
+
+- Ko pri **DFA**, **Računovodstvu**, **Izpiskih** ali **IFA** dodaš datoteko, program jo shrani tudi v Dokumente. **Prvič te vpraša, v katero mapo** (predlaga npr. *DFA prejeti računi*). Lahko izbereš drugo mapo, ustvariš novo ali izbereš *Ne shrani v Dokumente*. Z **Zapomni si** program naslednjič ne sprašuje.
+- Pravila vidiš in brišeš v **Nastavitve → Dokumenti – kam se shranjujejo**.
+- Ko datoteke naložiš v glavno mapo Dokumentov (ne v podmapo), program vpraša, v katero mapo jih shrani.
+- Ko PDF račune **povlečeš v evidenco** (npr. DFA plačila), program vpraša, kaj naj naredi: *Nov zapis za vsak dokument* (priloži PDF), *Shrani v Dokumente* ali *Preberi kot tabelo*. Excel in CSV se kot doslej uvozita v seznam.
+
+**Podvojene mape** (v Tutorialih in Dokumentih so se pojavljale dvakrat, ker je vsaka naprava ustvarila svoje privzete mape) program ob zagonu in pri vsakem usklajevanju združi v eno – vsebina obeh ostane. Izbrisane mape in datoteke se po novem ne vračajo z drugih naprav.
+
+### Tutoriali – nova struktura
+
+Mape: **Montaža**, **Uporaba izdelkov**, **Program STIK Prodaja**, **Prodaja in svetovanje**, **Varnost pri delu**, **Za stranke**. Seznam navodil ima kategorije (filter zgoraj) in polja za izdelek, vozilo, čas, korake, orodje in material, opozorila ter video povezavo.
+
+### Cenik builder – stolpci
+
+V **Ceniki → Cenik builder → Stolpci in vrstni red** izbereš stolpce in jih s puščicama razvrstiš, npr. **Slika – Šifra – Naziv – Cena brez DDV – Rabat – Cena z DDV – Pakiranje**. Na voljo so še *Cena z rabatom brez DDV*, *Kratek opis*, *Enota* in tvoji dodatni stolpci.
+
+- **Rabat** vpišeš v polje *Popust / rabat (%)*; stolpec *Cena z DDV* je nato že znižan.
+- **Pakiranje** vpišeš pri artiklu (*Uredi artikel → Pakiranje*) ali uvoziš iz stolpca *Pakiranje* v Excel ceniku.
+- **Excel** izvozi sestavljeni cenik s temi stolpci. Shranjene cenike izbrišeš s ✕.
+
+### Uskladitev cen – hitra primerjava brez AI
+
+1. **Moja trgovina:** vpiši naslov svoje trgovine.
+2. **Povleci povezave** v okvir *Hitra primerjava* (ali jih prilepi in klikni **Preberi**):
+    - povezava do **artikla** prebere naziv, šifro in ceno;
+    - povezava do **kategorije** prebere vse artikle na strani;
+    - povezave iz tvoje trgovine gredo med *Moje artikle*, ostale med artikle konkurence.
+3. Pri konkurenci klikni **Vsi artikli** – prebere vse artikle trgovine (Shopify) oziroma prvo stran.
+4. Tabela pokaže za vsak tvoj artikel najnižjo ceno pri konkurenci in razliko v %. Artikli se povežejo **po šifri** ali **po nazivu**. *Preveri* pomeni delno ujemanje. **✕** odstrani napačen par, **izberi ročno** poveže pravega.
+5. **Pregled artiklov konkurence** pokaže vse prebrane artikle z iskanjem in izvozom v Excel.
+
+*Preveri cene z AI* ostane za iskanje po celem spletu.
+
+### AI model za slike
+
+*Nastavitve → Opisi izdelkov in AI → Model za slike* je zdaj **Nano Banana 2 (gemini-3.1-flash-image)**, na izbiro sta še *Lite* (cenejši) in starejši model.
+
+## 26. Uvoz in izvoz – kako pravilno (brez napak)
+
+Ob vsakem gumbu za uvoz je gumb **?** z enakimi navodili.
+
+1. **Najprej varnostna kopija.** Pred večjim uvozom: *Nastavitve → Shranjevanje → Ročna varnostna kopija → Shrani kopijo*.
+2. **Prva vrstica so naslovi stolpcev** (npr. *Šifra, Naziv, Cena brez DDV, DDV %, Enota*). Nad tabelo ne sme biti praznih vrstic ali logotipa, celice niso združene.
+3. **En list.** Program prebere prvi list Excela.
+4. **Datumi** kot datum (`31.12.2026` ali `31/12/2026`), **zneski** kot številke (`1234,50`) – brez besedila v isti celici.
+5. **Preveri okno za uvoz:** izberi vrstico z naslovi in pri vsakem polju preveri izbrani stolpec. Spodaj je predogled prvih vrstic. Šele nato **Uvozi**.
+6. **PDF in Word** se preberejo kot tabela. Pri skeniranih ali nejasnih PDF klikni **Prepoznaj z AI**.
+7. **Ponoven uvoz** istega cenika artikle z isto šifro posodobi, ne podvoji. Stranke z enakim nazivom se dopolnijo.
+8. **Izvoz v Excel/CSV** je za računovodstvo, tisk in arhiv. Za prenos **vseh** podatkov na drug računalnik uporabi varnostno kopijo (`.json`) ali Google Drive, ne Excela.
+9. **CSV za Shopify** izvažaj samo iz *Tabele za Shopify*.
+10. **Ponudbe** izvozi kot PDF (iz programa, ne *Natisni*), če jih želiš kasneje uvoziti nazaj 1 : 1.
+
+## 27. Hitri kontrolni seznam za namestitev
 
 1. **GitHub Pages:** naloži vse datoteke iz ZIP v repozitorij (poglavje 1). Pri posodobitvi zamenjaj `index.html`, `sw.js` in `worker.js`.
 2. **Cloudflare Worker** (neobvezno, a priporočeno):
     - v Worker prilepi `worker.js` → **Deploy**;
     - dodaj skrivnosti `ANTHROPIC_KEY` (AI) in `BREVO_KEY` (e-pošta);
-    - naslov Workerja vpiši v *Nastavitve → Posrednik*.
+    - naslov Workerja vpiši v *Nastavitve → Pobiranje s spletnih strani* (koraki v poglavju 3).
 3. **Google Cloud:** projekt, Google Drive API in Google Calendar API, zaslon za soglasje s testnim uporabnikom, OAuth Client ID za `https://stiksoft.github.io` (poglavje 14).
 4. **Vsaka naprava:**
     - namesti aplikacijo (poglavje 2);
@@ -1283,7 +1514,7 @@ Meni **Prodaja → Tabele za Shopify** pripravi izdelke točno v obliki izvoza i
 6. **Podjetje:** logotip, podatki, glava in noga dokumentov; *Nastavitve*: DDV, rok dobave, cena ure montaže, garancija, plačilni rok.
 7. **Po posodobitvi:** stran enkrat osveži (Ctrl+F5 na računalniku; na telefonu aplikacijo zapri in znova odpri). Podatki ostanejo.
 
-## 26. Dobro je vedeti
+## 28. Dobro je vedeti
 
 **Google javi »Access blocked … doesn't comply with Google's OAuth 2.0 policy … Error 400: invalid_request«:** program je odprt **z dvoklikom na datoteko `index.html` na disku** (naslov v brskalniku se začne s `file:///`). Google prijave za datoteke z diska ne dovoli.
 
