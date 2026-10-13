@@ -2508,6 +2508,7 @@ function showSettings(){
   if(cur)saveQuoteNow();cur=null;setNav('settings');topSimple('Nastavitve');show('#vSet');
   const st=S.settings,c=st.company;
   $('#vSet').innerHTML=`<div class="wrap"><div class="list-head"><h1>Nastavitve</h1></div><div class="set-grid">
+  <div class="panel aspan"><h2>Shranjevanje v oblak (Google Drive)</h2>${asPanelHTML()}</div>
   <div class="panel"><h2>Podjetje, glava in noga</h2><p>Podatki podjetja, logotip, glava in noga ponudbe se urejajo v razdelku <b>Podjetje</b>.</p><button class="btn" data-go="company">${ic('building')}Odpri Podjetje</button></div>
   <div class="panel"><h2>Privzete vrednosti</h2><p>Veljajo za nove ponudbe.</p>
     <div class="row">${sf('Naslednja št. ponudbe','nextNumber')}${sf('DDV %','vat',{num:1})}</div>
@@ -2531,7 +2532,7 @@ function showSettings(){
       <div class="inline"><button class="btn" id="pickDir">${ic('folder')}${S.dir?'Zamenjaj mapo':'Izberi mapo'}</button>${S.dir&&bkState==='paused'?`<button class="btn sig" id="bkResume">Nadaljuj</button>`:''}${S.dir?`<button class="btn ghost" id="forgetDir">Izklopi</button>`:''}</div>
       <p class="help">Po vsaki spremembi se v mapo zapiše <code>STIK-Prodaja-podatki.json</code>, enkrat dnevno še datirana kopija. Če izbereš mapo <b>Google Drive za namizje</b> (npr. <code>G:\\Moj disk\\STIK</code>) ali OneDrive/iCloud, so podatki samodejno tudi v oblaku. V tej mapi se shranjujejo tudi PDF-ji ponudb.</p>`
       :`<p class="help">Ta brskalnik ne omogoča samodejnega zapisa v mapo (to zmoreta Chrome in Edge na računalniku). Uporabi Google Drive ali ročno kopijo spodaj.</p>`}
-    <div class="sub">2. Google Drive – prenos med napravami (telefon ↔ računalnik)</div>
+    <div class="sub">2. Google Drive – ročno (stari način; potreben samo, če ne uporabljaš samodejnega shranjevanja)</div>
     ${sf('Google Client ID','driveId',{ph:'xxxx.apps.googleusercontent.com'})}
     <div class="row" style="margin-top:8px">${sf('Google koledar (ID ali primary)','gcalId',{ph:'primary'})}<label class="chk" style="align-self:end"><input type="checkbox" data-s="gcalMont" ${st.gcalMont?'checked':''}>Montaže vpiši v Google koledar</label></div>
     <div class="inline" style="margin-top:8px"><button class="btn" id="drvUp"${st.driveId?'':' disabled'}>${ic('cloud')}Pošlji podatke v Drive</button><button class="btn" id="drvDown"${st.driveId?'':' disabled'}>${ic('download')}Prenesi iz Drive</button></div>
@@ -2630,13 +2631,13 @@ function renderNav(){
   const n=todoDueCount();let g=null;
   const col=S.settings.navCol||{};
   const lg=S.settings.navLogo&&S.settings.company.logo;
-  $('#nav').innerHTML=`<div class="brandrow"><div class="brand${lg?' haslogo':''}" data-go="dash">${lg?`<img class="navlogo" src="${esc(S.settings.company.logo)}" alt="${esc(S.settings.company.name||'')}">`:`${MARK}<span>STIK Prodaja</span>`}</div><div class="navarr">${S.settings.driveId?`<button class="syncpill mini" title="Google Drive">${ic('cloud')}<span></span></button>`:''}<button class="btn sm ghost icon" id="navBack" title="Nazaj (tudi stranski gumb miške)" aria-label="Nazaj">‹</button><button class="btn sm ghost icon" id="navFwd" title="Naprej" aria-label="Naprej">›</button></div></div>
+  $('#nav').innerHTML=`<div class="brandrow"><div class="brand${lg?' haslogo':''}" data-go="dash">${lg?`<img class="navlogo" src="${esc(S.settings.company.logo)}" alt="${esc(S.settings.company.name||'')}">`:`${MARK}<span>STIK Prodaja</span>`}</div><div class="navarr">${(S.settings.driveId||asOn())?`<button class="syncpill mini" title="Google Drive">${ic('cloud')}<span></span></button>`:''}<button class="btn sm ghost icon" id="navBack" title="Nazaj (tudi stranski gumb miške)" aria-label="Nazaj">‹</button><button class="btn sm ghost icon" id="navFwd" title="Naprej" aria-label="Naprej">›</button></div></div>
   <div class="navtools${divs().length?'':' two'}"><button class="gsearch" id="gSearch" title="Iskanje po programu (Ctrl+K)" aria-label="Iskanje">${ic('search')}</button>${yearSelect('yearSel')}${divs().length?`<select class="divsel" id="divSel" aria-label="Dejavnost" title="Izberi dejavnost (prodajni program). »Dejavnost« = vse dejavnosti."><option value="">Dejavnost</option>${divs().map(d=>`<option value="${d.id}"${S.settings.divF===d.id?' selected':''}>${esc(d.name)}</option>`).join('')}</select>`:''}</div><div class="navs">
   ${NAV.map(([k,l,i,grp,sh])=>{const h=grp!==g?(g=grp,grp?`<div class="ng${col[grp]?' col':''}" data-ngc="${grp}">${grp}<span>${col[grp]?'+':'−'}</span></div>`:''):'';if(grp&&col[grp]&&navOn!==k)return h;const cnt=k==='todo'?n:k==='montaze'?S.orders.filter(o=>!o.deleted&&!o.cancelled&&!o.done&&(o.type||'montaza')==='montaza'&&o.planned&&o.planned<=isoAdd(today(),7)).length:k==='list'?S.quotes.filter(q=>q.status==='poslano'&&!orderOf(q)).length:k==='dfa'?(S.recs.dfa||[]).filter(r=>payDue(r)==='zapadlo').length:0;
     return `${h}<a data-go="${k}" data-nav="${k}" class="${navOn===k?'on':''}${MOB_MAIN.includes(k)?' mm':' mx'}" title="${l}">${ic(i)}<span><i class="d">${l}</i><i class="m">${sh||l}</i></span>${cnt?`<em class="${k==='todo'||k==='dfa'?'badge':'cnt2'}">${cnt}</em>`:''}</a>`}).join('')}</div>
   <a class="morebtn${MOB_MAIN.includes(navOn)?'':' on'}" data-morenav>${ic('menu')}<span>Več</span></a>`;
   if(!$('#gsFloat')){const g=document.createElement('button');g.id='gsFloat';g.className='gsearch';g.setAttribute('aria-label','Iskanje');g.innerHTML=ic('search');document.body.appendChild(g)}
-  let fl=$('#syncFloat');if(S.settings.driveId){if(!fl){fl=document.createElement('button');fl.id='syncFloat';fl.className='syncpill';fl.innerHTML=`${ic('cloud')}<span></span>`;document.body.appendChild(fl)}}else if(fl)fl.remove();
+  let fl=$('#syncFloat');if(S.settings.driveId||asOn()){if(!fl){fl=document.createElement('button');fl.id='syncFloat';fl.className='syncpill';fl.innerHTML=`${ic('cloud')}<span></span>`;document.body.appendChild(fl)}}else if(fl)fl.remove();
   setTimeout(renderSyncPill,0);
 }
 function setNav(k,detail){navOn=k;document.body.classList.toggle('editing',k==='edit');document.body.classList.toggle('detail',!!detail);renderNav()}
@@ -3790,7 +3791,7 @@ async function restoreAll(j){
   S.orders=j.orders||[];await saveOrders();S.ships=j.ships||[];await saveShips();S.campaigns=j.campaigns||[];await saveCampaigns();
   S.suppliers=j.suppliers||[];await saveSup();S.pos=j.pos||[];await savePO();S.claims=j.claims||[];await saveClaims();S.mk=mergeDeep(DEF_MK,j.mk||{});await saveMk();S.recs=j.recs||{};await saveRecsNow();S.events=j.events||[];await saveEvents();S.drive=j.drive||{};await saveDrive();S.comp=j.comp||{sites:[],items:[]};await saveComp();S.shopMeta=j.shopMeta||null;await DB.put('kv',S.shopMeta,'shopMeta');
   for(const f of j.files||[])await DB.put('files',f);
-  if(j.settings){const keep={driveId:S.settings.driveId,driveFolder:S.settings.driveFolder,aiKey:S.settings.aiKey};S.settings=mergeDeep(DEF_SETTINGS,j.settings);Object.assign(S.settings,keep);await DB.put('kv',S.settings,'settings')}
+  if(j.settings){const keep={driveId:S.settings.driveId,driveFolder:S.settings.driveFolder,aiKey:S.settings.aiKey,as:S.settings.as};S.settings=mergeDeep(DEF_SETTINGS,j.settings);Object.assign(S.settings,keep);await DB.put('kv',S.settings,'settings')}
   renderNav();
 }
 let bkState='';
@@ -6426,6 +6427,181 @@ document.addEventListener('click',async e=>{const t=e.target;if(!t.closest||!t.c
   const pk=t.closest('[data-cppick]');if(pk){compPick(+pk.dataset.cppick);return}
   const ls=t.closest('[data-cpload]');if(ls){compLoadSite(+ls.dataset.cpload);return}});
 
+/* ================= v25: samodejno shranjevanje v Google Drive (Apps Script) – vse naprave, brez klikov ================= */
+const AS_CODE="/**\n * STIK Prodaja – samodejno shranjevanje v Google Drive (Google Apps Script)\n * Namestitev: glej NAVODILA → »Samodejno shranjevanje na vse naprave«.\n * Podatki so v tvojem Google Drive, v mapi »STIK Prodaja – sinhronizacija«.\n * Spodnje geslo je ustvaril program STIK Prodaja – ne spreminjaj ga.\n */\nconst GESLO = '__GESLO__';\nconst MAPA = 'STIK Prodaja – sinhronizacija';\nconst VER = 1;\n\nfunction doGet() { return out_({ ok: true, app: 'stik-sync', v: VER, msg: 'STIK Prodaja – sinhronizacija deluje.' }); }\nfunction doPost(e) {\n  let q;\n  try { q = JSON.parse(e.postData.contents); } catch (x) { return out_({ err: 'neveljavna zahteva' }); }\n  if (!q || q.k !== GESLO) return out_({ err: 'geslo' });\n  try { return out_(handle_(q, driveStore_())); } catch (x) { return out_({ err: String((x && x.message) || x) }); }\n}\nfunction out_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }\n/** Zaženi enkrat ročno (gumb ▶ Zaženi), da Google vpraša za dovoljenje. */\nfunction preizkus() { const st = driveStore_(); Logger.log('Mapa: ' + st.folder().getName() + ', različica podatkov: ' + st.rev()); }\n\n/* ---------- logika (neodvisna od Drive) ---------- */\nconst MAXOUT = 6e6;\nfunction hs_(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return h >>> 0; }\nconst BIG_ = { quotes: 7, prices: 7, recs: 7, files: 7, drive: 3, customers: 3, orders: 3 };\nfunction shardOf_(key) { const c = String(key).split('/')[0].replace(/[^a-z0-9]/gi, '') || 'x'; return c + '.' + (hs_(String(key)) & (BIG_[c] || 0)); }\nfunction handle_(q, st) {\n  const a = q.a;\n  if (a === 'ping' || a === 'rev') return { ok: true, v: VER, rev: st.rev(), at: st.prop('at') || '' };\n  if (a === 'pull') {\n    const since = +q.since || 0, rev = st.rev();\n    if (since >= rev) return { rev: rev, chg: [], more: false };\n    const sv = st.sv(), names = Object.keys(sv).filter(function (n) { return sv[n] > since; }).sort();\n    let start = q.cur ? names.indexOf(q.cur) : 0; if (start < 0) start = 0;\n    const chg = []; let size = 0, next = null;\n    for (let i = start; i < names.length; i++) {\n      if (size > MAXOUT && chg.length) { next = names[i]; break; }\n      const d = st.load(names[i]);\n      Object.keys(d.recs).forEach(function (k) { const x = d.recs[k]; if (x.v > since) { chg.push({ key: k, v: x.v, h: x.h, r: x.r }); size += JSON.stringify(x.r).length + 80; } });\n      Object.keys(d.dels).forEach(function (k) { if (d.dels[k] > since && !d.recs[k]) chg.push({ key: k, v: d.dels[k], del: 1 }); });\n    }\n    return { rev: rev, chg: chg, more: !!next, cur: next };\n  }\n  if (a === 'push') {\n    return st.lock(function () {\n      const base = +q.base || 0, rev0 = st.rev(), rev = rev0 + 1, mine = {}, conflicts = [], byShard = {};\n      (q.ch || []).forEach(function (c) { mine[c.key] = 1; const s = shardOf_(c.key); (byShard[s] = byShard[s] || []).push(c); });\n      const sv = st.sv(); let wrote = 0;\n      Object.keys(byShard).forEach(function (s) {\n        const d = st.load(s); let ch = false;\n        byShard[s].forEach(function (c) {\n          const cur = d.recs[c.key], dv = d.dels[c.key] || 0, sv2 = cur ? cur.v : dv;\n          if (sv2 > base && !(cur && cur.h === c.h) && !(!cur && c.del && dv)) { conflicts.push(cur ? { key: c.key, v: cur.v, h: cur.h, r: cur.r } : { key: c.key, v: dv, del: 1 }); return; }\n          if (c.del) { if (cur || !dv) { delete d.recs[c.key]; d.dels[c.key] = rev; ch = true; } }\n          else if (!cur || cur.h !== c.h) { d.recs[c.key] = { v: rev, h: c.h, r: c.r }; delete d.dels[c.key]; ch = true; }\n        });\n        if (ch) { st.save(s, d); sv[s] = rev; wrote++; }\n      });\n      if (wrote) { st.setSv(sv); st.setRev(rev); st.setProp('at', new Date().toISOString()); st.setProp('dev', q.dev || ''); st.snapshot && st.snapshot(); }\n      const newRev = wrote ? rev : rev0;\n      /* spremembe drugih naprav po »base« */\n      const others = [];\n      Object.keys(sv).filter(function (n) { return sv[n] > base; }).forEach(function (n) {\n        const d = st.load(n);\n        Object.keys(d.recs).forEach(function (k) { const x = d.recs[k]; if (x.v > base && !mine[k]) others.push({ key: k, v: x.v, h: x.h, r: x.r }); });\n        Object.keys(d.dels).forEach(function (k) { if (d.dels[k] > base && !d.recs[k] && !mine[k]) others.push({ key: k, v: d.dels[k], del: 1 }); });\n      });\n      return { rev: newRev, conflicts: conflicts, chg: others };\n    });\n  }\n  if (a === 'bhas') { const idx = st.bidx(); return { miss: (q.hs || []).filter(function (h) { return !idx[h]; }) }; }\n  if (a === 'bput') {\n    return st.lock(function () { const idx = st.bidx(); let n = 0; (q.b || []).forEach(function (x) { if (!idx[x.h] && typeof x.d === 'string') { idx[x.h] = st.bwrite(x.h, x.d); n++; } }); if (n) st.setBidx(idx); return { ok: true, n: n }; });\n  }\n  if (a === 'bget') { const idx = st.bidx(), b = {}; let size = 0; (q.hs || []).forEach(function (h) { if (idx[h] && size < MAXOUT) { const d = st.bread(idx[h]); if (d != null) { b[h] = d; size += d.length; } } }); return { b: b }; }\n  if (a === 'info') { const sv = st.sv(); return { rev: st.rev(), shards: Object.keys(sv).length, blobs: Object.keys(st.bidx()).length, at: st.prop('at') || '', dev: st.prop('dev') || '' }; }\n  return { err: 'neznano dejanje' };\n}\n\n/* ---------- shramba v Google Drive ---------- */\nfunction driveStore_() {\n  const P = PropertiesService.getScriptProperties();\n  const cache = {};\n  function folder() { let id = P.getProperty('folder'); if (id) { try { const f = DriveApp.getFolderById(id); if (!f.isTrashed()) return f; } catch (x) {} } const it = DriveApp.getFoldersByName(MAPA); const f = it.hasNext() ? it.next() : DriveApp.createFolder(MAPA); P.setProperty('folder', f.getId()); return f; }\n  function sub(name) { const key = 'sub_' + name; let id = P.getProperty(key); if (id) { try { return DriveApp.getFolderById(id); } catch (x) {} } const fo = folder(); const it = fo.getFoldersByName(name); const f = it.hasNext() ? it.next() : fo.createFolder(name); P.setProperty(key, f.getId()); return f; }\n  function readFile(name) { const id = P.getProperty('f_' + name); if (id) { try { return DriveApp.getFileById(id).getBlob().getDataAsString('UTF-8'); } catch (x) {} } return null; }\n  function writeFile(name, text) { const id = P.getProperty('f_' + name); if (id) { try { DriveApp.getFileById(id).setContent(text); return; } catch (x) {} } const f = sub('podatki').createFile(Utilities.newBlob(text, 'application/json', name + '.json')); P.setProperty('f_' + name, f.getId()); }\n  return {\n    folder: folder,\n    prop: function (k) { return P.getProperty(k); }, setProp: function (k, v) { P.setProperty(k, String(v)); },\n    rev: function () { return +(P.getProperty('rev') || 0); }, setRev: function (r) { P.setProperty('rev', String(r)); },\n    sv: function () { return JSON.parse(P.getProperty('sv') || '{}'); }, setSv: function (o) { P.setProperty('sv', JSON.stringify(o)); },\n    load: function (s) { if (cache[s]) return cache[s]; const t = readFile('d-' + s); const d = t ? JSON.parse(t) : { recs: {}, dels: {} }; d.recs = d.recs || {}; d.dels = d.dels || {}; cache[s] = d; return d; },\n    save: function (s, d) { cache[s] = d; writeFile('d-' + s, JSON.stringify(d)); },\n    lock: function (fn) { const l = LockService.getScriptLock(); l.waitLock(60000); try { return fn(); } finally { l.releaseLock(); } },\n    bidx: function () { if (cache.__b) return cache.__b; const t = readFile('blobs'); cache.__b = t ? JSON.parse(t) : {}; return cache.__b; },\n    setBidx: function (o) { cache.__b = o; writeFile('blobs', JSON.stringify(o)); },\n    bwrite: function (h, d) { return sub('priloge').createFile(Utilities.newBlob(d, 'text/plain', h + '.txt')).getId(); },\n    bread: function (id) { try { return DriveApp.getFileById(id).getBlob().getDataAsString('UTF-8'); } catch (x) { return null; } },\n    snapshot: function () {\n      const day = Utilities.formatDate(new Date(), 'Europe/Ljubljana', 'yyyy-MM-dd'); if (P.getProperty('snap') === day) return; P.setProperty('snap', day);\n      const ar = sub('arhiv'), sv = JSON.parse(P.getProperty('sv') || '{}'), all = {};\n      Object.keys(sv).forEach(function (s) { const t = readFile('d-' + s); if (t) all[s] = JSON.parse(t); });\n      ar.createFile(Utilities.newBlob(JSON.stringify({ day: day, rev: +(P.getProperty('rev') || 0), shards: all }), 'application/json', 'stik-arhiv-' + day + '.json'));\n      const old = []; const it = ar.getFiles(); while (it.hasNext()) old.push(it.next()); old.sort(function (a, b) { return b.getDateCreated() - a.getDateCreated(); });\n      old.slice(30).forEach(function (f) { f.setTrashed(true); });\n    }\n  };\n}\n";
+const AS={busy:false,again:false,err:'',msg:'',at:+(LS.get('asAt')||0),dirty:LS.get('asDirty')!=='0',timer:null,first:false,conflicts:0};
+const asCfg=()=>S.settings&&S.settings.as||null;
+const asOn=()=>{const c=asCfg();return !!(c&&c.url&&c.key&&c.on!==false)};
+const SY_LOCAL=new Set([...UI_KEYS,'as','lastDailyBk','lastBackup','lastDrive','gcalLast','lastBackupWarn','topicsSeeded','asKeyNew']);
+const syLocalKey=k=>SY_LOCAL.has(k)||/^mig/.test(k);
+/* ---- big strings (images, files) are sent once, separately, by content hash ---- */
+const BH=new Map(),LB=new Map();
+function bigHash(s){let h=BH.get(s);if(h)return h;let a=5381,b=2166136261;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);a=((a<<5)+a+c)|0;b=Math.imul(b^c,16777619)}h=(a>>>0).toString(36)+(b>>>0).toString(36)+s.length.toString(36);BH.set(s,h);LB.set(h,s);return h}
+const isBig=v=>typeof v==='string'&&v.length>2000&&v.startsWith('data:');
+const extRep=(k,v)=>isBig(v)?'@@b:'+bigHash(v):v;
+function syJ(v){const j=JSON.stringify(v===undefined?null:v,extRep);return{j,h:(hashStr(j)>>>0).toString(36)+'.'+j.length.toString(36)}}
+/* ---- what is synchronised (each record has its own key) ---- */
+function syGroups(){const G=[];
+  const arr=(name,get,save)=>G.push({p:name+'/',list:out=>{(get()||[]).forEach(x=>{if(x&&x.id)out.push([name+'/'+x.id,x])})},apply:(key,v)=>{const id=key.slice(name.length+1),A=get();const i=A.findIndex(x=>x&&x.id===id);if(v===undefined){if(i>=0)A.splice(i,1)}else if(i>=0)A[i]=v;else A.push(v)},save});
+  arr('customers',()=>S.customers,saveCustomers);arr('prices',()=>S.prices,savePrices);arr('todos',()=>S.todos,saveTodos);arr('orders',()=>S.orders,saveOrders);arr('ships',()=>S.ships,saveShips);
+  arr('campaigns',()=>S.campaigns,saveCampaigns);arr('suppliers',()=>S.suppliers,saveSup);arr('pos',()=>S.pos,savePO);arr('claims',()=>S.claims,saveClaims);arr('events',()=>S.events,saveEvents);
+  G.push({p:'quotes/',list:out=>S.quotes.forEach(q=>{if(q&&q.id)out.push(['quotes/'+q.id,q])}),apply:(key,v)=>{const id=key.slice(7),i=S.quotes.findIndex(x=>x.id===id);
+      if(v===undefined){if(i>=0)S.quotes.splice(i,1);AS.ops.push(DB.del('quotes',id));if(cur&&cur.id===id){cur=null;AS.closeCur=true}}
+      else{if(i>=0)S.quotes[i]=v;else S.quotes.push(v);AS.ops.push(DB.put('quotes',clone(v)));if(cur&&cur.id===id){cur=v;AS.reopen=id}}},save:()=>{}});
+  G.push({p:'recs/',list:out=>Object.entries(S.recs||{}).forEach(([k,L])=>(L||[]).forEach(x=>{if(x&&x.id)out.push(['recs/'+k+'/'+x.id,x])})),apply:(key,v)=>{const [,k,id]=key.split('/');const A=R$(k),i=A.findIndex(x=>x&&x.id===id);if(v===undefined){if(i>=0)A.splice(i,1)}else if(i>=0)A[i]=v;else A.push(v)},save:saveRecsNow});
+  G.push({p:'drive/',list:out=>Object.entries(S.drive||{}).forEach(([sp,D])=>{(D.folders||[]).forEach(f=>f&&f.id&&out.push(['drive/'+sp+'/f/'+f.id,f]));(D.items||[]).forEach(x=>x&&x.id&&out.push(['drive/'+sp+'/i/'+x.id,x]))}),
+    apply:(key,v)=>{const [,sp,t,id]=key.split('/');const D=S.drive[sp]=S.drive[sp]||{folders:[],items:[]};D.folders=D.folders||[];D.items=D.items||[];const A=t==='f'?D.folders:D.items;const i=A.findIndex(x=>x&&x.id===id);if(v===undefined){if(i>=0)A.splice(i,1)}else if(i>=0)A[i]=v;else A.push(v)},save:saveDrive});
+  G.push({p:'mk/',list:out=>['posts','ads','assets'].forEach(a=>(S.mk[a]||[]).forEach(x=>x&&x.id&&out.push(['mk/'+a+'/'+x.id,x]))),apply:(key,v)=>{const [,a,id]=key.split('/');const A=S.mk[a]=S.mk[a]||[];const i=A.findIndex(x=>x&&x.id===id);if(v===undefined){if(i>=0)A.splice(i,1)}else if(i>=0)A[i]=v;else A.push(v)},save:saveMk});
+  G.push({p:'mkf/',list:out=>Object.keys(S.mk||{}).forEach(k=>{if(!['posts','ads','assets'].includes(k))out.push(['mkf/'+k,S.mk[k]])}),apply:(key,v)=>{const k=key.slice(4);if(v===undefined)delete S.mk[k];else S.mk[k]=v},save:saveMk});
+  G.push({p:'compf/',list:out=>Object.keys(S.comp||{}).forEach(k=>out.push(['compf/'+k,S.comp[k]])),apply:(key,v)=>{S.comp=S.comp||{};const k=key.slice(6);if(v===undefined)delete S.comp[k];else S.comp[k]=v},save:saveComp});
+  G.push({p:'set/',list:out=>Object.keys(S.settings||{}).forEach(k=>{if(!syLocalKey(k)&&S.settings[k]!==undefined)out.push(['set/'+k,S.settings[k]])}),apply:(key,v)=>{const k=key.slice(4);if(syLocalKey(k))return;if(v===undefined)delete S.settings[k];else S.settings[k]=v;AS.setCh=true},save:()=>DB.put('kv',S.settings,'settings')});
+  G.push({p:'doc/',list:out=>{if(S.shopMeta)out.push(['doc/shopMeta',S.shopMeta])},apply:(key,v)=>{if(key==='doc/shopMeta')S.shopMeta=v===undefined?null:v},save:()=>DB.put('kv',S.shopMeta,'shopMeta')});
+  return G}
+const syGroupOf=(G,key)=>G.find(g=>key.startsWith(g.p));
+async function dbKeys(s){return DB.tx(s,'readonly',o=>o.getAllKeys())}
+/* local index: key → {h, j, v} */
+async function syIndex(){const G=syGroups(),list=[];G.forEach(g=>g.list(list));const idx=new Map();
+  for(const [k,v] of list){const {j,h}=syJ(v);idx.set(k,{h,j})}
+  try{for(const id of await dbKeys('files'))idx.set('files/'+id,{h:'f.'+id,file:id})}catch{}
+  return idx}
+async function syBase(){const b=await DB.get('kv','asBase').catch(()=>null);const u=(asCfg()||{}).url;if(!b||b.url!==u)return{url:u,rev:0,h:{}};return b}
+async function sySaveBase(b){DB.quiet=true;try{await DB.put('kv',b,'asBase')}finally{DB.quiet=false}}
+/* ---- server calls ---- */
+async function asCall(body,ms=90000){const c=asCfg();let r;try{r=await withTimeout(fetch(c.url,{method:'POST',body:JSON.stringify({...body,k:c.key,dev:deviceName()}),redirect:'follow',credentials:'omit'}),ms,'Google se ne odziva')}catch(e){throw new Error(navigator.onLine===false||/fetch|network|load/i.test(e.message||'')?'brez povezave':e.message)}
+  if(!r.ok&&r.status>=500)throw new Error('Google trenutno ni dosegljiv');
+  const t=await r.text();let j;try{j=JSON.parse(t)}catch{throw new Error(/<html/i.test(t)?'naslov ni pravilen ali spletna aplikacija ni objavljena za »Anyone«':'neveljaven odgovor')}
+  if(j.err)throw new Error(j.err==='geslo'?'napačno geslo – povezavo nastavi znova':j.err);return j}
+const refsIn=s=>{const o=new Set();for(const m of s.matchAll(/"@@b:([0-9a-z]+)"/g))o.add(m[1]);return o};
+async function syFetchBlobs(hs){const need=[...hs].filter(h=>!LB.has(h));let n=0;
+  for(let i=0;i<need.length;){const part=need.slice(i,i+25);AS.msg=`Prenašam slike in priloge ${Math.min(i+part.length,need.length)}/${need.length}`;renderSyncPill();
+    const r=await asCall({a:'bget',hs:part});const got=Object.keys(r.b||{});got.forEach(h=>{BH.set(r.b[h],h);LB.set(h,r.b[h])});n+=got.length;if(!got.length)i+=part.length;else i+=got.length===part.length?part.length:got.length}
+  AS.msg='';return n}
+const syInt=j=>JSON.parse(j.replace(/"@@b:([0-9a-z]+)"/g,(m,h)=>LB.has(h)?JSON.stringify(LB.get(h)):'""'));
+const syTime=v=>v&&typeof v==='object'?(+v.updated||+v.created||0):0;
+/* ---- apply changes from other devices (3-way: local / last common state / server) ---- */
+async function syApply(chg,base,idx,mode){if(!chg.length)return 0;const G=syGroups();AS.ops=[];const touched=new Set();let n=0;
+  const refs=new Set();chg.forEach(c=>{if(!c.del&&c.r!==undefined)refsIn(JSON.stringify(c.r)).forEach(h=>refs.add(h))});if(refs.size)await syFetchBlobs(refs);
+  for(const c of chg){const key=c.key,L=idx.get(key),lh=L?L.h:null,bh=base.h[key]??null,rh=c.del?null:c.h;
+    if(lh===rh){if(rh)base.h[key]=rh;else delete base.h[key];continue}
+    const localChanged=mode==='take'?false:lh!==bh;let takeRemote=!localChanged;
+    if(localChanged){if(rh===null)takeRemote=false;else if(lh===null)takeRemote=true;
+      else if(/^set\/next/.test(key)&&typeof c.r==='number'){const lv=JSON.parse(L.j);const mx=Math.max(+lv||0,+c.r||0);if(mx!==+c.r){base.h[key]=rh;AS.conflicts++;continue}takeRemote=true}
+      else{let lv=null;try{lv=JSON.parse(L.j)}catch{}const tr=syTime(c.r),tl=syTime(lv);takeRemote=tr===tl?!base.rev:tr>tl;if(base.rev)AS.conflicts++}}
+    if(!takeRemote){if(rh)base.h[key]=rh;else delete base.h[key];continue}
+    if(key.startsWith('files/')){const id=key.slice(6);if(rh===null)AS.ops.push(DB.del('files',id));else{const rec=syInt(JSON.stringify(c.r));if(rec&&rec.data)AS.ops.push(DB.put('files',rec))}}
+    else{const g=syGroupOf(G,key);if(!g)continue;g.apply(key,rh===null?undefined:syInt(JSON.stringify(c.r)));touched.add(g)}
+    if(rh)base.h[key]=rh;else delete base.h[key];if(L)idx.set(key,{h:rh,j:''});n++}
+  DB.quiet=true;try{for(const g of touched)AS.ops.push(Promise.resolve(g.save()));await Promise.all(AS.ops)}finally{DB.quiet=false}
+  if(n){try{autoBackup()}catch{}AS.changedUI=true}return n}
+function syRefreshUI(){if(!AS.changedUI)return;AS.changedUI=false;try{renderNav()}catch{}
+  if(AS.reopen&&cur&&$('#vEdit').classList.contains('on')){const id=AS.reopen;AS.reopen=null;if(document.activeElement&&$('#edForm').contains(document.activeElement)){toast('Ponudba je bila spremenjena na drugi napravi – prikazana je nova različica.','',6000)}openQuote(id);return}
+  AS.reopen=null;if(AS.closeCur){AS.closeCur=false;showList();return}
+  const on=$('.view.on');if(!on||!$('#modal').hidden||!$('#sheet').hidden)return;const id=on.id;
+  const R=window[{vList:'renderList',vDash:'renderDash',vCust:'renderCustomers',vOrd:'renderOrders',vTodo:'renderTodos',vBuy:'renderBuy',vWar:'renderWar',vMontaze:'renderMontaze',vCal:'renderCal',vMk:'renderMarketing',vComp2:'renderComp',vBank:'renderBank',vPrice:'renderPrices',vShip:'renderShips',vRep:'renderReports'}[id]];
+  try{if(typeof R==='function')R();else if(id==='vMod')renderMod($('#vMod').dataset.mod);else if(id==='vComp')renderCompany();else if(id==='vDrive'){const d=$('#vDrive .drive');if(d)rerenderDrive(d.dataset.space)}}catch(e){console.warn(e)}}
+/* ---- one synchronisation round ---- */
+async function asSync(o={}){if(!asOn())return;if(AS.busy){AS.again=true;return}if(!navigator.onLine&&!o.force){AS.err='brez povezave';renderSyncPill();return}
+  AS.busy=true;AS.err='';renderSyncPill();
+  try{const base=await syBase();let idx=await syIndex();const mode=AS.mode;AS.mode='';
+    // 1) pull
+    let first=null,curs=null,chg=[];do{const r=await asCall({a:'pull',since:base.rev,cur:curs});if(first===null)first=r.rev;chg.push(...(r.chg||[]));curs=r.cur;if(r.more){AS.msg=`Prenašam podatke … ${chg.length}`;renderSyncPill()}}while(curs);
+    if(mode==='take'){const rk=new Set(chg.map(c=>c.key));for(const k of idx.keys())if(!rk.has(k)&&!k.startsWith('files/')&&!k.startsWith('set/'))chg.push({key:k,del:1})}
+    await syApply(chg,base,idx,mode);base.rev=Math.max(base.rev,first||0);await sySaveBase(base);
+    // 2) push local changes
+    if(AS.dirty||o.full||AS.first){for(let round=0;round<4;round++){idx=await syIndex();const ch=[];
+        for(const [k,x] of idx)if(base.h[k]!==x.h)ch.push(k);for(const k of Object.keys(base.h))if(!idx.has(k))ch.push(k);
+        if(!ch.length)break;
+        const items=[];for(const k of ch){const x=idx.get(k);if(!x){items.push({key:k,del:1});continue}
+          if(x.file){const f=await DB.get('files',x.file);if(!f||/^video/.test(f.type||'')||String(f.data||'').length>28e6){base.h[k]=x.h;continue}const {j}=syJ(f);items.push({key:k,h:x.h,j})}else items.push({key:k,h:x.h,j:x.j})}
+        // blobs first
+        const refs=new Set();items.forEach(it=>{if(it.j)refsIn(it.j).forEach(h=>refs.add(h))});const sent=new Set(((await DB.get('kv','asBlobs').catch(()=>null))||{}).hs||[]);
+        let need=[...refs].filter(h=>!sent.has(h));if(need.length){let miss=[];for(let i=0;i<need.length;i+=400)miss.push(...((await asCall({a:'bhas',hs:need.slice(i,i+400)})).miss||[]));
+          const ok=need.filter(h=>!miss.includes(h));ok.forEach(h=>sent.add(h));let i=0;
+          while(i<miss.length){const pack=[];let sz=0;while(i<miss.length&&(sz<3.5e6||!pack.length)){const d=LB.get(miss[i]);if(d){pack.push({h:miss[i],d});sz+=d.length}i++}
+            AS.msg=`Pošiljam slike in priloge ${i}/${miss.length}`;renderSyncPill();if(pack.length){await asCall({a:'bput',b:pack},180000);pack.forEach(p=>sent.add(p.h))}}
+          DB.quiet=true;try{await DB.put('kv',{hs:[...sent]},'asBlobs')}finally{DB.quiet=false}AS.msg=''}
+        // records in chunks
+        let i=0,conf=[];while(i<items.length){const pack=[];let sz=0;while(i<items.length&&(sz<3.5e6||!pack.length)){const it=items[i++];pack.push(it.del?{key:it.key,del:1}:{key:it.key,h:it.h,r:JSON.parse(it.j)});sz+=(it.j||'').length+60}
+          if(items.length>pack.length){AS.msg=`Shranjujem ${Math.min(i,items.length)}/${items.length}`;renderSyncPill()}
+          const r=await asCall({a:'push',base:base.rev,ch:pack},180000);const bad=new Set((r.conflicts||[]).map(c=>c.key));
+          pack.forEach(p=>{if(bad.has(p.key))return;if(p.del)delete base.h[p.key];else base.h[p.key]=p.h});base.rev=r.rev;
+          const others=[...(r.chg||[]),...(r.conflicts||[])];if(others.length){idx=await syIndex();await syApply(others,base,idx,'')}conf.push(...bad);await sySaveBase(base)}
+        AS.msg='';if(!conf.length)break}}
+    AS.dirty=false;LS.set('asDirty','0');AS.first=false;AS.at=Date.now();LS.set('asAt',AS.at);S.settings.lastBackup=Date.now();S.settings.lastDrive=Date.now();
+    DB.quiet=true;try{await DB.put('kv',S.settings,'settings')}finally{DB.quiet=false}
+    if(AS.setCh){AS.setCh=false}syRefreshUI();
+  }catch(e){AS.err=e.message||String(e);console.warn('sync',e);clearTimeout(AS.retry);AS.retry=setTimeout(()=>asSync(),45000)}
+  finally{AS.busy=false;AS.msg='';renderSyncPill();if(AS.again){AS.again=false;setTimeout(()=>asSync(),300)}}}
+const asSoon=debounce(()=>asSync(),2500);
+/* ---- status shown on the cloud pill (no clicking needed) ---- */
+const _syncStateOld=syncState,_syncNowOld=syncNow,_syncBannerOld=syncBanner;
+syncState=function(){if(!asOn())return _syncStateOld();if(AS.msg)return['busy',AS.msg];if(AS.busy)return['busy','Shranjujem v oblak …'];
+  if(AS.err)return['warn',AS.err==='brez povezave'?'Brez interneta – shranjeno na napravi, pošljem samodejno':'Oblak: '+AS.err+' – poskusim znova sam'];
+  if(AS.dirty)return['idle','Shranjujem kmalu …'];return['ok',AS.at?`Shranjeno v oblak ${dtm(AS.at).slice(-5)}`:'Povezano z oblakom']};
+syncNow=function(o){if(asOn())return asSync({force:true});return _syncNowOld(o)};
+syncBanner=function(){return asOn()?'':_syncBannerOld()};
+const _markDirtyOld=markDirty;
+markDirty=function(){if(asOn()){AS.dirty=true;LS.set('asDirty','1');renderSyncPill();asSoon();return}return _markDirtyOld()};
+document.addEventListener('visibilitychange',()=>{if(!asOn())return;if(document.visibilityState==='visible')asSync();else if(AS.dirty)asSync()});
+addEventListener('online',()=>{if(asOn())asSync()});
+addEventListener('focus',()=>{if(asOn()&&Date.now()-AS.lastFocus>15000){AS.lastFocus=Date.now();asSync()}});AS.lastFocus=0;
+setInterval(()=>{if(asOn()&&document.visibilityState==='visible')asSync()},30000);
+/* ---- connect / disconnect ---- */
+function asNewKey(){const a=new Uint8Array(18);crypto.getRandomValues(a);return 'stik-'+[...a].map(x=>x.toString(36).padStart(2,'0')).join('').slice(0,30)}
+function asCodeFor(key){return AS_CODE.replace('__GESLO__',key)}
+const asDevCode=()=>{const c=asCfg();return 'STIK1-'+btoa(JSON.stringify({u:c.url,k:c.key})).replace(/=+$/,'')};
+function asParseCode(t){t=String(t||'').trim();const m=t.match(/STIK1-([A-Za-z0-9+/_-]+)/);if(!m)return null;try{const j=JSON.parse(atob(m[1].replace(/-/g,'+').replace(/_/g,'/')));return j.u&&j.k?{url:j.u,key:j.k}:null}catch{return null}}
+async function asConnect(url,key,{silent}={}){url=String(url||'').trim();if(!/^https:\/\/script\.google(usercontent)?\.com\/.+/.test(url)&&!/^https?:\/\/localhost/.test(url)){toast('Naslov mora biti »https://script.google.com/macros/s/…/exec«.','err',8000);return false}
+  const prev=S.settings.as;S.settings.as={url,key,on:true};busy(true,'Povezujem z Google Drive …');let info;
+  try{info=await asCall({a:'info'},40000)}catch(e){busy(false);S.settings.as=prev;toast('Povezava ni uspela: '+e.message,'err',10000);return false}
+  busy(false);window.__noUnloadWarn=true;await DB.put('kv',S.settings,'settings');
+  const hasLocal=S.quotes.length+S.customers.length+S.orders.length+S.prices.length>0;
+  AS.first=true;AS.dirty=true;
+  if(info.rev>0&&hasLocal&&!silent){const ch=await choose3(`V oblaku so že podatki (zadnja sprememba ${info.at?dtm(info.at):''}${info.dev?' z naprave »'+info.dev+'«':''}). Tudi na tej napravi so podatki. Kaj naj naredim?`,'Združi oboje','Prevzemi podatke iz oblaka (priporočeno)');
+    if(ch<0){toast('Povezava je shranjena, usklajevanje pa ni začeto.');S.settings.as.on=false;await DB.put('kv',S.settings,'settings');return false}
+    try{DB.quiet=true;await DB.put('kv',backupData(),'preSyncCopy')}catch{}finally{DB.quiet=false}if(ch===1)AS.mode='take'}
+  else if(info.rev>0&&!hasLocal){AS.mode='take'}
+  await asSync({full:true,force:true});renderNav();if(!AS.err)toast(info.rev>0?'Povezano. Podatki iz oblaka so preneseni – od zdaj se vse shranjuje samo.':'Povezano. Podatki so poslani v oblak – od zdaj se vse shranjuje samo.','',8000);
+  if($('#vSet').classList.contains('on'))showSettings();return true}
+function asSetupModal(){const key=(asCfg()&&asCfg().key)||S.settings.asKeyNew||(S.settings.asKeyNew=asNewKey());saveSettings();
+  openModal({title:'Samodejno shranjevanje – nastavitev (enkrat)',wide:1,body:`<p style="margin-top:0">Po tej nastavitvi se podatki <b>sami</b> shranjujejo v tvoj Google Drive in usklajujejo med vsemi napravami (Windows, Mac, Linux, Android, iPhone, iPad). Nastaviš samo enkrat, na eni napravi – ostale povežeš s kodo.</p>
+    <ol class="steps">
+      <li><b>Kopiraj kodo:</b> <button class="btn sm sig" data-asc="copy">${ic('copy')}Kopiraj kodo</button> <button class="btn sm" data-asc="dl">${ic('download')}Prenesi kot datoteko</button></li>
+      <li>Odpri <a href="https://script.google.com/create" target="_blank" rel="noopener"><b>script.google.com/create</b></a> (prijavljen z Google računom, kamor želiš shranjevati). Odpre se nov projekt.</li>
+      <li>Levo zgoraj klikni <b>Untitled project</b> in ga preimenuj v <b>STIK Prodaja sinhronizacija</b>.</li>
+      <li>V urejevalniku označi vse (<b>Ctrl+A</b>, Mac: Cmd+A), izbriši in prilepi kodo (<b>Ctrl+V</b>). Klikni ikono diskete <b>Save</b>.</li>
+      <li>Zgoraj desno <b>Deploy → New deployment</b> → pri <i>Select type</i> klikni zobnik ⚙ → <b>Web app</b>.</li>
+      <li><i>Execute as:</i> <b>Me</b> · <i>Who has access:</i> <b>Anyone</b> → <b>Deploy</b>.</li>
+      <li><b>Authorize access</b> → izberi svoj Google račun. Če se pokaže <i>Google hasn't verified this app</i>: <b>Advanced → Go to STIK Prodaja sinhronizacija (unsafe)</b> → <b>Allow</b>. (To je tvoja lastna skripta.)</li>
+      <li>Kopiraj <b>Web app URL</b> (se konča z <code>/exec</code>) → <b>Done</b>, ga prilepi spodaj in klikni <b>Poveži</b>.</li></ol>
+    <label class="fld"><span>Web app URL</span><input data-m="asurl" placeholder="https://script.google.com/macros/s/…/exec" value="${esc((asCfg()||{}).url||'')}"></label>
+    <div class="sub">Ali: ta naprava naj se poveže z že nastavljenim shranjevanjem</div>
+    <label class="fld"><span>Koda za povezavo (dobiš jo na napravi, ki je že povezana: Nastavitve → Shranjevanje → Koda za drugo napravo)</span><input data-m="ascode" placeholder="STIK1-…"></label>`,
+    foot:`<button class="btn" data-md="close">Prekliči</button><span class="grow"></span><button class="btn pri" data-asc="go">${ic('check')}Poveži</button>`,
+    onClick:async e=>{const a=e.target.closest('[data-asc]')?.dataset.asc;if(!a)return;
+      if(a==='copy'){try{await navigator.clipboard.writeText(asCodeFor(key));toast('Koda kopirana – prilepi jo v Apps Script.')}catch{download(new Blob([asCodeFor(key)],{type:'text/plain'}),'stik-sync.gs');toast('Koda je prenesena kot datoteka stik-sync.gs – odpri jo in kopiraj vsebino.','',8000)}return}
+      if(a==='dl'){download(new Blob([asCodeFor(key)],{type:'text/plain'}),'stik-sync.gs');return}
+      if(a==='go'){const v=mdVals();const c=asParseCode(v.ascode);if(c){closeModal();await asConnect(c.url,c.key);return}if(!v.asurl){toast('Prilepi Web app URL ali kodo za povezavo.','err');return}closeModal();await asConnect(v.asurl,key)}}})}
+async function asShareModal(){const code=asDevCode(),link=appRedirectUri()+'#stiksync='+encodeURIComponent(code);
+  openModal({title:'Poveži drugo napravo',body:`<p style="margin-top:0">Na drugi napravi (telefon, tablica, računalnik) najprej namesti program, nato izberi eno možnost:</p>
+    <ol class="steps"><li><b>Telefon s kamero:</b> poskeniraj kodo QR – odpre se program, ki se poveže sam. <div id="asQr" style="margin:8px 0"></div><small class="help">iPhone/iPad: če program uporabljaš z ikono na začetnem zaslonu, uporabi raje možnost 2 (Safari in ikona imata ločene podatke).</small></li>
+    <li><b>Koda:</b> v programu na drugi napravi <i>Nastavitve → Shranjevanje → Samodejno shranjevanje → Nastavi</i> → prilepi kodo v polje <i>Koda za povezavo</i> → <b>Poveži</b>.<div class="inline" style="margin-top:6px"><input class="inp" readonly value="${esc(code)}" onclick="this.select()"><button class="btn sm" data-ash="copy" style="flex:none">${ic('copy')}Kopiraj</button><button class="btn sm" data-ash="mail" style="flex:none">${ic('mail')}Pošlji si</button></div></li></ol>
+    <p class="warnbox">Koda je kot ključ do tvojih podatkov – ne pošiljaj je drugim.</p>`,foot:`<span class="grow"></span><button class="btn pri" data-md="close">Zapri</button>`,
+    onOpen:async()=>{try{await loadScript(CDN.qr);const d=$('#asQr');if(d)new QRCode(d,{text:link,width:180,height:180,correctLevel:QRCode.CorrectLevel.M})}catch{const d=$('#asQr');if(d)d.innerHTML='<small class="help">QR kode ni mogoče prikazati brez interneta – uporabi kodo.</small>'}},
+    onClick:async e=>{const a=e.target.closest('[data-ash]')?.dataset.ash;if(a==='copy'){try{await navigator.clipboard.writeText(code);toast('Koda kopirana.')}catch{prompt('Kopiraj kodo:',code)}}if(a==='mail')location.href=`mailto:?subject=${encodeURIComponent('STIK Prodaja – koda za povezavo naprave')}&body=${encodeURIComponent('Koda: '+code+'\n\nPovezava (odpri na napravi): '+link)}`}})}
+function asPanelHTML(){const c=asCfg(),on=asOn(),[st,tx]=syncState();
+  return `<div class="aspanel ${on?'on':''}"><div class="sub" style="margin-top:0">Samodejno shranjevanje v Google Drive – vse naprave ${ib('Ko je vklopljeno, se vsaka sprememba v nekaj sekundah sama shrani v tvoj Google Drive, druge naprave pa jo same prenesejo (ob odprtju, ob vrnitvi v program in vsakih 30 sekund). Ni gumbov za pošiljanje ali prenos. Če hkrati spremeniš isti zapis na dveh napravah, obvelja kasnejša sprememba; vsi drugi podatki se združijo. Brez interneta delaš normalno – shrani se, ko je povezava spet na voljo.')}</div>
+    ${on?`<div class="kv"><span class="syncpill ${st}" style="position:static">${ic('cloud')}<span>${esc(tx)}</span></span></div><p class="help" style="margin:6px 0">Vse se shranjuje samo. Ta naprava: <b>${esc(deviceName())}</b>${AS.conflicts?` · samodejno razrešenih sočasnih sprememb: ${AS.conflicts}`:''}.</p>
+      <div class="inline" style="flex-wrap:wrap"><button class="btn sig" id="asShare" style="flex:none">${ic('phone')}Koda za drugo napravo</button><button class="btn" id="asNow" style="flex:none">${ic('repeat')}Preveri zdaj</button><button class="btn ghost" id="asOff" style="flex:none">Prekini povezavo</button></div>`
+      :`<p class="help" style="margin:4px 0 8px">Enkratna nastavitev (10 minut), nato se podatki vseh naprav (računalnik, telefon, tablica – Windows, Mac, Linux, Android, iPhone) usklajujejo sami, brez klikanja.</p><div class="inline"><button class="btn sig" id="asSetup" style="flex:none">${ic('cloud')}Nastavi samodejno shranjevanje</button>${c&&c.url?`<button class="btn" id="asOn" style="flex:none">Ponovno vklopi</button>`:''}</div>`}</div>`}
+document.addEventListener('click',async e=>{const t=e.target;if(!t.closest)return;
+  if(t.closest('#asSetup')){asSetupModal();return}if(t.closest('#asShare')){asShareModal();return}
+  if(t.closest('#asNow')){await asSync({force:true,full:true});showSettings();toast(AS.err?'Oblak: '+AS.err:'Vse je shranjeno in usklajeno.');return}
+  if(t.closest('#asOff')){if(!confirm('Prekinem samodejno shranjevanje na tej napravi? Podatki ostanejo na napravi in v Google Drive.'))return;S.settings.as.on=false;await DB.put('kv',S.settings,'settings');renderNav();showSettings();return}
+  if(t.closest('#asOn')){const c=asCfg();await asConnect(c.url,c.key,{silent:true});return}});
+async function asInit(){const m=(location.hash||'').match(/stiksync=([^&]+)/);if(m){history.replaceState(null,'',location.pathname+location.search);const c=asParseCode(decodeURIComponent(m[1]));if(c){setTimeout(()=>asConnect(c.url,c.key),400);return}}
+  if(asOn()){window.__noUnloadWarn=true;setTimeout(()=>asSync({full:AS.dirty}),800)}}
+
 /* ================= toast ================= */
 function toast(msg,type='',ms=3500,action){
   const el=document.createElement('div');el.className='tst'+(type==='err'?' err':'');el.innerHTML=`<span>${esc(msg)}</span>`;
@@ -6480,7 +6656,7 @@ addEventListener('visibilitychange',()=>{if(document.hidden&&cur)saveQuoteNow()}
     const co=S.settings.company;if(co&&co.logo&&!co.logoProc){try{const r=await processLogo(co.logo);Object.assign(co,{logo:r.logo,logoLight:r.light,logoProc:1});saveSettings()}catch{}}
     if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   }
-  if(DB.db){try{await mig24()}catch(e){console.warn('mig24',e)}}
+  if(DB.db){try{await mig24()}catch(e){console.warn('mig24',e)}try{asInit()}catch(e){console.warn('asInit',e)}}
   if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
   // share target (Android: Deli → STIK Prodaja) or ?url=
   const P=new URLSearchParams(location.search),shared=[P.get('url'),P.get('text'),P.get('title')].filter(Boolean).join('\n');

@@ -11,6 +11,7 @@
 | `index.html` | celoten program |
 | `manifest.webmanifest`, `sw.js`, `icon-*.png` | omogočajo namestitev kot aplikacija in delo brez interneta |
 | `worker.js` | neobvezen lasten posrednik (Cloudflare): branje spletnih strani, AI (Claude) in e-pošta prek Brevo |
+| `stik-sync.gs` | koda za Google Apps Script – samodejno shranjevanje v Google Drive na vse naprave (enaka kodi, ki jo kopira program) |
 | `NAVODILA.md`, `NAVODILA.pdf` | ta navodila |
 
 ---
@@ -18,6 +19,59 @@
 ## Hitri začetek: namestitev, posodobitev in shranjevanje
 
 To poglavje je **glavno navodilo** za namestitev in shranjevanje. Če se kje v nadaljevanju opis razlikuje, velja to poglavje.
+
+### Samodejno shranjevanje na vse naprave (priporočeno – od različice 25)
+
+Ko je to nastavljeno, **se ti s shranjevanjem ni treba več ukvarjati**:
+
+- vsaka sprememba se v nekaj sekundah **sama shrani v tvoj Google Drive** (z računalnika, telefona ali tablice – Windows, Mac, Linux, Android, iPhone, iPad);
+- druge naprave spremembe **same prenesejo**: ko odpreš program, ko se vrneš vanj in vsakih 30 sekund, dokler je odprt;
+- **ni več gumbov** *Pošlji* in *Prenesi* in ni prijave v Google na vsaki napravi;
+- program nikoli ne povozi celotnih podatkov: shrani se **vsak zapis posebej** (ponudba, stranka, artikel …). Kar dodaš na telefonu in kar dodaš na računalniku, ostane oboje. Če isti zapis hkrati spremeniš na dveh napravah, obvelja kasnejša sprememba. Številke ponudb se ne podvojijo (vzame se višja);
+- izbrisan zapis ostane izbrisan na vseh napravah;
+- **brez interneta** delaš normalno, podatki so na napravi; ko je internet spet na voljo, se pošljejo sami;
+- slike in priloge se pošljejo **samo enkrat**, zato je usklajevanje hitro;
+- Google Drive vsak dan shrani še **dnevni arhiv** (zadnjih 30 dni) v mapo *STIK Prodaja – sinhronizacija → arhiv*;
+- samodejna kopija v **mapo na disku** računalnika ostane kot dodatna varnost.
+
+Stanje vidiš na ikoni oblačka (računalnik: nad menijem, telefon: zgoraj desno): **zeleno** *Shranjeno v oblak 18:05*, **sivo** *Shranjujem …*, **rumeno** *Brez interneta – shranjeno na napravi, pošljem samodejno*. Klikati ni treba.
+
+#### Nastavitev – enkrat, na računalniku (10 minut)
+
+1. Odpri program → **Nastavitve** → prvi okvir **Shranjevanje v oblak (Google Drive)** → **Nastavi samodejno shranjevanje**.
+2. Klikni **Kopiraj kodo**. (Koda vsebuje tvoje lastno, naključno ustvarjeno geslo.)
+3. Klikni povezavo **script.google.com/create**. Prijavi se z Google računom, kamor želiš shranjevati (npr. *info@pickupoprema.si*). Odpre se nov projekt.
+4. Levo zgoraj klikni **Untitled project** → vpiši **STIK Prodaja sinhronizacija** → **Rename**.
+5. V urejevalniku klikni v besedilo, **Ctrl+A** (Mac: Cmd+A), **Delete**, nato **Ctrl+V** (prilepi kodo). Klikni ikono diskete **Save** (ali Ctrl+S).
+6. Zgoraj desno modri gumb **Deploy → New deployment**.
+7. Pri *Select type* klikni **zobnik ⚙ → Web app**.
+8. *Description:* `STIK` · *Execute as:* **Me** · *Who has access:* **Anyone** → **Deploy**.
+9. **Authorize access** → izberi svoj Google račun.
+    - Če se pokaže *Google hasn't verified this app*: klikni **Advanced** → **Go to STIK Prodaja sinhronizacija (unsafe)**. To je tvoja lastna skripta, zato je varno.
+    - Klikni **Allow**.
+10. Pokaže se **Web app URL** (konča se z `/exec`) → klikni **Copy** → **Done**.
+11. V programu prilepi naslov v polje **Web app URL** → **Poveži**. Program pošlje vse podatke (prvič lahko traja nekaj minut, napredek je na ikoni oblačka).
+
+#### Druge naprave (telefon, tablica, drugi računalnik)
+
+Na napravi najprej **namesti program** (poglavje *Namestitev*), nato:
+
+1. Na **računalniku, ki je že povezan**: *Nastavitve → Shranjevanje v oblak → **Koda za drugo napravo***.
+2. Izberi eno možnost:
+    - **Android, drugi računalnik:** s telefonom **poskeniraj kodo QR** (ali na drugem računalniku odpri povezavo, ki si jo poslal z gumbom *Pošlji si*) – program se odpre in poveže sam;
+    - **iPhone in iPad** (program z ikono na začetnem zaslonu): klikni **Pošlji si** (e-pošta s kodo) ali **Kopiraj**. Na iPhonu kopiraj kodo `STIK1-…` iz e-pošte, odpri program z ikono → **Več → Nastavitve → Nastavi samodejno shranjevanje** → prilepi v polje **Koda za povezavo** → **Poveži**.
+3. Če so na novi napravi že stari podatki, program vpraša: **Prevzemi podatke iz oblaka (priporočeno)** ali *Združi oboje*. Stari podatki naprave se pred tem shranijo kot kopija.
+
+Kodo za povezavo hrani zase – kdor jo ima, lahko dostopa do podatkov.
+
+#### Če se kaj zalomi
+
+- **»napačno geslo«** – na tej napravi znova klikni *Nastavi samodejno shranjevanje* in prilepi kodo za povezavo z druge naprave.
+- **»naslov ni pravilen ali spletna aplikacija ni objavljena za Anyone«** – v Apps Script: **Deploy → Manage deployments → ✎ (Edit)** → *Who has access:* **Anyone** → **Deploy**. Če *Anyone* pri Google Workspace ni na voljo, ga mora skrbnik domene dovoliti (Admin konzola → Aplikacije → Google Workspace → Drive / Apps Script), ali pa skripto namesti v navadnem Gmail računu.
+- **Sprememba kode Apps Script** (npr. nova različica skripte): *Deploy → Manage deployments → ✎ → Version: **New version** → Deploy*. Naslov `/exec` ostane enak, naprav ni treba ponovno povezovati.
+- Ikona je dalj časa rumena z napako – program poskuša sam vsakih 45 sekund. Podatki so medtem varni na napravi.
+
+Nastavitve za **Google Client ID** (spodaj) potrebuješ samo še za **Google koledar** in **pošiljanje e-pošte prek Gmaila**. Za shranjevanje niso več potrebne.
 
 ### Kje so podatki
 
@@ -34,6 +88,8 @@ Pravila:
 - Na **telefonu in tablici** (Android, iPhone, iPad) mape na disku ni mogoče izbrati, ker brskalniki tam tega ne dovolijo. Tam je kopija samo na Google Drive. To je dovolj, ker program usklajuje sam.
 
 ### Namestitev – računalnik DOMA (prvi, glavni)
+
+> Z **samodejnim shranjevanjem** (zgoraj) koraka *Google Client ID* in *Uskladi z Google Drive zdaj* v spodnjih navodilih nista potrebna – namesto njiju napravo povežeš s kodo. Client ID potrebuješ samo za Google koledar in Gmail.
 
 1. Na GitHubu poišči naslov programa: repozitorij → **Settings → Pages** → *Your site is live at …*
 2. Ta naslov odpri v **Chromu** ali **Edgeu** → v naslovni vrstici klikni **Namesti** (ali meni **⋮ → Shrani in deli → Namesti stran kot aplikacijo**). Nastane ikona **STIK Prodaja**.
@@ -65,7 +121,7 @@ Pravila:
 
 Če se na telefonu pokaže napaka **redirect_uri_mismatch**, naslov iz koraka 3 ni vpisan v Google Cloud (ali se razlikuje – preveri poševnico na koncu). Če usklajevanje ne konča v 2 minutah, se prekine in izpiše vzrok.
 
-### Vsakodnevno delo – samodejno usklajevanje
+### Vsakodnevno delo – stari način z gumbom Uskladi zdaj (samo, če samodejno shranjevanje ni nastavljeno)
 
 - **Ko odpreš program**, se na vrhu pokaže rumeno obvestilo. Na telefonu je oblaček zgoraj desno, na računalniku gumb nad menijem. Klikni **Uskladi zdaj**. Brskalnik zahteva klik zaradi Googlove prijave.
 - Program sam ugotovi, kaj je treba narediti:
@@ -1331,15 +1387,17 @@ Iščeš lahko po ponudbah (številka, kupec, izdelek), naročilih, strankah, ce
 
 Podatki v programu ostanejo. Stara leta skriješ z izbiro leta. Seznam arhivov je v **Nastavitve → Arhivi po letih**.
 
-## 25. Novosti v različici 24
+## 25. Novosti v različicah 24 in 25
+
+**Različica 25:** samodejno shranjevanje na vse naprave prek Google Drive (brez gumbov in brez ponovnih prijav) – opis in nastavitev sta v poglavju *Hitri začetek → Samodejno shranjevanje na vse naprave*. Po posodobitvi na 25 ga nastavi enkrat na računalniku, nato poveži še ostale naprave.
 
 ### Kako dobiti novo različico (podatki ostanejo)
 
 1. Na računalniku, kjer delaš, klikni **Uskladi zdaj** (oblaček nad menijem mora biti zelen).
 2. Odpri **github.com** → repozitorij `stikos` → **Add file → Upload files**.
-3. Iz ZIP paketa povleci v okno datoteke **`index.html`**, **`sw.js`**, **`NAVODILA.md`** in **`NAVODILA.pdf`** → spodaj **Commit changes**. `worker.js`, ikon in `manifest.webmanifest` ni treba nalagati (niso spremenjeni).
+3. Iz ZIP paketa povleci v okno datoteke **`index.html`**, **`sw.js`**, **`NAVODILA.md`** in **`NAVODILA.pdf`** → spodaj **Commit changes**. `worker.js`, ikon in `manifest.webmanifest` ni treba nalagati (niso spremenjeni). Datoteka `stik-sync.gs` je samo za Google Apps Script (glej *Samodejno shranjevanje na vse naprave*) – na GitHub je ni treba nalagati, program jo zna tudi sam kopirati.
 4. Počakaj 1–2 minuti. Na **vsaki napravi** zapri program in ga odpri z ikono (na računalniku še **Ctrl + F5**, na Macu **Cmd + Shift + R**).
-5. Preveri, da je naložena nova različica: v meniju **Marketing → Spletne strani** mora biti zavihek **Povezave in raziskave**, izbira na vrhu menija pa se imenuje **Dejavnost**.
+5. Preveri, da je naložena nova različica: v **Nastavitvah** mora biti prvi okvir **Shranjevanje v oblak (Google Drive)**.
 6. Klikni **Uskladi zdaj**.
 
 Ob prvem zagonu program sam: združi podvojene mape (npr. v Tutorialih in Dokumentih), prestavi *Montaže – postopki* v *Tutoriale* in nastavi novi AI model za slike. Nič ni treba narediti ročno.
